@@ -34,7 +34,7 @@
 							<el-table :data="evaluate" border style="width: 100%">
 								<el-table-column type="index" label="序号" width="80">
 								</el-table-column>
-								<el-table-column prop="goods.goods_name" label="商品名称" width="450">
+								<el-table-column prop="goods.title" label="商品名称" width="450">
 								</el-table-column>
 								<el-table-column prop="user.nickname" label="用户名" width="160">
 									<template slot-scope="scope">
@@ -118,7 +118,7 @@
 				console.log(this.all)
 				for (let s in this.all) {
 					let k = this.all[s]
-					let a = k.goods.goods_name
+					let a = k.goods.title
 					if (a.indexOf(key) >= 0) {
 						arr.push(k)
 					}

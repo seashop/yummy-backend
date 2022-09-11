@@ -17,7 +17,7 @@
 							<template>
 								<el-table :data="list" border style="width: 100%">
 									<el-table-column type="index" label="序号" width="50px"></el-table-column>
-									<el-table-column prop="goods_name" label="商品名称"></el-table-column>
+									<el-table-column prop="title" label="商品名称"></el-table-column>
 									<el-table-column prop="img.url" label="图片">
 										<template slot-scope="scope">
 											<template v-if="scope.row.img">
@@ -38,7 +38,7 @@
 									</el-table-column>
 									<el-table-column prop="operation" label="操作" width="300px">
 										<template slot-scope="scope">
-											<el-button @click="edit(scope.row.id,scope.row.goods_name,scope.row.content,
+											<el-button @click="edit(scope.row.id,scope.row.title,scope.row.content,
 											scope.row.img_id,scope.row.stock,scope.row.points)"
 											 type="success" size="small">修改</el-button>
 
@@ -67,7 +67,7 @@
 			<!-- 修改 -->
 			<el-form ref="form" :model="form" label-width="80px">
 				<el-form-item label="商品名称">
-					<el-input v-model="form.goods_name"></el-input>
+					<el-input v-model="form.title"></el-input>
 				</el-form-item>
 				<el-form-item label="商品内容">
 					<el-input v-model="form.content"></el-input>
@@ -102,7 +102,7 @@
 		<el-dialog title="添加商品" :visible.sync="dialogVisibleadd" width="30%">
 			<el-form ref="form" :model="form_pro" label-width="80px">
 				<el-form-item label="商品名称">
-					<el-input v-model="form_pro.goods_name"></el-input>
+					<el-input v-model="form_pro.title"></el-input>
 				</el-form-item>
 				<el-form-item label="商品内容">
 					<el-input v-model="form_pro.content"></el-input>
@@ -161,14 +161,14 @@
 				oid: 0,
 				form: {
 					id: '',
-					goods_name: '',
+					title: '',
 					content: '',
 					img_id: [],
 					stock: '',
 					points: ''
 				},
 				form_pro: {
-					goods_name: '',
+					title: '',
 					content: '',
 					img_id: [],
 					stock: '',
@@ -211,7 +211,7 @@
 					this.form = {}
 					this.upfile_banner_list=[]
 					this.form_pro={
-						goods_name: '',
+						title: '',
 						content: '',
 						img_id: [],
 						stock: '',
@@ -237,9 +237,9 @@
 			add_user() {
 				this.dialogVisibleadd = true
 			},
-			edit(id, goods_name, content, img_id, stock, points) {
+			edit(id, title, content, img_id, stock, points) {
 				this.form.id = id
-				this.form.goods_name = goods_name
+				this.form.title = title
 				this.dialogVisible = true
 				this.form.content = content
 				this.form.img_id = img_id

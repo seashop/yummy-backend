@@ -11,7 +11,7 @@
 				<el-form ref="forms" :model="forms" label-width="120px">
 					<template v-if="show_input">
 						<el-form-item label="商品名称">
-							<el-input v-model="forms.goods_name" style="width:60%"></el-input>
+							<el-input v-model="forms.title" style="width:60%"></el-input>
 						</el-form-item>
 						<el-row>
 							<el-col :span="6">
@@ -237,7 +237,7 @@
 				},
 				category: [],
 				forms: {
-					goods_name: "",
+					title: "",
 					category_id: "",
 					people: "",
 					shipping_fee: "",
@@ -334,7 +334,7 @@
 					this.fullscreenLoading = false;
 					this.caiji_url = ''
 					this.dialogVisible = false
-					this.forms.goods_name = res.data.goods_name
+					this.forms.title = res.data.title
 					let arr = []
 					for (let v in res.data.bannerimgs_url) {
 						let k = res.data.bannerimgs_url[v]

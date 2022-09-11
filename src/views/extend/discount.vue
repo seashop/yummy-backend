@@ -74,14 +74,14 @@
 				oid: 0,
 				form: {
 					id: '',
-					goods_name: '',
+					title: '',
 					content: '',
 					img_id: [],
 					stock: '',
 					points: ''
 				},
 				form_pro: {
-					goods_name: '',
+					title: '',
 					content: '',
 					img_id: [],
 					stock: '',
@@ -133,7 +133,7 @@
 					this.form = {}
 					this.upfile_banner_list = []
 					this.form_pro = {
-							goods_name: '',
+							title: '',
 							content: '',
 							img_id: [],
 							stock: '',

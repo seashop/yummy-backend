@@ -19,9 +19,9 @@
 							<div style="height:20px;">&nbsp;</div>
 							<el-table :data="list" border>
 								<el-table-column type="index" label="序号" width="50px"></el-table-column>
-								<el-table-column prop="goodsinf.goods_name" label="商品名称" width="400">
+								<el-table-column prop="goodsinf.title" label="商品名称" width="400">
 									<template slot-scope="scope">
-										{{scope.row.goodsinf.goods_name}}
+										{{scope.row.goodsinf.title}}
 									</template>
 								</el-table-column>
 								<el-table-column prop="goods_info.imgs" label="图片" width="110">
@@ -77,14 +77,14 @@ import Nav from './components/extend_nav.vue'
 				oid: 0,
 				form: {
 					id: '',
-					goods_name: '',
+					title: '',
 					content: '',
 					img_id: [],
 					stock: '',
 					points: ''
 				},
 				form_pro: {
-					goods_name: '',
+					title: '',
 					content: '',
 					img_id: [],
 					stock: '',
@@ -108,7 +108,7 @@ import Nav from './components/extend_nav.vue'
 					this.form = {}
 					this.upfile_banner_list = []
 					this.form_pro = {
-							goods_name: '',
+							title: '',
 							content: '',
 							img_id: [],
 							stock: '',

@@ -27,7 +27,7 @@
 						<el-table-column prop="order_num" label="订单号" width="180"></el-table-column>
 						<el-table-column label="商品名称" width="280">
 							<template slot-scope="scope">
-								<div v-for="item,key of scope.row.ordergoods">{{item.goods_name | ellipsis}}</div>
+								<div v-for="item,key of scope.row.ordergoods">{{item.title | ellipsis}}</div>
 							</template>
 						</el-table-column>
 						<el-table-column label="订单价格" width="100">

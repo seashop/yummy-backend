@@ -60,7 +60,7 @@
 											<div class="pro">
 												<div class="pro_02"><img :src="scope.row.img_id.full_url" /></div>
 												<div class="pro_03">
-													<div class="pro_03_1">{{scope.row.goods_name}}</div>
+													<div class="pro_03_1">{{scope.row.title}}</div>
 													<div class="pro_03_2">¥{{scope.row.price}}</div>
 												</div>
 											</div>
@@ -93,7 +93,7 @@
 											<div class="pro">
 												<div class="pro_02"><img :src="tableData[scope.row].img_id" /></div>
 												<div class="pro_03">
-													<div class="pro_03_1">{{tableData[scope.row].goods_name}}</div>
+													<div class="pro_03_1">{{tableData[scope.row].title}}</div>
 													<div class="pro_03_2">¥{{tableData[scope.row].price}}</div>
 												</div>
 											</div>
@@ -330,9 +330,9 @@
 				this.dialogVisibleadd = true
 			},
 
-			edit(id, goods_name, content, img_id, stock, points) {
+			edit(id, title, content, img_id, stock, points) {
 				this.form.id = id
-				this.form.goods_name = goods_name
+				this.form.title = title
 				this.form.content = content
 				this.form.img_id = img_id
 				this.form.stock = stock

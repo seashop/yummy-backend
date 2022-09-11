@@ -42,7 +42,7 @@
 								<div style="display: flex;">
 									<div class="product-img" v-if="scope.row.imgs"><img :src="$getimg+scope.row.imgs"></div>
 									<div class="product-mes">
-										<p>{{scope.row.goods_name}}</p>
+										<p>{{scope.row.title}}</p>
 										<p>{{scope.row.description}}</p>
 									</div>
 								</div>
@@ -155,7 +155,7 @@
 				// this.getProductList(1, this.value);
 				let arr = []
 				for (let s of this.allB) {
-					let a = s.goods_name.indexOf(key)
+					let a = s.title.indexOf(key)
 					if (a >= 0) {
 						arr.push(s)
 					}

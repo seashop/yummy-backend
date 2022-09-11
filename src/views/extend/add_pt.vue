@@ -95,7 +95,7 @@
 
 												<div class="pro_02"><img :src="getimg +scope.row.imgs" /></div>
 												<div class="pro_03">
-													<div class="pro_03_1">{{scope.row.goods_name}}</div>
+													<div class="pro_03_1">{{scope.row.title}}</div>
 													<div class="pro_03_2">¥{{scope.row.price}}</div>
 												</div>
 											</div>
@@ -128,7 +128,7 @@
 											<div class="pro">
 												<div class="pro_02"><img :src="getimg + tableData[scope.row].imgs" /></div>
 												<div class="pro_03">
-													<div class="pro_03_1">{{tableData[scope.row].goods_name}}</div>
+													<div class="pro_03_1">{{tableData[scope.row].title}}</div>
 													<div class="pro_03_2">¥{{tableData[scope.row].price}}</div>
 												</div>
 											</div>

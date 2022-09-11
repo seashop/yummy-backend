@@ -78,7 +78,7 @@
 				oid: 0,
 				form: {
 					id: '',
-					goods_name: '',
+					title: '',
 					content: '',
 					img_id: [],
 					stock: '',

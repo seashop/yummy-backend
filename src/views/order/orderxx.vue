@@ -38,7 +38,7 @@
 											<div class="sea_02_01_l">商品名：</div>
 											<div class="sea_02_01_r">
 												<el-input v-model="search_form.pro_name" placeholder="请输入商品名"></el-input>
-												<el-button size="small" style="margin-left: 10px;" type="success" @click="search('goods_name')">搜索</el-button>
+												<el-button size="small" style="margin-left: 10px;" type="success" @click="search('title')">搜索</el-button>
 											</div>
 										</div>
 										<div class="sea_02_01">
@@ -90,7 +90,7 @@
 								<el-table-column prop="order_num" label="订单号" width="180"></el-table-column>
 								<el-table-column label="商品名称" prop="goods_id" width="280" :filters="goods_list" :filter-method="filterHandler">
 									<template slot-scope="scope">
-										<div v-for="(item,key) of scope.row.ordergoods">{{item.goods_name | ellipsis}}</div>
+										<div v-for="(item,key) of scope.row.ordergoods">{{item.title | ellipsis}}</div>
 									</template>
 								</el-table-column>
 								<el-table-column label="订单价格" width="100">
@@ -336,14 +336,14 @@
 				oid: 0,
 				form: {
 					id: '',
-					goods_name: '',
+					title: '',
 					content: '',
 					img_id: [],
 					stock: '',
 					points: ''
 				},
 				form_pro: {
-					goods_name: '',
+					title: '',
 					content: '',
 					img_id: [],
 					stock: '',
@@ -475,9 +475,9 @@
 						}
 						for (let g in v.ordergoods) {
 							let h = v.ordergoods[g]
-							brr[h.goods_id] = h.goods_name
+							brr[h.goods_id] = h.title
 							// brr.push({
-							// 	value: h.goods_name,
+							// 	value: h.title,
 							// 	id: h.goods_id
 							// })
 						}
@@ -665,9 +665,9 @@
 				this.dialogVisibleadd = true
 			},
 
-			edit(id, goods_name, content, img_id, stock, points) {
+			edit(id, title, content, img_id, stock, points) {
 				this.form.id = id
-				this.form.goods_name = goods_name
+				this.form.title = title
 				this.dialogVisible = true
 				this.form.content = content
 				this.form.img_id = img_id

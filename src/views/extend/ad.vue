@@ -29,7 +29,7 @@
 											&emsp;&emsp;
 											<el-select v-if="type_list.length" v-model="form.jump_id" @change="choose">
 												<template v-for="(item,index) of type_list">
-													<el-option v-if="is_goods == 1" :key="index" :value="item.goods_id" :label="item.goods_name"></el-option>
+													<el-option v-if="is_goods == 1" :key="index" :value="item.goods_id" :label="item.title"></el-option>
 													<el-option v-if="is_goods == 0" :key="index" :value="item.id" :label="item.title"></el-option>
 												</template>
 											</el-select>
@@ -272,7 +272,8 @@
 				this.img_list = []
 				let obj = {
 					id: '',
-					url: ''
+					url: '',
+					full_url: '',
 				}
 				this.http.get('banner/get_banner_content?id=' + id)
 					.then((res) => {
@@ -284,6 +285,7 @@
 						this.is_change(res.data.type)
 						obj.id = res.data.img_id
 						obj.url = res.data.imgs.url
+						obj.full_url = res.data.imgs.full_url
 						this.img_list.push(obj)
 						// console.log(this.img_list)
 					})

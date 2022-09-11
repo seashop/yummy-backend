@@ -38,7 +38,7 @@
 										<div class="sea_02_01_l">商品名：</div>
 										<div class="sea_02_01_r">
 											<el-input v-model="search_form.pro_name" placeholder="请输入商品名"></el-input>
-											<el-button size="small" style="margin-left: 10px;" type="success" @click="search('goods_name')">搜索</el-button>
+											<el-button size="small" style="margin-left: 10px;" type="success" @click="search('title')">搜索</el-button>
 										</div>
 									</div>
 									<div class="sea_02_01">

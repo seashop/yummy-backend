@@ -93,7 +93,7 @@
 
 												<div class="pro_02"><img :src="getimg +scope.row.imgs" /></div>
 												<div class="pro_03">
-													<div class="pro_03_1">{{scope.row.goods_name}}</div>
+													<div class="pro_03_1">{{scope.row.title}}</div>
 													<div class="pro_03_2">¥{{scope.row.price}}</div>
 												</div>
 											</div>
@@ -126,7 +126,7 @@
 											<div class="pro">
 												<div class="pro_02"><img :src="getimg + scope.row.imgs" /></div>
 												<div class="pro_03">
-													<div class="pro_03_1">{{scope.row.goods.goods_name}}</div>
+													<div class="pro_03_1">{{scope.row.goods.title}}</div>
 													<div class="pro_03_2">¥{{scope.row.goods.price}}</div>
 												</div>
 											</div>
@@ -297,7 +297,7 @@
 				let obj_2 = {
 					goods_id: item.goods_id,
 					goods: {
-						goods_name: item.goods_name,
+						title: item.title,
 						price: item.price
 					},
 					price: '',

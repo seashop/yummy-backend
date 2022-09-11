@@ -72,7 +72,7 @@
 							<el-table-column type="index" width="50"></el-table-column>
 							<el-table-column label="商品名称" width="400">
 								<template slot-scope="scope">
-									<div style="width:80%;">{{scope.row.goods_name | ellipsis}}</div>
+									<div style="width:80%;">{{scope.row.title | ellipsis}}</div>
 								</template>
 							</el-table-column>
 							<el-table-column label="规格" width="200">
