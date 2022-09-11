@@ -32,7 +32,6 @@
 
 						<template>
 							<el-table :data="evaluate" border style="width: 100%">
-
 								<el-table-column type="index" label="序号" width="80">
 								</el-table-column>
 								<el-table-column prop="goods.goods_name" label="商品名称" width="450">
@@ -166,7 +165,7 @@
 					cancelButtonText: '取消',
 					type: 'warning'
 				}).then(() => {
-					orderModel.del_evaluate(id).then(res=>{
+					orderModel.del_evaluate(id).then(() => {
 						that.$message({
 							showClose: true,
 							message: '删除成功',
