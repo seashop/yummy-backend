@@ -47,7 +47,7 @@
 									</el-table-column>
 									<el-table-column  label="分类图片">
 										<template slot-scope="scope">
-											<img v-if="scope.row.category_pic" style="width: 60px;height: 60px;" :src="getimg + scope.row.category_pic" />
+											<img v-if="scope.row.pic_full_url" style="width: 60px;height: 60px;" :src="scope.row.pic_full_url" />
 										</template>
 									</el-table-column>
 									<el-table-column prop="level" label="操作">

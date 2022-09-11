@@ -1,5 +1,5 @@
 // const Api_url = '/../'
-const Api_url = 'http://localhost:8000'
+const Api_url = '/api/v0'
 
 const IsDemo = false
 

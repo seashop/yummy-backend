@@ -85,7 +85,7 @@
 									<el-table-column prop="" label="">
 										<template slot-scope="scope">
 											<div class="pro">
-												<div class="pro_02"><img :src="getimg + scope.row.img_id" /></div>
+												<div class="pro_02"><img :src="scope.row.img_id.full_url" /></div>
 												<div class="pro_03">
 													<div class="pro_03_1">{{scope.row.goods_name}}</div>
 													<div class="pro_03_2">¥{{scope.row.price}}</div>

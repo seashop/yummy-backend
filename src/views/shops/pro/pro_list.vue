@@ -52,7 +52,7 @@
 											<el-table-column label="商品名称" width="550">
 												<template slot-scope="scope">
 													<div style="display: flex;">
-														<div class="product-img" v-if="scope.row.img_id"><img :src="getimg+scope.row.img_id"></div>
+														<div class="product-img" v-if="scope.row.img_id"><img :src="scope.row.img_id.full_url"></div>
 														<div class="product-mes">
 															<p>{{scope.row.goods_name}}</p>
 															<p>{{scope.row.description}}</p>

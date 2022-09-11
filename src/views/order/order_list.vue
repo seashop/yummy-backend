@@ -115,7 +115,7 @@
 								<div class="order-01-2">
 									<div class="order-01-2-01" v-for="(ite,index) of item.ordergoods" :key="index">
 										<img v-if="!ite.pic" src="@/img/1.jpg" />
-										<img style="width: 6.5rem; height: 6.5rem;" v-else :src="geting+ite.pic" />
+										<img style="width: 6.5rem; height: 6.5rem;" v-else :src="ite.pic.full_url" />
 										<div class="order-01-2-01-name">{{ite.goods_name}}&nbsp;x{{ite.number}}</div>
 										
 									</div>

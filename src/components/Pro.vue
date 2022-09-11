@@ -82,13 +82,12 @@
 										<template v-if="img_list.length > 0">
 											<div style="display: flex; width:700px ; flex-wrap: wrap;">
 												<template v-for="(item,index) of img_list">
-
 													<div class="picA" v-if="img_list.length > 0">
 														<template v-if="is_caiji == 1">
 															<img class="img" :src="item">
 														</template>
 														<template v-else>
-															<img class="img" :src="getimg + item">
+															<img class="img" :src="item.full_url">
 														</template>
 														<i class="el-icon-circle-close" @click="del_img(index)"></i>
 													</div>
@@ -111,7 +110,7 @@
 															<img class="img" :src="item">
 														</template> -->
 														<template>
-															<img class="img" :src="getimg + item">
+															<img class="img" :src="item.full_url">
 														</template>
 														<i class="el-icon-circle-close" @click="del_img_detail(index)"></i>
 													</div>
@@ -358,7 +357,7 @@
 				console.log(this.img_list)
 				for (let k in e) {
 					const v = e[k]
-					this.img_list.push(v.url)
+					this.img_list.push(v)
 				}
 				this.length = 6 - this.img_list.length
 				console.log('get_img_end:', e, this.img_list)
@@ -369,7 +368,7 @@
 				this.drawer_detail = false
 				for (let k in e) {
 					const v = e[k]
-					this.img_list_detail.push(v.url)
+					this.img_list_detail.push(v)
 				}
 				this.length_detail = 6 - this.img_list_detail.length
 			},
@@ -635,11 +634,9 @@
 				});
 				var that = this;
 				proModel.get_pro_byID(id).then(res=>{
-					for (var k in res.data.bannerimgs_list) {
-						const v = res.data.bannerimgs_list[k]
-						that.img_list[k] = {}
-						that.img_list[k]['id'] = v.id
-						that.img_list[k]['url'] = v.url
+					for (var k in res.data.bannerimgs) {
+						const v = res.data.bannerimgs[k]
+						that.img_list[k] = v
 					}
 					for (var x in that.forms) {
 						that.forms[x] = res.data[x];
@@ -658,9 +655,9 @@
 					this.forms.tag_ids = res.data.tag_ids
 					
 					this.forms.bannerimgs = res.data.bannerimgs
-					this.img_list = res.data.bannerimgs.split(',')
+					this.img_list = res.data.bannerimgs
 					this.forms.detailimgs = res.data.detailimgs
-					this.img_list_detail = res.data.detailimgs.split(',')
+					this.img_list_detail = res.data.detailimgs
 					if(!this.forms.detailimgs){
 						this.forms.detailimgs = []
 						this.img_list_detail = []

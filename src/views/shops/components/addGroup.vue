@@ -18,13 +18,12 @@
 					</el-select>
 				</el-form-item>
 				<el-form-item label="分类图片" :label-width="formLabelWidth">
-			
 					<template v-if="img_list.length > 0">
 						<div style="display: flex; width:530px ; flex-wrap: wrap;">
 							<template v-for="(item,index) of img_list">
 								<i class="el-icon-circle-close" @click="delimg(index)"></i>
 								<div class="picA" v-if="img_list.length > 0">
-									<img class="img" :src="getimg + item.url">
+									<img class="img" :src="item.full_url">
 								</div>
 							</template>
 						</div>
