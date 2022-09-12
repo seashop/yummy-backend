@@ -1,10 +1,19 @@
+import { ImageModel } from "/@/api/asset/model/imageModel";
+
 export interface GoodsModel {
-  icon: string;
+  goods_id: number;
   title: string;
-  value: number;
-  total: number;
-  color: string;
-  action: string;
+  market_price: number;
+  price: number;
+  stock: number;
+  sales: number;
+  is_hot: boolean;
+  is_recommend: boolean;
+  is_new: boolean;
+  state: boolean;
+  img_id: number;
+  img: ImageModel;
+  sort: number;
 }
 
 export interface selectParams {

@@ -38,7 +38,7 @@
   import { ImageModel } from '/@/api/asset/model/imageModel';
 
   export default defineComponent({
-    name: 'RoleDrawer',
+    name: 'CategoryDrawer',
     components: { Image, BasicModal, BasicForm, PictureDrawer, BasicButton },
     emits: ['success', 'register'],
     setup(_, { emit }) {

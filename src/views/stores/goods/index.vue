@@ -1,66 +1,202 @@
 <template>
-  <BasicTable
-    @register="registerTable"
-    :rowSelection="{ type: 'checkbox', selectedRowKeys: checkedKeys, onChange: onSelectChange }"
-  >
-    <template #form-custom> custom-slot </template>
-    <template #headerTop>
-      <a-alert type="info" show-icon>
-        <template #message>
-          <template v-if="checkedKeys.length > 0">
-            <span>已选中{{ checkedKeys.length }}条记录(可跨页)</span>
-            <a-button type="link" @click="checkedKeys = []" size="small">清空</a-button>
-          </template>
-          <template v-else>
-            <span>未选中任何项目</span>
-          </template>
+  <div>
+    <BasicTable @register="registerTable">
+      <template #toolbar>
+        <a-button type="primary" @click="handleCreate"> 新增商品 </a-button>
+      </template>
+      <template #bodyCell="{ column, record }">
+        <template v-if="['is_hot', 'is_recommend', 'is_new', 'state'].indexOf(column.key) !== -1">
+          <Switch v-model:checked="record[column.key]" @change="toggleSwitch(record, column.key)" />
         </template>
-      </a-alert>
-    </template>
-    <template #toolbar>
-      <a-button type="primary" @click="getFormValues">获取表单数据</a-button>
-    </template>
-  </BasicTable>
+        <template v-else-if="column.key === 'title'">
+          <div style="display: flex">
+            <div class="product-img" v-if="record.img_id">
+              <img :src="record.img_id.full_url" />
+            </div>
+            <div class="product-mes">
+              <p>{{ record.title }}</p>
+              <p>{{ record.description }}</p>
+            </div>
+          </div>
+        </template>
+        <template v-else-if="column.key === 'action'">
+          <TableAction
+            :actions="[
+              {
+                icon: 'clarity:note-edit-line',
+                onClick: handleEdit.bind(null, record),
+              },
+              {
+                icon: 'ant-design:delete-outlined',
+                color: 'error',
+                popConfirm: {
+                  title: '是否确认删除',
+                  placement: 'left',
+                  confirm: handleDelete.bind(null, record),
+                },
+              },
+            ]"
+          />
+        </template>
+      </template>
+    </BasicTable>
+    <GoodsModal @register="registerModal" @success="handleSuccess" />
+  </div>
 </template>
-<script lang="ts">
-  import { defineComponent, ref } from 'vue';
-  import { BasicTable, useTable } from '/@/components/Table';
-  import { getBasicColumns, getFormConfig } from './tableData';
-  import { Alert } from 'ant-design-vue';
 
-  import { demoListApi } from '/@/api/demo/table';
+<script lang="ts">
+  import { defineComponent } from 'vue';
+
+  import { Switch } from 'ant-design-vue';
+  import { BasicTable, useTable, TableAction } from '/@/components/Table';
+  import { createGoods, listGoods, updateGoods, switchGoods } from '/@/api/stores/goods';
+
+  import { useModal } from '/@/components/Modal';
+  import GoodsModal from './GoodsModal.vue';
+
+  import { columns, searchFormSchema } from './goods.data';
+  import { GoodsModel } from '/@/api/stores/model/goodsModel';
 
   export default defineComponent({
-    components: { BasicTable, AAlert: Alert },
+    name: 'GoodsManagement',
+    components: { BasicTable, GoodsModal, TableAction, Switch },
     setup() {
-      const checkedKeys = ref<Array<string | number>>([]);
-      const [registerTable, { getForm }] = useTable({
-        title: '开启搜索区域',
-        api: demoListApi,
-        columns: getBasicColumns(),
+      const [registerModal, { openModal }] = useModal();
+      const [registerTable, { reload }] = useTable({
+        title: '产品列表',
+        api: listGoods,
+        columns,
+        formConfig: {
+          labelWidth: 120,
+          schemas: searchFormSchema,
+        },
         useSearchForm: true,
-        formConfig: getFormConfig(),
         showTableSetting: true,
-        tableSetting: { fullScreen: true },
+        bordered: true,
         showIndexColumn: false,
-        rowKey: 'id',
+        actionColumn: {
+          width: 80,
+          title: '操作',
+          dataIndex: 'action',
+          // slots: { customRender: 'action' },
+          fixed: undefined,
+        },
       });
 
-      function getFormValues() {
-        console.log(getForm().getFieldsValue());
+      function toggleSwitch(record: GoodsModel, key: string) {
+        switchGoods(record.goods_id, key);
       }
 
-      function onSelectChange(selectedRowKeys: (string | number)[]) {
-        console.log(selectedRowKeys);
-        checkedKeys.value = selectedRowKeys;
+      function handleCreate() {
+        openModal(true, {
+          isUpdate: false,
+        });
+      }
+
+      function handleEdit(record: Recordable) {
+        openModal(true, {
+          record,
+          isUpdate: true,
+        });
+      }
+
+      function handleDelete(record: Recordable) {
+        console.log(record);
+      }
+
+      function handleSuccess({ isUpdate, values }) {
+        if (isUpdate) {
+          const result = updateGoods(values);
+          console.log(result);
+        } else {
+          const result = createGoods(values);
+          console.log(result);
+        }
+        reload();
       }
 
       return {
         registerTable,
-        getFormValues,
-        checkedKeys,
-        onSelectChange,
+        registerModal,
+        toggleSwitch,
+        handleCreate,
+        handleEdit,
+        handleDelete,
+        handleSuccess,
       };
     },
   });
 </script>
+
+<style lang="less">
+	.pro_list {
+		.pro-list {
+			line-height: 30px;
+			text-align: left;
+		}
+
+		.list-a {
+			line-height: 30px;
+			background-color: #fff;
+
+			text-align: left;
+		}
+
+		.tab-btn {
+			margin: 0 0 20px;
+		}
+
+		.list {
+			line-height: 30px;
+			text-align: left;
+		}
+
+		.list-head {
+			padding-bottom: 10px;
+			display: flex;
+		}
+
+		.liat-head-02 {
+			font-size: 14px;
+			padding-left: 10px
+		}
+
+		.product-img {
+			display: inline-block;
+			width: 60px;
+		}
+
+		.product-img img {
+			height: 60px;
+			width: 60px;
+			margin: 10px;
+			margin-bottom: 20px;
+		}
+
+		.product-mes {
+			display: inline-block;
+			// width: 220px;
+			margin-left: 30px;
+		}
+
+		.product-mes p {
+			line-height: 30px;
+			margin-top: 2px;
+			overflow: hidden;
+			height: 30px
+		}
+
+		.product-mes-name {
+			line-height: 30px;
+			overflow: hidden;
+			height: 30px
+		}
+
+		.order-back {
+			line-height: 30px;
+			padding-bottom: 10px;
+			text-align: left;
+			padding-left: 50px
+		}
+	}
+</style>
