@@ -3,13 +3,18 @@
 </template>
 <script lang="ts">
   import { basicProps } from './props';
+  import { concat, max } from 'lodash-es';
 </script>
 <script lang="ts" setup>
   import { onMounted, ref, Ref } from 'vue';
   import { useECharts } from '/@/hooks/web/useECharts';
 
-  defineProps({
+  const props = defineProps({
     ...basicProps,
+    options: {
+      type: Object,
+      default: () => {},
+    },
   });
   const chartRef = ref<HTMLDivElement | null>(null);
   const { setOptions } = useECharts(chartRef as Ref<HTMLDivElement>);
@@ -28,7 +33,7 @@
       xAxis: {
         type: 'category',
         boundaryGap: false,
-        data: [...new Array(18)].map((_item, index) => `${index + 6}:00`),
+        data: props.options.xData ?? [],
         splitLine: {
           show: true,
           lineStyle: {
@@ -44,7 +49,7 @@
       yAxis: [
         {
           type: 'value',
-          max: 80000,
+          max: max(concat(props.options.yData.orders, props.options.yData.users)),
           splitNumber: 4,
           axisTick: {
             show: false,
@@ -60,11 +65,9 @@
       grid: { left: '1%', right: '1%', top: '2  %', bottom: 0, containLabel: true },
       series: [
         {
+          name: 'Orders',
           smooth: true,
-          data: [
-            111, 222, 4000, 18000, 33333, 55555, 66666, 33333, 14000, 36000, 66666, 44444, 22222,
-            11111, 4000, 2000, 500, 333, 222, 111,
-          ],
+          data: props.options.yData.orders ?? [],
           type: 'line',
           areaStyle: {},
           itemStyle: {
@@ -72,11 +75,9 @@
           },
         },
         {
+          name: 'Users',
           smooth: true,
-          data: [
-            33, 66, 88, 333, 3333, 5000, 18000, 3000, 1200, 13000, 22000, 11000, 2221, 1201, 390,
-            198, 60, 30, 22, 11,
-          ],
+          data: props.options.yData.users ?? [],
           type: 'line',
           areaStyle: {},
           itemStyle: {
