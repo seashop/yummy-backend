@@ -7,8 +7,6 @@ import 'element-ui/lib/theme-chalk/index.css';
 import http from './common/axios.js' //找到该文件,修改API网址 
 
 import {Api_url} from './common/config'
-import {Api_url_img} from './common/config'
-
 
 Vue.prototype.http = http	//全局调用axios  
 
