@@ -62,7 +62,7 @@
     },
     props: {
       limit: {
-        type: Number as PropType<Number>,
+        type: Number as PropType<number>,
         default: 1,
       },
       images: {
@@ -76,11 +76,13 @@
     setup(props, { emit }) {
       const activeKey = ref('1');
       const checkList = ref<Number[]>([]);
+      const data = ref<any>();
 
       const { createMessage } = useMessage();
 
-      const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(async (data) => {
-        console.log(data);
+      const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(async (payload) => {
+        checkList.value = [];
+        data.value = payload;
         setDrawerProps({ confirmLoading: false });
       });
 
@@ -115,7 +117,7 @@
         try {
           setDrawerProps({ confirmLoading: true });
           closeDrawer();
-          emit('success', checkList.value);
+          emit('success', {data: data.value, value: checkList.value});
         } finally {
           setDrawerProps({ confirmLoading: false });
         }

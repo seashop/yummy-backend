@@ -16,6 +16,17 @@ export interface GoodsModel {
   bannerimgs: Array<number>;
   detailimgs: Array<number>;
   sort: number;
+  sku_arr: GoodsSkuArr;
+}
+
+export interface GoodsSkuArr {
+  tree: Array<Object>;
+  list: Array<GoodsSkuItem>;
+}
+
+export interface GoodsSkuItem {
+  price?: number;
+  stock_num?: number;
 }
 
 export interface selectParams {

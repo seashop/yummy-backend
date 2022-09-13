@@ -139,6 +139,7 @@ export const formSchema: FormSchema[] = [
     label: '使用SKU',
     required: true,
     component: 'Switch',
+    defaultValue: false,
   },
   {
     field: 'sku',

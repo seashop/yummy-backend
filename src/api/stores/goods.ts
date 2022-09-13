@@ -3,6 +3,7 @@ import { GoodsModel, selectParams } from './model/goodsModel';
 
 enum Api {
   CreateGoods = '/product/admin/add_product',
+  GetGoods = '/product/get_product',
   UpdateGoods = '/product/admin/edit_product',
   ListGoods = '/product/admin/all_goods_info',
   SwitchGoods = '/order/admin/update',
@@ -14,6 +15,12 @@ enum Api {
 
 export const listGoods = (params?: selectParams) => {
   return defHttp.get<GoodsModel>({ url: Api.ListGoods, params });
+};
+
+export const getGoods = (id: number) => {
+  return defHttp.get<GoodsModel>({ url: Api.GetGoods, params: {
+    id,
+  } });
 };
 
 export const createGoods = (data?: GoodsModel) => {

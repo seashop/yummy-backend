@@ -4,14 +4,14 @@
       <div class="form-h">商品规格</div>
       <div class="form-item" v-for="(attr, index) in attrs" :key="index">
         <div class="form-title">
-          <Input class="sku-name" v-model="attr.pName" placeholder="规格名" />
-          <Checkbox v-model="checked" v-if="index == 0">添加规格图片</Checkbox>
+          <Input class="sku-name" v-model:value="attr.pName" placeholder="规格名" />
+          <Checkbox v-model:value="checked" v-if="index == 0">添加规格图片</Checkbox>
           <span class="delete" @click="toDelete(index)">×</span>
         </div>
         <ul class="form-list">
           <li v-for="(item, index2) in attr.spec" :key="index2">
             <div class="spgg_r_02_2">
-              <Input v-model="item.cName"></Input>
+              <Input v-model:value="item.cName" />
               <div class="in_clo" @click="del_canshu(index, index2)">
                 <i class="el-icon-error" style="color: #cecece"></i>
               </div>
@@ -25,7 +25,7 @@
           </li>
           <li>
             &emsp;
-            <button class="btn" type="button" name @click="add_canshu(index)">添加</button>
+            <button class="btn" type="button" @click="add_canshu(index)">添加</button>
           </li>
         </ul>
         <div class="spgg_r_04" v-if="checked && index == 0">
@@ -34,13 +34,14 @@
       </div>
       <div class="form-btn-group">
         <Button
-          size="mini"
+          size="small"
           :disabled="attrs.length == 3 ? true : false"
-          type="button"
+          type="default"
           name
           @click="addItem"
-          >添加规格项目</Button
         >
+          添加规格项目
+        </Button>
       </div>
       <div class="form-table" v-show="tableData">
         <div class="stock-title">商品库存</div>
@@ -54,76 +55,86 @@
           </thead>
           <tbody>
             <tr v-for="row in rows" :key="row">
-              <td
-                v-for="(item, index2) in tableData"
-                v-if="!((row - 1) % item['rowspan'])"
-                :rowspan="item['rowspan']"
-                :key="index2"
-                >{{ item | getName(row) }}</td
-              >
+              <template v-for="(item, index2) in tableData">
+                <td v-if="!((row - 1) % item.rowspan)" :rowspan="item.rowspan" :key="index2">
+                  {{ getName(item, row) }}
+                </td>
+              </template>
               <td>
-                <input v-model="tableList[row - 1]['price']" placeholder="单价" />
+                <InputNumber v-model:value="tableList[row - 1].price" placeholder="单价" />
               </td>
               <td>
-                <input v-model="tableList[row - 1]['stock_num']" placeholder="库存" />
+                <InputNumber v-model:value="tableList[row - 1].stock_num" placeholder="库存" />
               </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-    <Pic :drawer="drawer" :father_fun="get_img" :length="length"></Pic>
+    <PictureDrawer
+      :images="images"
+      :length="length"
+      @register="registerDrawer"
+      @reload="handlePictureDrawerRealod"
+      @success="handlePictureDrawerSuccess"
+    />
   </div>
 </template>
 
 <script lang="ts">
   import { computed, defineComponent, ref, watch } from 'vue';
-  import { Button, Checkbox, Input } from 'ant-design-vue';
+  import { Button, Checkbox, Input, InputNumber } from 'ant-design-vue';
   import { set } from 'lodash-es';
+  import { useDrawer } from '/@/components/Drawer';
   import PictureDrawer from '/@/components/AssetPicker/PictureDrawer.vue';
+  import { ImageModel } from '/@/api/asset/model/imageModel';
+  import { listImages } from '/@/api/asset/image';
+  import { GoodsSkuArr, GoodsSkuItem } from '/@/api/stores/model/goodsModel';
 
   interface SkuSpec {
-    cName: String;
-    pic?: String;
+    cName: string;
+    pic?: ImageModel;
   }
 
   interface SkuAttr {
-    pName: String;
-    rowspan: Number;
+    pName: string;
+    rowspan: number;
     spec: Array<SkuSpec>;
   }
 
   interface SkuData {
-    pName: String;
+    pName: string;
     spec: Array<SkuSpec>;
-    price: Number | null;
-    stock_num: Number | null;
+    price: number | null;
+    stock_num: number | null;
     specLen: number;
     rowspan: number;
-}
-
-  interface SkuItem {
-    price: Number | null;
-    stock_num: Number | null;
   }
 
   export default defineComponent({
     name: 'Sku',
     components: {
-      Button, Checkbox, Input, PictureDrawer,
+      Button,
+      Checkbox,
+      Input,
+      InputNumber,
+      PictureDrawer,
     },
     props: {
       sub: Number as PropType<number>, // 获取最终数据用于提交
-      rdata: Object, // 修改时的原数据
+      rdata: Object as PropType<GoodsSkuArr>, // 修改时的原数据
       del: Number, // 情况数据
     },
     setup(props, { emit }) {
+      const [registerDrawer] = useDrawer();
+
+      const images = ref<ImageModel[]>([]);
       const checked = ref(false);
       const drawer = ref(false);
       const sku_img_index = ref<number>();
       const attrs = ref<Array<SkuAttr>>([]);
       const img_ids = ref<Array<number>>([]);
-      const edit_data = ref<Object>({});
+      const edit_data = ref<GoodsSkuArr | undefined>();
       const img_list = ref<Array<Object>>([]);
       const dynamicTags = ref<Array<Object>>([]);
       const imageUrl = ref<Array<String>>([]);
@@ -136,7 +147,7 @@
           console.log('传递规格-最终参数');
           const data = {
             list: tableList,
-            sku_img_id: checked.value ? img_ids.value : []
+            sku_img_id: checked.value ? img_ids.value : [],
           };
           emit('pro_sku', data);
         },
@@ -156,6 +167,9 @@
           edit_data.value = e;
           edit_old(e);
         },
+        {
+          immediate: true,
+        },
       );
 
       // Computed
@@ -168,17 +182,17 @@
         // 初始化tableData
         for (let i = 0; i < attrs.value.length; i++) {
           let row: SkuData = {
-            pName: attrs[i]['pName'],
+            pName: attrs.value[i].pName,
             spec: [],
             price: null,
             stock_num: null,
             specLen: 0,
             rowspan: 1,
           };
-          let len2 = attrs[i]['spec'].length;
+          let len2 = attrs.value[i].spec.length;
           let specLen = 0;
           for (let j = 0; j < len2; j++) {
-            let cName = attrs[i]['spec'][j]['cName'];
+            let cName = attrs.value[i].spec[j].cName;
             if (!cName) {
               continue;
             }
@@ -191,7 +205,7 @@
           row.specLen = specLen;
           tData.push(row);
         }
-        //获取rowspan
+        // 获取rowspan
         for (let k = 0, len3 = tData.length; k < len3; k++) {
           let rowspan = 1;
           for (let k1 = k + 1; k1 < len3; k1++) {
@@ -203,35 +217,40 @@
         return tData;
       });
 
-      //规格条数
+      // 规格条数
       const rows = computed(() => {
-        if (!tableData.value) {
-          return;
-        }
         let rows = 1;
         let len = tableData.value.length;
+        if (len == 0) {
+          return 0;
+        }
         for (let i = 0; i < len; i++) {
-          let specLen = tableData[i]['specLen'] || 1;
+          let specLen = tableData.value[i].specLen || 1;
           rows *= specLen;
         }
-        //每条rowspan都为1情况
+        // 每条rowspan都为1情况
         if (rows == 1) {
-          return tableData[0]['spec'].length; // 2
+          return tableData.value[0].spec.length; // 2
         }
         return rows;
       });
 
       const tableList = computed(() => {
-        let tList: Array<SkuItem> = [];
+        let tList: Array<GoodsSkuItem> = [];
         if (!tableData) {
           return [];
         }
         let srcData = tableData.value;
         for (let i = 0; i < rows.value; i++) {
-          let listItem: SkuItem = {
-            price: null,
-            stock_num: null,
-          };
+          let listItem: GoodsSkuItem = {};
+          if (edit_data?.value?.list) {
+            let e = edit_data?.value.list;
+            // 判断 e[i]['price']，如果 e[i]不存在就会报错
+            if (e[i]) {
+              listItem.price = e[i].price;
+              listItem.stock_num = e[i].stock_num;
+            }
+          }
           //构建动态项
           for (let j = 0; j < srcData.length; j++) {
             //构造第一类目
@@ -245,20 +264,23 @@
             let index = parseInt(i / rowspan) % len;
             set(listItem, key, spec[index].cName);
           }
-          if (edit_data.value.list) {
-            let e = edit_data.value.list;
-            //判断 e[i]['price']，如果 e[i]不存在就会报错
-            if (e[i]) {
-              listItem.price = e[i].price;
-              listItem.stock_num = e[i].stock_num;
-            }
-          }
           tList.push(listItem);
         }
         return tList;
       });
 
       // Methods
+      async function handlePictureDrawerRealod() {
+        images.value = await listImages();
+      }
+
+      function handlePictureDrawerSuccess(payload: Array<Number>) {
+        setFieldsValue({
+          category_pic: payload.length > 0 ? payload[0] : null,
+        });
+        console.log(payload);
+      }
+
       function delA(index) {
         img_list.value.splice(index, 1);
       }
@@ -268,7 +290,7 @@
         });
       }
 
-      //规格
+      // 规格
       function choose_pic(index) {
         drawer.value = true;
         this.xb = index;
@@ -279,21 +301,21 @@
         console.log('执行setlist', e);
         console.log(this.xb);
         drawer.value = false;
-        set(attrs[0].spec[this.xb], 'pic', e[0].url)
+        set(attrs[0].spec[this.xb], 'pic', e[0].url);
         img_ids.value[this.xb] = e[0].id;
         console.log('spec', attrs[0].spec);
       }
 
-      //规格图片下标
+      // 规格图片下标
       function sku_img_idfun(index) {
         sku_img_index.value = index;
         imageUrl.value.splice(index, 1, '');
         img_ids.value.splice(index, 1, 0);
       }
 
-      //规格图片上传成功
+      // 规格图片上传成功
       function handleAvatarSuccess(res, file) {
-        let index = sku_img_index.value??0;
+        let index = sku_img_index.value ?? 0;
         console.log('sku_index', index);
         let img = URL.createObjectURL(file.raw);
         let id = res.id;
@@ -301,10 +323,12 @@
         img_ids.value.splice(index, 1, id);
       }
 
-      //获取修改数据
+      // 获取修改数据
       function edit_old(res) {
-        console.log('tree:', res.tree[0]);
-        for (let [k, v] of Object.entries(res.tree)) {
+        if (res === undefined) {
+          return;
+        }
+        for (let [k, v] of Object.entries(res?.tree)) {
           let arr = [];
           for (let [x, y] of Object.entries(v.v)) {
             arr[x] = {};
@@ -337,11 +361,7 @@
         let obj = {
           pName: '',
           rowspan: 1,
-          spec: [
-            {
-              cName: '',
-            },
-          ],
+          spec: [{ cName: '' }],
         };
         if (attrs.value.length >= 3) {
           return;
@@ -354,7 +374,7 @@
       }
       //新增规格参数
       function add_canshu(index) {
-        attrs[index].spec.push({
+        attrs.value[index].spec.push({
           cName: '',
         });
       }
@@ -362,11 +382,25 @@
       function del_canshu(index, index2) {
         attrs.value[index].spec.splice(index2, 1);
       }
+
       function handleClose(tag) {
         dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1);
       }
 
+      function getName(obj, index) {
+        if (obj) {
+          let r = parseInt((index - 1) / obj['rowspan']);
+          let l = obj['specLen'] || 1;
+          let key = r % l;
+          return obj['spec'] && obj['spec'][key] && obj['spec'][key]['cName'];
+        }
+      }
+
       return {
+        registerDrawer,
+        handlePictureDrawerRealod,
+        handlePictureDrawerSuccess,
+        images,
         oncli: '',
         img_list,
         drawer,
@@ -391,17 +425,8 @@
         toDelete,
         add_canshu,
         del_canshu,
+        getName,
       };
-    },
-    filters: {
-      getName: function (obj, index) {
-        if (obj) {
-          let r = parseInt((index - 1) / obj['rowspan']);
-          let l = obj['specLen'] || 1;
-          let key = r % l;
-          return obj['spec'] && obj['spec'][key] && obj['spec'][key]['cName'];
-        }
-      },
     },
   });
 </script>

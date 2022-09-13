@@ -2,7 +2,7 @@ import { MockMethod } from 'vite-plugin-mock';
 import { Random } from 'mockjs';
 import { resultPageSuccess } from '../_util';
 
-export function goodsList() {
+const goodsList = (() => {
   const result: any[] = [];
   for (let index = 0; index < 200; index++) {
     result.push({
@@ -24,7 +24,7 @@ export function goodsList() {
     });
   }
   return result;
-}
+})()
 
 export default [
   // mock user login

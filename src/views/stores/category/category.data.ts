@@ -43,6 +43,7 @@ export const formSchema: FormSchema[] = [
       labelField: 'category_name',
       valueField: 'category_id',
     },
+    defaultValue: 0,
   },
   {
     field: 'category_name',

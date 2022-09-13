@@ -86,11 +86,10 @@
         images.value = await listImages();
       }
 
-      function handlePictureDrawerSuccess(payload: Array<Number>) {
+      function handlePictureDrawerSuccess(payload: any) {
         setFieldsValue({
-          category_pic: payload.length > 0 ? payload[0] : null,
+          category_pic: payload?.value?.length > 0 ? payload.value[0] : null,
         });
-        console.log(payload);
       }
 
       async function handleSubmit() {
