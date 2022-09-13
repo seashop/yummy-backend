@@ -5,7 +5,7 @@
       <div class="form-item" v-for="(attr, index) in attrs" :key="index">
         <div class="form-title">
           <Input class="sku-name" v-model="attr.pName" placeholder="规格名" />
-          <el-checkbox v-model="checked" v-if="index == 0">添加规格图片</el-checkbox>
+          <Checkbox v-model="checked" v-if="index == 0">添加规格图片</Checkbox>
           <span class="delete" @click="toDelete(index)">×</span>
         </div>
         <ul class="form-list">
@@ -18,7 +18,7 @@
             </div>
             <div v-if="checked && index == 0">
               <div class="picA" @click="choose_pic(index2)" v-if="checked">
-                <img v-if="item.pic" :src="getimg + item.pic" />
+                <img v-if="item.pic" :src="item.pic.full_url" />
                 <i v-else class="el-icon-plus sku-img"></i>
               </div>
             </div>
@@ -33,13 +33,13 @@
         </div>
       </div>
       <div class="form-btn-group">
-        <el-button
+        <Button
           size="mini"
           :disabled="attrs.length == 3 ? true : false"
           type="button"
           name
           @click="addItem"
-          >添加规格项目</el-button
+          >添加规格项目</Button
         >
       </div>
       <div class="form-table" v-show="tableData">
@@ -78,24 +78,50 @@
 
 <script lang="ts">
   import { computed, defineComponent, ref, watch } from 'vue';
-  import { Input } from 'ant-design-vue';
+  import { Button, Checkbox, Input } from 'ant-design-vue';
+  import { set } from 'lodash-es';
   import PictureDrawer from '/@/components/AssetPicker/PictureDrawer.vue';
+
+  interface SkuSpec {
+    cName: String;
+    pic?: String;
+  }
+
+  interface SkuAttr {
+    pName: String;
+    rowspan: Number;
+    spec: Array<SkuSpec>;
+  }
+
+  interface SkuData {
+    pName: String;
+    spec: Array<SkuSpec>;
+    price: Number | null;
+    stock_num: Number | null;
+    specLen: number;
+    rowspan: number;
+}
+
+  interface SkuItem {
+    price: Number | null;
+    stock_num: Number | null;
+  }
 
   export default defineComponent({
     name: 'Sku',
     components: {
-      PictureDrawer, Input,
+      Button, Checkbox, Input, PictureDrawer,
     },
     props: {
-      sub: Number as PropType<number>, //获取最终数据用于提交
-      rdata: Object, //修改时的原数据
-      del: Number, //情况数据
+      sub: Number as PropType<number>, // 获取最终数据用于提交
+      rdata: Object, // 修改时的原数据
+      del: Number, // 情况数据
     },
     setup(props, { emit }) {
       const checked = ref(false);
       const drawer = ref(false);
       const sku_img_index = ref<number>();
-      const attrs = ref<Array<Object>>([]);
+      const attrs = ref<Array<SkuAttr>>([]);
       const img_ids = ref<Array<number>>([]);
       const edit_data = ref<Object>({});
       const img_list = ref<Array<Object>>([]);
@@ -108,13 +134,10 @@
         () => props.sub,
         () => {
           console.log('传递规格-最终参数');
-          const data = {};
-          data['list'] = tableList;
-          if (checked.value) {
-            data['sku_img_id'] = img_ids.value;
-          } else {
-            data['sku_img_id'] = [];
-          }
+          const data = {
+            list: tableList,
+            sku_img_id: checked.value ? img_ids.value : []
+          };
           emit('pro_sku', data);
         },
       );
@@ -136,33 +159,36 @@
       );
 
       // Computed
-      //规格table
+      // 规格table
       const tableData = computed(() => {
-        let len = attrs.value.length;
-        if (len == 0) {
+        if (attrs.value.length == 0) {
           return [];
         }
-        let tData: Array<Object> = [];
-        //初始化tableData
-        for (let i = 0; i < len; i++) {
-          let row = {};
-          row['pName'] = attrs[i]['pName'];
-          row['spec'] = [];
-          row['price'] = {};
-          row['stock_num'] = {};
+        let tData: Array<SkuData> = [];
+        // 初始化tableData
+        for (let i = 0; i < attrs.value.length; i++) {
+          let row: SkuData = {
+            pName: attrs[i]['pName'],
+            spec: [],
+            price: null,
+            stock_num: null,
+            specLen: 0,
+            rowspan: 1,
+          };
           let len2 = attrs[i]['spec'].length;
           let specLen = 0;
           for (let j = 0; j < len2; j++) {
-            let spe = {};
             let cName = attrs[i]['spec'][j]['cName'];
             if (!cName) {
               continue;
             }
+            let spe: SkuSpec = {
+              cName,
+            };
             ++specLen;
-            spe['cName'] = cName;
-            row['spec'].push(spe);
+            row.spec.push(spe);
           }
-          row['specLen'] = specLen;
+          row.specLen = specLen;
           tData.push(row);
         }
         //获取rowspan
@@ -172,7 +198,7 @@
             let kSpecLen = tData[k1]['specLen'] || 1;
             rowspan *= kSpecLen;
           }
-          tData[k]['rowspan'] = rowspan;
+          tData[k].rowspan = rowspan;
         }
         return tData;
       });
@@ -194,35 +220,37 @@
         }
         return rows;
       });
+
       const tableList = computed(() => {
+        let tList: Array<SkuItem> = [];
         if (!tableData) {
-          return;
+          return [];
         }
-        let tList: Array<Object> = [];
         let srcData = tableData.value;
         for (let i = 0; i < rows.value; i++) {
-          let listItem = {};
+          let listItem: SkuItem = {
+            price: null,
+            stock_num: null,
+          };
           //构建动态项
           for (let j = 0; j < srcData.length; j++) {
             //构造第一类目
-            let key = srcData[j]['pName'];
-            let rowspan = srcData[j]['rowspan'];
-            let len = srcData[j]['specLen'];
+            let key = srcData[j].pName as string;
+            let rowspan = srcData[j].rowspan;
+            let len = srcData[j].specLen;
             if (!len) {
               continue;
             }
-            let spec = srcData[j]['spec'];
+            let spec = srcData[j].spec;
             let index = parseInt(i / rowspan) % len;
-            listItem[key] = spec[index]['cName'];
+            set(listItem, key, spec[index].cName);
           }
-          listItem['price'] = '';
-          listItem['stock_num'] = '';
           if (edit_data.value.list) {
             let e = edit_data.value.list;
             //判断 e[i]['price']，如果 e[i]不存在就会报错
             if (e[i]) {
-              listItem['price'] = e[i]['price'];
-              listItem['stock_num'] = e[i]['stock_num'];
+              listItem.price = e[i].price;
+              listItem.stock_num = e[i].stock_num;
             }
           }
           tList.push(listItem);
@@ -239,17 +267,19 @@
           this.delivery = res.data;
         });
       }
+
       //规格
       function choose_pic(index) {
         drawer.value = true;
         this.xb = index;
         get_img.value = setlist;
       }
+
       function setlist(e) {
         console.log('执行setlist', e);
         console.log(this.xb);
         drawer.value = false;
-        this.$set(attrs[0].spec[this.xb], 'pic', e[0].url);
+        set(attrs[0].spec[this.xb], 'pic', e[0].url)
         img_ids.value[this.xb] = e[0].id;
         console.log('spec', attrs[0].spec);
       }
@@ -260,6 +290,7 @@
         imageUrl.value.splice(index, 1, '');
         img_ids.value.splice(index, 1, 0);
       }
+
       //规格图片上传成功
       function handleAvatarSuccess(res, file) {
         let index = sku_img_index.value??0;
@@ -269,6 +300,7 @@
         imageUrl.value.splice(index, 1, img);
         img_ids.value.splice(index, 1, id);
       }
+
       //获取修改数据
       function edit_old(res) {
         console.log('tree:', res.tree[0]);
@@ -282,9 +314,9 @@
                 arr[x]['pic'] = y.imgUrl;
                 imageUrl.value.splice(x, 1, y.imgUrl);
                 img_ids.value.splice(x, 1, y.img_id);
-                this.checked = true;
+                checked.value = true;
               } else {
-                this.checked = false;
+                checked.value = false;
               }
             }
           }
@@ -355,7 +387,10 @@
         tableList,
         // method
         choose_pic,
+        addItem,
         toDelete,
+        add_canshu,
+        del_canshu,
       };
     },
     filters: {

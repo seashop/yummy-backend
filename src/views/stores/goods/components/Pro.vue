@@ -187,10 +187,8 @@
 	import Pic from '../views/PicList.vue'
 	import PicDetail from '../views/PicList.vue'
 	import Video from './Video.vue'
-	import skuv from './Sku.vue'
-	import {
-		Api_url
-	} from "@/common/config";
+  import skuv from './Sku.vue'
+
 	export default {
 		name: "Pro",
 		props: ["eid"],

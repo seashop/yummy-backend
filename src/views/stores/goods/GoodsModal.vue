@@ -38,15 +38,18 @@
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import PictureDrawer from '/@/components/AssetPicker/PictureDrawer.vue';
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
+  import { useMessage } from '/@/hooks/web/useMessage';
   import { listImages } from '/@/api/asset/image';
   import { ImageModel } from '/@/api/asset/model/imageModel';
-import { updateGoods } from '/@/api/stores/goods';
+  import { GoodsModel } from '/@/api/stores/model/goodsModel';
+  import { updateGoods } from '/@/api/stores/goods';
 
   export default defineComponent({
     name: 'GoodsDrawer',
     components: { Image, BasicModal, BasicForm, PictureDrawer, BasicButton, Sku },
-    emits: ['success', 'register'],
+    emits: ['success', 'register', 'back'],
     setup(_, { emit }) {
+      const { createMessage } = useMessage();
       const [registerDrawer, { openDrawer }] = useDrawer();
 
       const sub = ref(0);
@@ -54,7 +57,7 @@ import { updateGoods } from '/@/api/stores/goods';
       const rdata = ref({});
 
       const isUpdate = ref(true);
-      const images = ref<ImageModel[]>([]);
+      const images = ref<Array<ImageModel>>([]);
       const rowId = ref('');
 
       const [registerForm, { resetFields, getFieldsValue, setFieldsValue, validate }] = useForm({
@@ -82,19 +85,18 @@ import { updateGoods } from '/@/api/stores/goods';
 
       //提交 修改商品
       function onEdit() {
-        const values = getFieldsValue();
+        const values = getFieldsValue() as GoodsModel;
         values.bannerimgs = this.img_list;
         values.detailimgs = this.img_list_detail;
         console.log('sda', values);
-        updateGoods(values).then((res) => {
-          this.$message({
-            showClose: true,
-            message: '修改成功',
-            type: 'success',
-          });
-          that.rest();
-          this.$emit('back');
+        updateGoods(values).then((_) => {
+          createMessage.success('修改成功');
+          rest();
         });
+      }
+
+      function rest() {
+        emit("back");
       }
 
       //新增商品

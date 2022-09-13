@@ -13,6 +13,8 @@ export interface GoodsModel {
   state: boolean;
   img_id: number;
   img: ImageModel;
+  bannerimgs: Array<number>;
+  detailimgs: Array<number>;
   sort: number;
 }
 
