@@ -16,7 +16,7 @@
         <BasicButton v-else :onClick="openDrawer">选择图片</BasicButton>
       </template>
       <template #sku="{ model, field }">
-        <skuv :sub="sub" :del="sku_comfirm" :rdata="rdata" @pro_sku="pro_sku"></skuv>
+        <Sku :sub="sub" :del="sku_comfirm" :rdata="rdata" @pro_sku="pro_sku" />
       </template>
     </BasicForm>
   </BasicModal>

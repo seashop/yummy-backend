@@ -4,14 +4,14 @@
       <div class="form-h">商品规格</div>
       <div class="form-item" v-for="(attr, index) in attrs" :key="index">
         <div class="form-title">
-          <el-input class="sku-name" v-model="attr.pName" placeholder="规格名" />
+          <Input class="sku-name" v-model="attr.pName" placeholder="规格名" />
           <el-checkbox v-model="checked" v-if="index == 0">添加规格图片</el-checkbox>
           <span class="delete" @click="toDelete(index)">×</span>
         </div>
         <ul class="form-list">
           <li v-for="(item, index2) in attr.spec" :key="index2">
             <div class="spgg_r_02_2">
-              <el-input v-model="item.cName"></el-input>
+              <Input v-model="item.cName"></Input>
               <div class="in_clo" @click="del_canshu(index, index2)">
                 <i class="el-icon-error" style="color: #cecece"></i>
               </div>
@@ -77,91 +77,72 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
+  import { computed, defineComponent, ref, watch } from 'vue';
+  import { Input } from 'ant-design-vue';
   import PictureDrawer from '/@/components/AssetPicker/PictureDrawer.vue';
 
   export default defineComponent({
     name: 'Sku',
     components: {
-      PictureDrawer,
-    },
-    data() {
-      return {
-        oncli: '',
-        img_list: [],
-        drawer: false,
-        length: 1,
-        getimg: this.$getimg,
-        checked: false,
-        sku_img_index: '', //规格图片下标
-        attrs: [],
-        dynamicTags: [],
-        inputVisible: false,
-        inputValue: '',
-        edit_data: {}, //原修改数据
-        upfile_url: Api_url + '/admin/upload/img',
-        upfile_head: {
-          token: localStorage.getItem('token'),
-        },
-        get_img: Function,
-        imageUrl: [],
-        img_ids: [],
-      };
+      PictureDrawer, Input,
     },
     props: {
-      sub: Number, //获取最终数据用于提交
+      sub: Number as PropType<number>, //获取最终数据用于提交
       rdata: Object, //修改时的原数据
       del: Number, //情况数据
     },
-    mounted() {
-      //console.log("atr:", this.attrs);
-      console.log('data:', this.tableData);
-      // console.log("rows", this.rows);
-      //console.log(this.tableList);
-    },
-    watch: {
-      //父组件点击提交按钮，本组件传递数据出去
-      sub() {
-        console.log('传递规格-最终参数');
-        const data = {};
-        data['list'] = this.tableList;
-        if (this.checked) {
-          data['sku_img_id'] = this.img_ids;
-        } else {
-          data['sku_img_id'] = [];
-        }
-        this.$emit('pro_sku', data);
-      },
-      //父组件提交成功后，清空本组件数据
-      del() {
-        console.log('sku-clear');
-        this.attrs = [];
-      },
-      //修改时的原数据
-      rdata(e) {
-        this.edit_data = e;
-        this.edit_old(e);
-      },
-    },
-    filters: {
-      getName: function (obj, index) {
-        if (obj) {
-          let r = parseInt((index - 1) / obj['rowspan']);
-          let l = obj['specLen'] || 1;
-          let key = r % l;
-          return obj['spec'] && obj['spec'][key] && obj['spec'][key]['cName'];
-        }
-      },
-    },
-    computed: {
+    setup(props, { emit }) {
+      const checked = ref(false);
+      const drawer = ref(false);
+      const sku_img_index = ref<number>();
+      const attrs = ref<Array<Object>>([]);
+      const img_ids = ref<Array<number>>([]);
+      const edit_data = ref<Object>({});
+      const img_list = ref<Array<Object>>([]);
+      const dynamicTags = ref<Array<Object>>([]);
+      const imageUrl = ref<Array<String>>([]);
+      const get_img = ref<Function>();
+
+      // 父组件点击提交按钮，本组件传递数据出去
+      watch(
+        () => props.sub,
+        () => {
+          console.log('传递规格-最终参数');
+          const data = {};
+          data['list'] = tableList;
+          if (checked.value) {
+            data['sku_img_id'] = img_ids.value;
+          } else {
+            data['sku_img_id'] = [];
+          }
+          emit('pro_sku', data);
+        },
+      );
+      // 父组件提交成功后，清空本组件数据
+      watch(
+        () => props.del,
+        () => {
+          console.log('sku-clear');
+          attrs.value = [];
+        },
+      );
+      // 修改时的原数据
+      watch(
+        () => props.rdata,
+        (e) => {
+          edit_data.value = e;
+          edit_old(e);
+        },
+      );
+
+      // Computed
       //规格table
-      tableData: function () {
-        let attrs = this.attrs;
-        let len = attrs.length;
+      const tableData = computed(() => {
+        let len = attrs.value.length;
         if (len == 0) {
-          return;
+          return [];
         }
-        let tData = [];
+        let tData: Array<Object> = [];
         //初始化tableData
         for (let i = 0; i < len; i++) {
           let row = {};
@@ -194,33 +175,32 @@
           tData[k]['rowspan'] = rowspan;
         }
         return tData;
-      },
+      });
+
       //规格条数
-      rows: function () {
-        if (!this.tableData) {
+      const rows = computed(() => {
+        if (!tableData.value) {
           return;
         }
         let rows = 1;
-        let tableData = this.tableData;
-        let len = tableData.length;
+        let len = tableData.value.length;
         for (let i = 0; i < len; i++) {
           let specLen = tableData[i]['specLen'] || 1;
           rows *= specLen;
         }
         //每条rowspan都为1情况
         if (rows == 1) {
-          return tableData[0]['spec'].length; //2
+          return tableData[0]['spec'].length; // 2
         }
         return rows;
-      },
-      tableList: function () {
-        if (!this.tableData) {
+      });
+      const tableList = computed(() => {
+        if (!tableData) {
           return;
         }
-        let rows = this.rows;
-        let tList = [];
-        let srcData = this.tableData;
-        for (let i = 0; i < rows; i++) {
+        let tList: Array<Object> = [];
+        let srcData = tableData.value;
+        for (let i = 0; i < rows.value; i++) {
           let listItem = {};
           //构建动态项
           for (let j = 0; j < srcData.length; j++) {
@@ -237,8 +217,8 @@
           }
           listItem['price'] = '';
           listItem['stock_num'] = '';
-          if (this.edit_data.list) {
-            let e = this.edit_data.list;
+          if (edit_data.value.list) {
+            let e = edit_data.value.list;
             //判断 e[i]['price']，如果 e[i]不存在就会报错
             if (e[i]) {
               listItem['price'] = e[i]['price'];
@@ -248,49 +228,49 @@
           tList.push(listItem);
         }
         return tList;
-      },
-    },
-    methods: {
-      delA(index) {
-        this.img_list.splice(index, 1);
-      },
-      get_delivery() {
+      });
+
+      // Methods
+      function delA(index) {
+        img_list.value.splice(index, 1);
+      }
+      function get_delivery() {
         this.http.get('delivery /admin/get_delivery').then((res) => {
           this.delivery = res.data;
         });
-      },
+      }
       //规格
-      choose_pic(index) {
-        this.drawer = true;
+      function choose_pic(index) {
+        drawer.value = true;
         this.xb = index;
-        this.get_img = this.setlist;
-      },
-      setlist(e) {
+        get_img.value = setlist;
+      }
+      function setlist(e) {
         console.log('执行setlist', e);
         console.log(this.xb);
-        this.drawer = false;
-        this.$set(this.attrs[0].spec[this.xb], 'pic', e[0].url);
-        this.img_ids[this.xb] = e[0].id;
-        console.log('spec', this.attrs[0].spec);
-      },
+        drawer.value = false;
+        this.$set(attrs[0].spec[this.xb], 'pic', e[0].url);
+        img_ids.value[this.xb] = e[0].id;
+        console.log('spec', attrs[0].spec);
+      }
 
       //规格图片下标
-      sku_img_idfun(index) {
-        this.sku_img_index = index;
-        this.imageUrl.splice(index, 1, '');
-        this.img_ids.splice(index, 1, 0);
-      },
+      function sku_img_idfun(index) {
+        sku_img_index.value = index;
+        imageUrl.value.splice(index, 1, '');
+        img_ids.value.splice(index, 1, 0);
+      }
       //规格图片上传成功
-      handleAvatarSuccess(res, file) {
-        let index = this.sku_img_index;
+      function handleAvatarSuccess(res, file) {
+        let index = sku_img_index.value??0;
         console.log('sku_index', index);
         let img = URL.createObjectURL(file.raw);
         let id = res.id;
-        this.imageUrl.splice(index, 1, img);
-        this.img_ids.splice(index, 1, id);
-      },
+        imageUrl.value.splice(index, 1, img);
+        img_ids.value.splice(index, 1, id);
+      }
       //获取修改数据
-      edit_old(res) {
+      function edit_old(res) {
         console.log('tree:', res.tree[0]);
         for (let [k, v] of Object.entries(res.tree)) {
           let arr = [];
@@ -300,8 +280,8 @@
             if (k == 0) {
               if (y.img_id) {
                 arr[x]['pic'] = y.imgUrl;
-                this.imageUrl.splice(x, 1, y.imgUrl);
-                this.img_ids.splice(x, 1, y.img_id);
+                imageUrl.value.splice(x, 1, y.imgUrl);
+                img_ids.value.splice(x, 1, y.img_id);
                 this.checked = true;
               } else {
                 this.checked = false;
@@ -314,14 +294,14 @@
             spec: arr,
           };
           console.log('sku_img', arr);
-          if (this.attrs.length >= 3) {
+          if (attrs.value.length >= 3) {
             return;
           }
-          this.attrs.push(obj);
+          attrs.value.push(obj);
         }
-      },
+      }
       //新增规格名称
-      addItem: function () {
+      function addItem() {
         let obj = {
           pName: '',
           rowspan: 1,
@@ -331,27 +311,61 @@
             },
           ],
         };
-        if (this.attrs.length >= 3) {
+        if (attrs.value.length >= 3) {
           return;
         }
-        this.attrs.push(obj);
-      },
-      toDelete: function (index) {
-        this.img_list = [];
-        this.attrs.splice(index, 1);
-      },
+        attrs.value.push(obj);
+      }
+      function toDelete(index) {
+        img_list.value = [];
+        attrs.value.splice(index, 1);
+      }
       //新增规格参数
-      add_canshu(index) {
-        this.attrs[index].spec.push({
+      function add_canshu(index) {
+        attrs[index].spec.push({
           cName: '',
         });
-      },
+      }
       //删除规格参数
-      del_canshu(index, index2) {
-        this.attrs[index].spec.splice(index2, 1);
-      },
-      handleClose(tag) {
-        this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+      function del_canshu(index, index2) {
+        attrs.value[index].spec.splice(index2, 1);
+      }
+      function handleClose(tag) {
+        dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1);
+      }
+
+      return {
+        oncli: '',
+        img_list,
+        drawer,
+        length: 1,
+        checked,
+        sku_img_index, //规格图片下标
+        attrs,
+        dynamicTags,
+        inputVisible: false,
+        inputValue: '',
+        edit_data, //原修改数据
+        get_img,
+        imageUrl,
+        img_ids,
+        // computed
+        tableData,
+        rows,
+        tableList,
+        // method
+        choose_pic,
+        toDelete,
+      };
+    },
+    filters: {
+      getName: function (obj, index) {
+        if (obj) {
+          let r = parseInt((index - 1) / obj['rowspan']);
+          let l = obj['specLen'] || 1;
+          let key = r % l;
+          return obj['spec'] && obj['spec'][key] && obj['spec'][key]['cName'];
+        }
       },
     },
   });
@@ -463,17 +477,14 @@
 
   table {
     border: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
   }
 
   table.table-sku {
     width: 100%;
     background-color: #fff;
     text-align: left;
-  }
-
-  table {
-    border-collapse: collapse;
-    border-spacing: 0;
   }
 
   table.table-sku td {
@@ -486,7 +497,6 @@
     border: 1px solid #ccc;
   }
 
-  /**/
   .form-title {
     background: #f8f8f8;
     padding: 5px 10px;
