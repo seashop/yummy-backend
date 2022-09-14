@@ -1,5 +1,5 @@
 import { defHttp } from '/@/utils/http/axios';
-import { GoodsModel, selectParams } from './model/goodsModel';
+import { GoodsItem, GoodsListResultModel, selectParams } from './model/goodsModel';
 
 enum Api {
   CreateGoods = '/product/admin/add_product',
@@ -14,11 +14,11 @@ enum Api {
  */
 
 export const listGoods = (params?: selectParams) => {
-  return defHttp.get<GoodsModel>({ url: Api.ListGoods, params });
+  return defHttp.get<GoodsListResultModel>({ url: Api.ListGoods, params });
 };
 
 export const getGoods = (id: number) => {
-  return defHttp.get<GoodsModel>({
+  return defHttp.get<GoodsItem>({
     url: Api.GetGoods,
     params: {
       id,
@@ -26,17 +26,17 @@ export const getGoods = (id: number) => {
   });
 };
 
-export const createGoods = (data: Partial<GoodsModel>) => {
+export const createGoods = (data: Partial<GoodsItem>) => {
   console.log(data);
-  return defHttp.post<GoodsModel>({ url: Api.CreateGoods, data });
+  return defHttp.post<GoodsItem>({ url: Api.CreateGoods, data });
 };
 
-export const updateGoods = (data?: GoodsModel) => {
-  return defHttp.post<GoodsModel>({ url: Api.UpdateGoods, data });
+export const updateGoods = (data?: GoodsItem) => {
+  return defHttp.post<GoodsItem>({ url: Api.UpdateGoods, data });
 };
 
 export const switchGoods = (id: number, field: string) => {
-  return defHttp.put<GoodsModel>({
+  return defHttp.put<GoodsItem>({
     url: Api.SwitchGoods,
     data: {
       db: 'goods',

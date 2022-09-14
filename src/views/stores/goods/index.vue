@@ -46,7 +46,6 @@
 
 <script lang="ts">
   import { defineComponent } from 'vue';
-
   import { Image, Switch } from 'ant-design-vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { listGoods, switchGoods } from '/@/api/stores/goods';
@@ -55,7 +54,7 @@
   import GoodsModal from './GoodsModal.vue';
 
   import { columns, searchFormSchema } from './goods.data';
-  import { GoodsModel } from '/@/api/stores/model/goodsModel';
+  import { GoodsItem } from '/@/api/stores/model/goodsModel';
 
   export default defineComponent({
     name: 'GoodsManagement',
@@ -83,7 +82,7 @@
         },
       });
 
-      function toggleSwitch(record: GoodsModel, key: string) {
+      function toggleSwitch(record: GoodsItem, key: string) {
         switchGoods(record.goods_id, key);
       }
 

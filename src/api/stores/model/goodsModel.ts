@@ -1,6 +1,7 @@
 import { ImageItem } from '/@/api/asset/model/imageModel';
+import { BasicFetchResult } from '/@/api/model/baseModel';
 
-export interface GoodsModel {
+export interface GoodsItem {
   goods_id: number;
   title: string;
   market_price: number;
@@ -32,3 +33,5 @@ export interface GoodsSkuItem {
 export interface selectParams {
   title: string;
 }
+
+export type GoodsListResultModel = BasicFetchResult<GoodsItem>;
