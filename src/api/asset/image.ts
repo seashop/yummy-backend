@@ -1,6 +1,6 @@
 import { defHttp } from '/@/utils/http/axios';
 import { useGlobSetting } from '/@/hooks/setting';
-import { ImageModel } from './model/imageModel';
+import { ImageListResultModel } from './model/imageModel';
 
 const globSetting = useGlobSetting();
 
@@ -14,7 +14,7 @@ enum Api {
  */
 
 export const listImages = () => {
-  return defHttp.get<ImageModel[]>({ url: Api.ListCategory });
+  return defHttp.get<ImageListResultModel>({ url: Api.ListCategory });
 };
 
 export const CreateImageUrl = globSetting.apiUrl + globSetting.urlPrefix + Api.CreateImage;

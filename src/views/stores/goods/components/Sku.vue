@@ -2,33 +2,33 @@
   <div id="sku_tag">
     <div class="form-group">
       <div class="form-h">商品规格</div>
-      <div class="form-item" v-for="(attr, index) in attrs" :key="index">
+      <div class="form-item" v-for="(attr, attrIdx) in attrs" :key="attrIdx">
         <div class="form-title">
           <Input class="sku-name" v-model:value="attr.pName" placeholder="规格名" />
-          <Checkbox v-model:value="checked" v-if="index == 0">添加规格图片</Checkbox>
-          <span class="delete" @click="toDelete(index)">×</span>
+          <Checkbox v-model:checked="checked" v-if="attrIdx == 0">添加规格图片</Checkbox>
+          <span class="delete" @click="toDelete(attrIdx)">×</span>
         </div>
         <ul class="form-list">
-          <li v-for="(item, index2) in attr.spec" :key="index2">
+          <li v-for="(spec, specIdx) in attr.spec" :key="specIdx">
             <div class="spgg_r_02_2">
-              <Input v-model:value="item.cName" />
-              <div class="in_clo" @click="del_canshu(index, index2)">
+              <Input v-model:value="spec.cName" />
+              <div class="in_clo" @click="del_canshu(attrIdx, specIdx)">
                 <i class="el-icon-error" style="color: #cecece"></i>
               </div>
             </div>
-            <div v-if="checked && index == 0">
-              <div class="picA" @click="choose_pic(index2)" v-if="checked">
-                <img v-if="item.pic" :src="item.pic.full_url" />
-                <i v-else class="el-icon-plus sku-img"></i>
+            <div v-if="checked && attrIdx == 0">
+              <div class="picA" @click="() => openDrawer(true, { specIdx })" v-if="checked">
+                <Image v-if="spec.pic" :src="spec.pic.full_url" />
+                <Icon v-else icon="ant-design:plus-outlined" class="sku-img" />
               </div>
             </div>
           </li>
           <li>
             &emsp;
-            <button class="btn" type="button" @click="add_canshu(index)">添加</button>
+            <button class="btn" type="button" @click="add_canshu(attrIdx)">添加</button>
           </li>
         </ul>
-        <div class="spgg_r_04" v-if="checked && index == 0">
+        <div class="spgg_r_04" v-if="checked && attrIdx == 0">
           仅支持为第一组规格设置规格图片，建议尺寸：160*160像素
         </div>
       </div>
@@ -83,17 +83,18 @@
 
 <script lang="ts">
   import { computed, defineComponent, ref, watch } from 'vue';
-  import { Button, Checkbox, Input, InputNumber } from 'ant-design-vue';
+  import { Button, Checkbox, Image, Input, InputNumber } from 'ant-design-vue';
   import { set } from 'lodash-es';
-  import { useDrawer } from '/@/components/Drawer';
   import PictureDrawer from '/@/components/AssetPicker/PictureDrawer.vue';
-  import { ImageModel } from '/@/api/asset/model/imageModel';
+  import { useDrawer } from '/@/components/Drawer';
+  import { Icon } from '/@/components/Icon';
+  import { ImageItem } from '/@/api/asset/model/imageModel';
   import { listImages } from '/@/api/asset/image';
   import { GoodsSkuArr, GoodsSkuItem } from '/@/api/stores/model/goodsModel';
 
   interface SkuSpec {
     cName: string;
-    pic?: ImageModel;
+    pic?: ImageItem;
   }
 
   interface SkuAttr {
@@ -116,50 +117,30 @@
     components: {
       Button,
       Checkbox,
+      Icon,
+      Image,
       Input,
       InputNumber,
       PictureDrawer,
     },
     props: {
-      sub: Number as PropType<number>, // 获取最终数据用于提交
       rdata: Object as PropType<GoodsSkuArr>, // 修改时的原数据
-      del: Number, // 情况数据
     },
-    setup(props, { emit }) {
-      const [registerDrawer] = useDrawer();
+    setup(props) {
+      const [registerDrawer, { openDrawer }] = useDrawer();
 
-      const images = ref<ImageModel[]>([]);
-      const checked = ref(false);
-      const drawer = ref(false);
+      const images = ref<ImageItem[]>([]);
+      const checked = ref<boolean>(false);
+      const drawer = ref<boolean>(false);
       const sku_img_index = ref<number>();
       const attrs = ref<Array<SkuAttr>>([]);
-      const img_ids = ref<Array<number>>([]);
+      const attrsImageId = ref<Array<number>>([]);
       const edit_data = ref<GoodsSkuArr | undefined>();
       const img_list = ref<Array<Object>>([]);
       const dynamicTags = ref<Array<Object>>([]);
       const imageUrl = ref<Array<String>>([]);
       const get_img = ref<Function>();
 
-      // 父组件点击提交按钮，本组件传递数据出去
-      watch(
-        () => props.sub,
-        () => {
-          console.log('传递规格-最终参数');
-          const data = {
-            list: tableList,
-            sku_img_id: checked.value ? img_ids.value : [],
-          };
-          emit('pro_sku', data);
-        },
-      );
-      // 父组件提交成功后，清空本组件数据
-      watch(
-        () => props.del,
-        () => {
-          console.log('sku-clear');
-          attrs.value = [];
-        },
-      );
       // 修改时的原数据
       watch(
         () => props.rdata,
@@ -271,14 +252,14 @@
 
       // Methods
       async function handlePictureDrawerRealod() {
-        images.value = await listImages();
+        images.value = (await listImages()).items;
       }
+      handlePictureDrawerRealod();
 
-      function handlePictureDrawerSuccess(payload: Array<Number>) {
-        setFieldsValue({
-          category_pic: payload.length > 0 ? payload[0] : null,
-        });
-        console.log(payload);
+      function handlePictureDrawerSuccess({ data, items }) {
+        let item = items?.length > 0 ? items[0] as ImageItem : undefined;
+        attrs.value[0].spec[data.specIdx].pic = item;
+        attrsImageId.value[data.specIdx] = item ? item.id : 0;
       }
 
       function delA(index) {
@@ -291,26 +272,17 @@
       }
 
       // 规格
-      function choose_pic(index) {
-        drawer.value = true;
-        this.xb = index;
-        get_img.value = setlist;
-      }
-
       function setlist(e) {
-        console.log('执行setlist', e);
-        console.log(this.xb);
-        drawer.value = false;
-        set(attrs[0].spec[this.xb], 'pic', e[0].url);
-        img_ids.value[this.xb] = e[0].id;
-        console.log('spec', attrs[0].spec);
+        set(attrs.value[0].spec[this.xb], 'pic', e[0].url);
+        attrsImageId.value[this.xb] = e[0].id;
+        console.log('spec', attrs.value[0].spec);
       }
 
       // 规格图片下标
       function sku_img_idfun(index) {
         sku_img_index.value = index;
         imageUrl.value.splice(index, 1, '');
-        img_ids.value.splice(index, 1, 0);
+        attrsImageId.value.splice(index, 1, 0);
       }
 
       // 规格图片上传成功
@@ -320,7 +292,7 @@
         let img = URL.createObjectURL(file.raw);
         let id = res.id;
         imageUrl.value.splice(index, 1, img);
-        img_ids.value.splice(index, 1, id);
+        attrsImageId.value.splice(index, 1, id);
       }
 
       // 获取修改数据
@@ -337,7 +309,7 @@
               if (y.img_id) {
                 arr[x]['pic'] = y.imgUrl;
                 imageUrl.value.splice(x, 1, y.imgUrl);
-                img_ids.value.splice(x, 1, y.img_id);
+                attrsImageId.value.splice(x, 1, y.img_id);
                 checked.value = true;
               } else {
                 checked.value = false;
@@ -396,8 +368,22 @@
         }
       }
 
+      // 父组件提交成功后，清空本组件数据
+      function clear() {
+        attrs.value = [];
+      }
+
+      // 父组件点击提交按钮，本组件传递数据出去
+      function result() {
+        return {
+          list: tableList.value,
+          sku_img_id: checked.value ? attrsImageId.value : [],
+        };
+      }
+
       return {
         registerDrawer,
+        openDrawer,
         handlePictureDrawerRealod,
         handlePictureDrawerSuccess,
         images,
@@ -414,65 +400,31 @@
         edit_data, //原修改数据
         get_img,
         imageUrl,
-        img_ids,
+        attrsImageId,
         // computed
         tableData,
         rows,
         tableList,
         // method
-        choose_pic,
         addItem,
         toDelete,
         add_canshu,
         del_canshu,
         getName,
+        clear,
+        result,
       };
     },
   });
 </script>
 
-<style lang="css">
-  #sku_tag {
+<style lang="less">
+#sku_tag {
     width: 60%;
   }
 
   .spgg_r_04 {
     padding-left: 20px;
-  }
-
-  .spgg_r_03 {
-    display: flex;
-  }
-
-  .spgg_r_03_01 {
-    padding: 10px 30px 0 0;
-  }
-
-  .avatar-uploader .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .avatar-uploader .el-upload:hover {
-    border-color: #409eff;
-  }
-
-  .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 118px;
-    height: 118px;
-    line-height: 118px;
-    text-align: center;
-  }
-
-  .avatar {
-    width: 118px;
-    height: 118px;
-    display: block;
   }
 
   #sku_tag th {
@@ -481,27 +433,8 @@
     text-indent: 10px;
   }
 
-  .el-tag + .el-tag {
-    margin-left: 10px;
-  }
-
-  .button-new-tag {
-    margin-left: 10px;
-    height: 32px;
-    line-height: 30px;
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  .input-new-tag {
-    width: 90px;
-    margin-left: 10px;
-    vertical-align: bottom;
-  }
-
   /**reset*/
-  button,
-  input {
+  button, input {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     outline: none;
   }
@@ -518,17 +451,15 @@
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
     border-radius: 2px;
+
+    :active, :focus, :hover {
+      text-decoration: none;
+      color: #333;
+      background-color: #fcfcfc;
+      border-color: #ccc;
+    }
   }
 
-  .btn.active,
-  .btn:active,
-  .btn:focus,
-  .btn:hover {
-    text-decoration: none;
-    color: #333;
-    background-color: #fcfcfc;
-    border-color: #ccc;
-  }
 
   /*table*/
   .form-item {
@@ -539,54 +470,54 @@
     border: 0;
     border-collapse: collapse;
     border-spacing: 0;
-  }
 
-  table.table-sku {
-    width: 100%;
-    background-color: #fff;
-    text-align: left;
-  }
+    .table-sku {
+      width: 100%;
+      background-color: #fff;
+      text-align: left;
+    }
 
-  table.table-sku td {
-    border: 1px solid #e5e5e5;
-    padding: 3px 10px;
-  }
+    .table-sku td {
+      border: 1px solid #e5e5e5;
+      padding: 3px 10px;
+    }
 
-  table.table-sku td input {
-    padding: 3px 10px;
-    border: 1px solid #ccc;
+    .table-sku td input {
+      padding: 3px 10px;
+      border: 1px solid #ccc;
+    }
   }
 
   .form-title {
     background: #f8f8f8;
     padding: 5px 10px;
     position: relative;
-  }
 
-  .form-title .label {
-    color: #999;
-  }
+    .label {
+      color: #999;
+    }
 
-  .form-title .delete {
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
-    border: 1px solid #ccc;
-    border-radius: 50%;
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    margin-top: -10px;
-    text-align: center;
-    color: #fff;
-    background: #ccc;
-    cursor: pointer;
-  }
+    .delete {
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      border: 1px solid #ccc;
+      border-radius: 50%;
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      margin-top: -10px;
+      text-align: center;
+      color: #fff;
+      background: #ccc;
+      cursor: pointer;
+    }
 
-  .form-title input {
-    background: #fff;
-    border: 1px solid #ccc;
-    padding: 10px;
+    input {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
   }
 
   .form-list {
@@ -608,8 +539,7 @@
     white-space: nowrap;
   }
 
-  .form-list,
-  .form-title {
+  .form-list, .form-title {
     text-align: left;
   }
 
@@ -627,11 +557,11 @@
 
   .form-table {
     margin-top: 20px;
-  }
 
-  .form-table input {
-    height: 30px;
-    line-height: 30px;
+    input {
+      height: 30px;
+      line-height: 30px;
+    }
   }
 
   .form-btn-group {
@@ -640,8 +570,7 @@
     padding: 10px;
   }
 
-  .stock-title,
-  .form-h {
+  .stock-title, .form-h {
     height: 40px;
     line-height: 40px;
   }
@@ -669,15 +598,38 @@
     padding: 3px 10px;
   }
 
-  .el-input,
-  .el-input__inner {
-    height: 34px;
-    line-height: 34px;
-  }
-
   .sku-img {
     margin-top: 45%;
     height: 28px;
     width: 28px;
+  }
+
+  .picA {
+    width: 148px;
+    height: 148px;
+    position: relative;
+    background-color: #FBFDFF;
+    border: 1px dashed #C0CCDA;
+    border-radius: 6px;
+    box-sizing: border-box;
+    vertical-align: top;
+    text-align: center;
+    margin: 6px 6px 6px 10px;
+
+    img {
+      width: 144px;
+      height: 144px;
+      border: 1px solid #BFBFBF;
+      border-radius: 3px;
+    }
+
+    .el-icon-circle-close {
+      position: absolute;
+      top: -13px;
+      right: -10px;
+      color: #7C7C7C;
+      font-size: 25px;
+      cursor: pointer;
+    }
   }
 </style>

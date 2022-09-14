@@ -1,5 +1,5 @@
 import { defHttp } from '/@/utils/http/axios';
-import { CategoryModel, selectParams } from './model/categoryModel';
+import { CategoryItem, CategoryListResultModel, selectParams } from './model/categoryModel';
 
 enum Api {
   CreateCategory = '/category/admin/add_category',
@@ -12,13 +12,13 @@ enum Api {
  */
 
 export const listCategory = (params?: selectParams) => {
-  return defHttp.get<CategoryModel>({ url: Api.ListCategory, params });
+  return defHttp.get<CategoryListResultModel>({ url: Api.ListCategory, params });
 };
 
-export const createCategory = (data?: CategoryModel) => {
-  return defHttp.post<CategoryModel>({ url: Api.CreateCategory, data });
+export const createCategory = (data?: CategoryItem) => {
+  return defHttp.post<CategoryItem>({ url: Api.CreateCategory, data });
 };
 
-export const updateCategory = (data?: CategoryModel) => {
-  return defHttp.post<CategoryModel>({ url: Api.UpdateCategory, data });
+export const updateCategory = (data?: CategoryItem) => {
+  return defHttp.post<CategoryItem>({ url: Api.UpdateCategory, data });
 };

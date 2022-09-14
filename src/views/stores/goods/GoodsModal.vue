@@ -23,7 +23,7 @@
       </template>
       <template #sku="{}">
         <FormItemRest>
-          <Sku :sub="sub" :del="sku_comfirm" :rdata="rdata" @pro_sku="pro_sku" />
+          <Sku ref="skuRef" :rdata="rdata" />
         </FormItemRest>
       </template>
     </BasicForm>
@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref, computed, unref } from 'vue';
+  import { defineComponent, ref, computed, unref, getCurrentInstance } from 'vue';
   import { Image } from 'ant-design-vue';
   import { FormItemRest } from 'ant-design-vue/es/form';
   import { useDrawer } from '/@/components/Drawer';
@@ -50,7 +50,7 @@
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { listImages } from '/@/api/asset/image';
-  import { ImageModel } from '/@/api/asset/model/imageModel';
+  import { ImageItem } from '/@/api/asset/model/imageModel';
   import { GoodsModel, GoodsSkuArr } from '/@/api/stores/model/goodsModel';
   import { getGoods, updateGoods } from '/@/api/stores/goods';
   import { set } from 'lodash-es';
@@ -68,9 +68,11 @@
     },
     emits: ['success', 'register', 'back'],
     setup(_, { emit }) {
+      const { proxy } = getCurrentInstance();
       const { createMessage } = useMessage();
       const [registerDrawer, { openDrawer }] = useDrawer();
 
+      const is_caiji = ref(false);
       const sub = ref(0);
       const sku_comfirm = ref(0);
       const rdata = ref<GoodsSkuArr>();
@@ -78,7 +80,7 @@
       const img_list_detail = ref<Array<number>>([]);
 
       const isUpdate = ref(true);
-      const images = ref<Array<ImageModel>>([]);
+      const images = ref<Array<ImageItem>>([]);
       const rowId = ref<number>(0);
 
       const [registerForm, { resetFields, getFieldsValue, setFieldsValue, validate }] = useForm({
@@ -95,7 +97,7 @@
 
         setModalProps({ confirmLoading: false });
         isUpdate.value = !!data?.isUpdate;
-        images.value = await listImages();
+        images.value = (await listImages()).items;
 
         if (unref(isUpdate)) {
           const record = await getGoods(data.record.goods_id);
@@ -116,86 +118,15 @@
 
       const getTitle = computed(() => (!unref(isUpdate) ? '新增商品' : '编辑商品'));
 
-      //提交 修改商品
-      function onEdit() {
-        const values = getFieldsValue() as GoodsModel;
-        values.bannerimgs = img_list.value;
-        values.detailimgs = img_list_detail.value;
-        console.log('sda', values);
-        updateGoods(values).then((_) => {
-          createMessage.success('修改成功');
-          rest();
-        });
-      }
-
-      function rest() {
-        emit('back');
-      }
-
-      //新增商品
-      async function onSubmit() {
-        // const values = getFieldsValue();
-        // if (that.is_caiji == 1) {
-        //   values.bannerimgs = await that.get_banner_id();
-        // } else {
-        //   values.bannerimgs = img_list.value;
-        // }
-        // if (!this.check_data()) {
-        //   return;
-        // }
-        // if (values['sku'][0]) {
-        //   values['price'] = values['sku'][0]['price'];
-        //   values['stock'] = values['sku'][0]['stock_num'];
-        // }
-        // // if(this.show_sku == 1){
-        // // 	values.sku = this.sku_obj
-        // // }
-        // values.detailimgs = img_list_detail.value;
-        // values.video_id = this.video_id;
-        // console.log(values);
-        // proModel.add_pro(values).then((res) => {
-        //   var res_code = res.status.toString(); //返回结果状态码转字符串取第一位数
-        //   if (res_code.charAt(0) == 2) {
-        //     this.$message({
-        //       showClose: true,
-        //       message: '新增成功',
-        //       type: 'success',
-        //     });
-        //     this._clsForm(); //清空form数据
-        //     this.upfile_list = []; //清空上传列表
-        //     this.upfile_list_sku = []; //清空上传列表
-        //     this.upfile_banner_list = []; //清空上传列表
-        //     this.$emit('back');
-        //   } else {
-        //     that.$message({
-        //       showClose: true,
-        //       message: res.msg,
-        //       type: 'error',
-        //     });
-        //   }
-        // });
-      }
-
-      function pro_sku(e) {
-        console.log('tree:', e.tree);
-        console.log('list:', e.list);
-        const values = getFieldsValue();
-        // this.get_sku_data(e)
-        if (values.show_sku == 1) {
-          console.log('ssku:', values['sku']);
-          values['sku'] = e['list'];
-          values['sku_img_ids'] = e['sku_img_id'];
+      function fillSkuInfo(values, skuInfo) {
+        if (values?.show_sku == 1) {
+          values.sku = skuInfo['list'];
+          values.sku_img_ids = skuInfo['sku_img_id'];
         } else {
-          console.log('end--sku:', values['sku']);
-          values['sku'] = [];
-          values['sku_img_ids'] = [];
+          values.sku = [];
+          values.sku_img_ids = [];
         }
-        if (isUpdate.value) {
-          console.log('km:');
-          onEdit();
-        } else {
-          onSubmit();
-        }
+        return values;
       }
 
       function getImageUrlById(id: Number) {
@@ -209,25 +140,97 @@
       }
 
       async function handlePictureDrawerRealod() {
-        images.value = await listImages();
+        images.value = (await listImages()).items;
       }
 
-      function handlePictureDrawerSuccess({ data, value }) {
+      function handlePictureDrawerSuccess({ data, ids }) {
         let payload = {};
-        set(payload, data.field, value?.length > 0 ? [...value] : []);
+        set(payload, data.field, ids?.length > 0 ? [...ids] : []);
         setFieldsValue(payload);
       }
 
+      function checkData(values) {
+        if (values.bannerimgs && !values.bannerimgs[0]) {
+          createMessage.error("未选择商品图片");
+          return false;
+        }
+        if (values.fx_money * 1 > values.price * 1) {
+          createMessage.error("分销佣金必须小于销售价格");
+          return false;
+        }
+        if(!values.delivery_id){
+          createMessage.error("请选择运费模板");
+        	return false;
+        }
+        return true
+      },
+
+      //新增商品
+      async function doCreate(values) {
+        if (is_caiji.value) {
+          values.bannerimgs = await get_banner_id();
+        } else {
+          values.bannerimgs = img_list.value;
+        }
+        if (!checkData(values)) {
+          return;
+        }
+        if (values.sku[0]) {
+          values.price = values.sku[0].price;
+          values.stock = values.sku[0].stock_num;
+        }
+        // if(values.show_sku == 1){
+        // 	values.sku = this.sku_obj
+        // }
+        values.detailimgs = img_list_detail.value;
+        // proModel.add_pro(values).then((res) => {
+        //   var res_code = res.status.toString(); // 返回结果状态码转字符串取第一位数
+        //   if (res_code.charAt(0) == 2) {
+        //     this.$message({
+        //       showClose: true,
+        //       message: '新增成功',
+        //       type: 'success',
+        //     });
+        //     this._clsForm(); // 清空form数据
+        //     this.upfile_list = []; // 清空上传列表
+        //     this.upfile_list_sku = []; // 清空上传列表
+        //     this.upfile_banner_list = []; // 清空上传列表
+        //     this.$emit('back');
+        //   } else {
+        //     that.$message({
+        //       showClose: true,
+        //       message: res.msg,
+        //       type: 'error',
+        //     });
+        //   }
+        // });
+        return values;
+      }
+
+      // 提交 修改商品
+      function doUpdate(values) {
+        values.bannerimgs = unref(img_list);
+        values.detailimgs = unref(img_list_detail);
+        return values;
+      }
+    
       async function handleSubmit() {
         try {
-          const values = await validate();
+          const skuInfo = proxy.$refs.skuRef?.result();
+          let values = await validate();
+          values = fillSkuInfo(values, skuInfo);
           setModalProps({ confirmLoading: true });
-          // TODO custom api
+          if (isUpdate.value) {
+            values = doUpdate(values);
+          } else {
+            values = doCreate(values);
+          }
+          // // TODO custom api
           console.log(values);
           closeModal();
           emit('success', {
             isUpdate: unref(isUpdate),
-            values: { ...values, goods_id: rowId.value },
+            values: { ...values, goods_id: unref(rowId) },
           });
         } finally {
           setModalProps({ confirmLoading: false });
@@ -238,7 +241,7 @@
         sub,
         sku_comfirm,
         rdata,
-        pro_sku,
+        fillSkuInfo,
         images,
         registerModal,
         registerForm,

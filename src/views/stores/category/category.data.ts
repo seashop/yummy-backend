@@ -37,6 +37,7 @@ export const formSchema: FormSchema[] = [
     component: 'ApiSelect',
     componentProps: {
       api: listCategory,
+      resultField: 'items',
       params: {
         withRoot: true,
       },

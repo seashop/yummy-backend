@@ -35,7 +35,7 @@
   import PictureDrawer from '/@/components/AssetPicker/PictureDrawer.vue';
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
   import { listImages } from '/@/api/asset/image';
-  import { ImageModel } from '/@/api/asset/model/imageModel';
+  import { ImageItem } from '/@/api/asset/model/imageModel';
 
   export default defineComponent({
     name: 'CategoryDrawer',
@@ -45,7 +45,7 @@
       const [registerDrawer, { openDrawer }] = useDrawer();
 
       const isUpdate = ref(true);
-      const images = ref<ImageModel[]>([]);
+      const images = ref<ImageItem[]>([]);
       const rowId = ref('');
 
       const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
@@ -59,7 +59,7 @@
         resetFields();
         setModalProps({ confirmLoading: false });
         isUpdate.value = !!data?.isUpdate;
-        images.value = await listImages();
+        images.value = (await listImages()).items;
 
         if (unref(isUpdate)) {
           rowId.value = data.record.category_id;
@@ -83,12 +83,12 @@
       }
 
       async function handlePictureDrawerRealod() {
-        images.value = await listImages();
+        images.value = (await listImages()).items;
       }
 
-      function handlePictureDrawerSuccess(payload: any) {
+      function handlePictureDrawerSuccess({ ids }) {
         setFieldsValue({
-          category_pic: payload?.value?.length > 0 ? payload.value[0] : null,
+          category_pic: ids?.length > 0 ? ids[0] : null,
         });
       }
 

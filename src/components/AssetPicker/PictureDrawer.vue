@@ -10,7 +10,7 @@
     <a-tabs v-model:activeKey="activeKey">
       <a-tab-pane key="1" tab="全部" />
     </a-tabs>
-
+    {{ data }}
     <Upload
       name="img"
       :action="uploadUrl"
@@ -31,20 +31,20 @@
         :src="image.full_url"
         :width="80"
         :preview="false"
-        :class="tabCss(image.id)"
-        @click="chooseImg(image.id)"
+        :class="tabCss(image)"
+        @click="chooseImg(image)"
       />
     </div>
   </BasicDrawer>
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref } from 'vue';
+  import { defineComponent, ref, unref } from 'vue';
   import { Image, Tabs, Button, Upload } from 'ant-design-vue';
   import { UploadOutlined } from '@ant-design/icons-vue';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { BasicDrawer, useDrawerInner } from '/@/components/Drawer';
-  import { ImageModel } from '/@/api/asset/model/imageModel';
+  import { ImageItem } from '/@/api/asset/model/imageModel';
   import { CreateImageUrl } from '/@/api/asset/image';
   import { getToken } from '/@/utils/auth';
   import type { UploadChangeParam } from 'ant-design-vue';
@@ -66,7 +66,7 @@
         default: 1,
       },
       images: {
-        type: Array as PropType<ImageModel[]>,
+        type: Array as PropType<ImageItem[]>,
         default() {
           return [];
         },
@@ -75,13 +75,15 @@
     emits: ['success', 'reload', 'register'],
     setup(props, { emit }) {
       const activeKey = ref('1');
-      const checkList = ref<Number[]>([]);
+      const ids = ref<Array<number>>([]);
+      const items = ref<Array<ImageItem>>([]);
       const data = ref<any>();
 
       const { createMessage } = useMessage();
 
       const [registerDrawer, { setDrawerProps, closeDrawer }] = useDrawerInner(async (payload) => {
-        checkList.value = [];
+        ids.value = [];
+        items.value = [];
         data.value = payload;
         setDrawerProps({ confirmLoading: false });
       });
@@ -89,24 +91,24 @@
       const getTitle = '图库管理';
 
       //选择一张图片进入选择列表
-      function chooseImg(id: Number) {
+      function chooseImg(item: ImageItem) {
         const { limit } = props;
-        if (checkList.value.indexOf(id) > -1) {
-          let index = checkList.value.indexOf(id);
-          checkList.value.splice(index, 1);
+        if (ids.value.indexOf(item.id) !== -1) {
+          let index = ids.value.indexOf(item.id);
+          ids.value.splice(index, 1);
+          items.value.splice(index, 1);
+        } else if (ids.value.length < limit) {
+          ids.value.push(item.id);
+          items.value.push({ ...item });
         } else {
-          if (checkList.value.length < limit) {
-            checkList.value.push(id);
-          } else {
-            createMessage.warn('最多选择' + limit + '张图片');
-            return;
-          }
+          createMessage.warn('最多选择' + limit + '张图片');
+          return;
         }
       }
 
       //选中图片时的样式
-      function tabCss(id: Number) {
-        if (checkList.value.indexOf(id) > -1) {
+      function tabCss(item: ImageItem) {
+        if (ids.value.indexOf(item.id) > -1) {
           return 'pic-box';
         } else {
           return 'pic-default';
@@ -117,7 +119,7 @@
         try {
           setDrawerProps({ confirmLoading: true });
           closeDrawer();
-          emit('success', {data: data.value, value: checkList.value});
+          emit('success', { data: unref(data), ids: unref(ids), items: unref(items)});
         } finally {
           setDrawerProps({ confirmLoading: false });
         }
@@ -141,6 +143,7 @@
         registerDrawer,
         getTitle,
         activeKey,
+        data,
         chooseImg,
         tabCss,
         uploadUrl: CreateImageUrl,

@@ -1,4 +1,4 @@
-import { ImageModel } from "/@/api/asset/model/imageModel";
+import { ImageItem } from '/@/api/asset/model/imageModel';
 
 export interface GoodsModel {
   goods_id: number;
@@ -12,7 +12,7 @@ export interface GoodsModel {
   is_new: boolean;
   state: boolean;
   img_id: number;
-  img: ImageModel;
+  img: ImageItem;
   bannerimgs: Array<number>;
   detailimgs: Array<number>;
   sort: number;
