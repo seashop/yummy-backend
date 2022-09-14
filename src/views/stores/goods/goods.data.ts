@@ -1,5 +1,10 @@
-import { BasicColumn } from '/@/components/Table';
-import { FormSchema } from '/@/components/Table';
+import { listCategory } from '/@/api/stores/category';
+import { useComponentRegister } from '/@/components/Form';
+import { ComponentType } from '/@/components/Form/src/types';
+import { BasicColumn, FormSchema } from '/@/components/Table';
+import { Tinymce } from '/@/components/Tinymce/index';
+
+useComponentRegister('Tinymce' as ComponentType, Tinymce);
 
 export const columns: BasicColumn[] = [
   {
@@ -70,69 +75,104 @@ export const formSchema: FormSchema[] = [
     label: '名称',
     required: true,
     component: 'Input',
+    defaultValue: 'a',
   },
   {
     field: 'category_id',
     label: '分类',
     required: true,
-    component: 'Input',
+    component: 'ApiSelect',
+    componentProps: {
+      api: listCategory,
+      resultField: 'items',
+      params: {
+        withRoot: true,
+      },
+      labelField: 'category_name',
+      valueField: 'category_id',
+    },
+    defaultValue: 0,
   },
   {
     field: 'description',
     label: '商品促销语',
     required: true,
     component: 'Input',
+    defaultValue: 'a',
   },
   {
     field: 'price',
     label: '销售价格',
     required: true,
     component: 'InputNumber',
+    colProps: {
+      span: 8,
+    },
+    defaultValue: 0,
   },
   {
     field: 'market_price',
     label: '市场价格',
     required: true,
     component: 'InputNumber',
+    colProps: {
+      span: 8,
+    },
+    defaultValue: 0,
   },
   {
     field: 'fx_money',
     label: '分销佣金',
     required: true,
     component: 'InputNumber',
+    colProps: {
+      span: 8,
+    },
+    defaultValue: 0,
   },
   {
     field: 'stock',
     label: '总库存',
     required: true,
     component: 'InputNumber',
+    colProps: {
+      span: 12,
+    },
+    defaultValue: 0,
   },
   {
     field: 'sales',
     label: '基础销量',
     required: true,
     component: 'InputNumber',
+    colProps: {
+      span: 12,
+    },
+    defaultValue: 0,
   },
   {
     field: 'bannerimgs',
     label: '商品轮播图',
-    required: true,
+    required: false,
     slot: 'picDrawer',
     component: 'Input',
+    defaultValue: 0,
   },
   {
     field: 'detailimgs',
     label: '商品详情图',
-    required: true,
+    required: false,
     slot: 'picDrawer',
     component: 'Input',
+    defaultValue: 0,
   },
   {
     field: 'video_id',
     label: '商品视频',
-    required: true,
+    required: false,
     slot: 'picDrawer',
     component: 'Input',
+    defaultValue: 0,
   },
   {
     field: 'show_sku',
@@ -148,11 +188,16 @@ export const formSchema: FormSchema[] = [
     ifShow: ({ values }) => values.show_sku,
     slot: 'sku',
     component: 'Input',
+    defaultValue: 0,
   },
   {
     field: 'content',
     label: '商品详情',
     required: true,
-    component: 'Input',
+    component: 'Tinymce' as ComponentType,
+    componentProps: {
+      showImageUpload: false,
+    },
+    defaultValue: 'a',
   },
 ];

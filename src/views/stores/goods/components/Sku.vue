@@ -17,8 +17,8 @@
               </div>
             </div>
             <div v-if="checked && attrIdx == 0">
-              <div class="picA" @click="() => openDrawer(true, { specIdx })" v-if="checked">
-                <Image v-if="spec.pic" :src="spec.pic.full_url" />
+              <div class="sku_idx_img" @click="() => openDrawer(true, { specIdx })" v-if="checked">
+                <Image v-if="spec.pic" :src="spec.pic" />
                 <Icon v-else icon="ant-design:plus-outlined" class="sku-img" />
               </div>
             </div>
@@ -94,7 +94,7 @@
 
   interface SkuSpec {
     cName: string;
-    pic?: ImageItem;
+    pic?: string;
   }
 
   interface SkuAttr {
@@ -137,7 +137,6 @@
       const attrsImageId = ref<Array<number>>([]);
       const edit_data = ref<GoodsSkuArr | undefined>();
       const img_list = ref<Array<Object>>([]);
-      const dynamicTags = ref<Array<Object>>([]);
       const imageUrl = ref<Array<String>>([]);
       const get_img = ref<Function>();
 
@@ -218,7 +217,7 @@
 
       const tableList = computed(() => {
         let tList: Array<GoodsSkuItem> = [];
-        if (!tableData) {
+        if (!tableData.value) {
           return [];
         }
         let srcData = tableData.value;
@@ -257,46 +256,13 @@
       handlePictureDrawerRealod();
 
       function handlePictureDrawerSuccess({ data, items }) {
-        let item = items?.length > 0 ? items[0] as ImageItem : undefined;
-        attrs.value[0].spec[data.specIdx].pic = item;
+        let item = items?.length > 0 ? (items[0] as ImageItem) : undefined;
+        attrs.value[0].spec[data.specIdx].pic = item?.full_url;
         attrsImageId.value[data.specIdx] = item ? item.id : 0;
       }
 
-      function delA(index) {
-        img_list.value.splice(index, 1);
-      }
-      function get_delivery() {
-        this.http.get('delivery /admin/get_delivery').then((res) => {
-          this.delivery = res.data;
-        });
-      }
-
-      // 规格
-      function setlist(e) {
-        set(attrs.value[0].spec[this.xb], 'pic', e[0].url);
-        attrsImageId.value[this.xb] = e[0].id;
-        console.log('spec', attrs.value[0].spec);
-      }
-
-      // 规格图片下标
-      function sku_img_idfun(index) {
-        sku_img_index.value = index;
-        imageUrl.value.splice(index, 1, '');
-        attrsImageId.value.splice(index, 1, 0);
-      }
-
-      // 规格图片上传成功
-      function handleAvatarSuccess(res, file) {
-        let index = sku_img_index.value ?? 0;
-        console.log('sku_index', index);
-        let img = URL.createObjectURL(file.raw);
-        let id = res.id;
-        imageUrl.value.splice(index, 1, img);
-        attrsImageId.value.splice(index, 1, id);
-      }
-
       // 获取修改数据
-      function edit_old(res) {
+      function edit_old(res: any) {
         if (res === undefined) {
           return;
         }
@@ -355,10 +321,6 @@
         attrs.value[index].spec.splice(index2, 1);
       }
 
-      function handleClose(tag) {
-        dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1);
-      }
-
       function getName(obj, index) {
         if (obj) {
           let r = parseInt((index - 1) / obj['rowspan']);
@@ -394,7 +356,6 @@
         checked,
         sku_img_index, //规格图片下标
         attrs,
-        dynamicTags,
         inputVisible: false,
         inputValue: '',
         edit_data, //原修改数据
@@ -419,7 +380,7 @@
 </script>
 
 <style lang="less">
-#sku_tag {
+  #sku_tag {
     width: 60%;
   }
 
@@ -434,7 +395,8 @@
   }
 
   /**reset*/
-  button, input {
+  button,
+  input {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     outline: none;
   }
@@ -452,14 +414,15 @@
     -moz-border-radius: 2px;
     border-radius: 2px;
 
-    :active, :focus, :hover {
+    :active,
+    :focus,
+    :hover {
       text-decoration: none;
       color: #333;
       background-color: #fcfcfc;
       border-color: #ccc;
     }
   }
-
 
   /*table*/
   .form-item {
@@ -539,7 +502,8 @@
     white-space: nowrap;
   }
 
-  .form-list, .form-title {
+  .form-list,
+  .form-title {
     text-align: left;
   }
 
@@ -570,7 +534,8 @@
     padding: 10px;
   }
 
-  .stock-title, .form-h {
+  .stock-title,
+  .form-h {
     height: 40px;
     line-height: 40px;
   }
@@ -604,12 +569,12 @@
     width: 28px;
   }
 
-  .picA {
-    width: 148px;
-    height: 148px;
+  .sku_idx_img {
+    width: 74px;
+    height: 74px;
     position: relative;
-    background-color: #FBFDFF;
-    border: 1px dashed #C0CCDA;
+    background-color: #fbfdff;
+    border: 1px dashed #c0ccda;
     border-radius: 6px;
     box-sizing: border-box;
     vertical-align: top;
@@ -617,9 +582,9 @@
     margin: 6px 6px 6px 10px;
 
     img {
-      width: 144px;
-      height: 144px;
-      border: 1px solid #BFBFBF;
+      width: 72px;
+      height: 72px;
+      border: 1px solid #bfbfbf;
       border-radius: 3px;
     }
 
@@ -627,7 +592,7 @@
       position: absolute;
       top: -13px;
       right: -10px;
-      color: #7C7C7C;
+      color: #7c7c7c;
       font-size: 25px;
       cursor: pointer;
     }

@@ -18,12 +18,16 @@ export const listGoods = (params?: selectParams) => {
 };
 
 export const getGoods = (id: number) => {
-  return defHttp.get<GoodsModel>({ url: Api.GetGoods, params: {
-    id,
-  } });
+  return defHttp.get<GoodsModel>({
+    url: Api.GetGoods,
+    params: {
+      id,
+    },
+  });
 };
 
-export const createGoods = (data?: GoodsModel) => {
+export const createGoods = (data: Partial<GoodsModel>) => {
+  console.log(data);
   return defHttp.post<GoodsModel>({ url: Api.CreateGoods, data });
 };
 
@@ -32,9 +36,12 @@ export const updateGoods = (data?: GoodsModel) => {
 };
 
 export const switchGoods = (id: number, field: string) => {
-  return defHttp.put<GoodsModel>({ url: Api.SwitchGoods, data: {
-    db: 'goods',
-    id,
-    field,
-  } });
+  return defHttp.put<GoodsModel>({
+    url: Api.SwitchGoods,
+    data: {
+      db: 'goods',
+      id,
+      field,
+    },
+  });
 };

@@ -10,7 +10,6 @@
     <a-tabs v-model:activeKey="activeKey">
       <a-tab-pane key="1" tab="全部" />
     </a-tabs>
-    {{ data }}
     <Upload
       name="img"
       :action="uploadUrl"
@@ -119,7 +118,7 @@
         try {
           setDrawerProps({ confirmLoading: true });
           closeDrawer();
-          emit('success', { data: unref(data), ids: unref(ids), items: unref(items)});
+          emit('success', { data: unref(data), ids: unref(ids), items: unref(items) });
         } finally {
           setDrawerProps({ confirmLoading: false });
         }
