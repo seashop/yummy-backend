@@ -3,7 +3,7 @@
     <template #headerContent>
       <div class="flex justify-between items-center">
         <span class="flex-1">
-          <a :href="GITHUB_URL" target="_blank">{{ name }}</a>
+          {{ name }}
           是一个基于Vue3.0、Vite、 Ant-Design-Vue 、TypeScript
           的后台解决方案，目标是为中大型项目开发,提供现成的开箱解决方案及丰富的示例,原则上不会限制任何代码用于商用。
         </span>
@@ -29,7 +29,7 @@
   const devSchema: DescItem[] = [];
 
   const commonTagRender = (color: string) => (curVal) => h(Tag, { color }, () => curVal);
-  const commonLinkRender = (text: string) => (href) => h('a', { href, target: '_blank' }, text);
+  // const commonLinkRender = (text: string) => (href) => h('a', { href, target: '_blank' }, text);
 
   const infoSchema: DescItem[] = [
     {
@@ -42,21 +42,21 @@
       field: 'lastBuildTime',
       render: commonTagRender('blue'),
     },
-    {
-      label: '文档地址',
-      field: 'doc',
-      render: commonLinkRender('文档地址'),
-    },
-    {
-      label: '预览地址',
-      field: 'preview',
-      render: commonLinkRender('预览地址'),
-    },
-    {
-      label: 'Github',
-      field: 'github',
-      render: commonLinkRender('Github'),
-    },
+    // {
+    //   label: '文档地址',
+    //   field: 'doc',
+    //   render: commonLinkRender('文档地址'),
+    // },
+    // {
+    //   label: '预览地址',
+    //   field: 'preview',
+    //   render: commonLinkRender('预览地址'),
+    // },
+    // {
+    //   label: 'Github',
+    //   field: 'github',
+    //   render: commonLinkRender('Github'),
+    // },
   ];
 
   const infoData = {
