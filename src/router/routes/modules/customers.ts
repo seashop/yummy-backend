@@ -29,7 +29,7 @@ const customers: AppRouteModule = {
       component: () => import('/@/views/customers/level/index.vue'),
       meta: {
         // affix: true,
-        title: t('routes.customers.customer'),
+        title: t('routes.customers.level'),
       },
     },
   ],

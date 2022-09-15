@@ -12,7 +12,7 @@
   </RadioGroup>
 </template>
 <script lang="ts">
-  import { defineComponent, PropType, ref, unref } from 'vue';
+  import { defineComponent, onDeactivated, PropType, ref, unref } from 'vue';
   import { Input, Radio, DatePicker } from 'ant-design-vue';
   import { useRuleFormItem } from '/@/hooks/component/useFormItem';
   import { useAttrs } from '/@/hooks/core/useAttrs';
@@ -23,7 +23,6 @@
     components: {
       Input,
       RadioGroup: Radio.Group,
-      RadioButton: Radio.Button,
       Radio,
       RangePicker: DatePicker.RangePicker,
     },
@@ -40,8 +39,16 @@
       const { t } = useI18n();
       // Embedded in the form, just use the hook binding to perform form verification
       const [state] = useRuleFormItem(props);
-
       const day = ref<number>();
+
+      onDeactivated(() => {
+        day.value = 0;
+        console.log('onActivated');
+      });
+
+      function reset() {
+        console.log('CouponTime reset');
+      }
 
       function handleChange(_, ...args) {
         emitData.value = args;
@@ -51,11 +58,22 @@
         emit('effect', { state: state.value, value });
       }
 
-      function onDayChange(e) {
+      function onDayChange() {
         emit('effect', { state: state.value, value: unref(day) });
       }
 
-      return { state, attrs, loading, t, day, handleChange, onRangeChange, onDayChange, props };
+      return {
+        state,
+        attrs,
+        loading,
+        t,
+        day,
+        handleChange,
+        onRangeChange,
+        onDayChange,
+        props,
+        reset,
+      };
     },
   });
 </script>

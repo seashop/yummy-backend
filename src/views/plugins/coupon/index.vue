@@ -10,6 +10,7 @@
             :actions="[
               {
                 icon: 'clarity:note-edit-line',
+                ifShow: false,
                 onClick: handleEdit.bind(null, record),
               },
               {
@@ -31,7 +32,7 @@
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue';
-  import { Button, Image } from 'ant-design-vue';
+  import { Button } from 'ant-design-vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { createCoupon, listCoupons, updateCoupon } from '/@/api/plugins/coupon';
@@ -42,7 +43,7 @@
 
   export default defineComponent({
     name: 'CouponManagement',
-    components: { BasicTable, CouponModal, TableAction, Image, Button },
+    components: { BasicTable, CouponModal, TableAction, Button },
     setup() {
       const [registerModal, { openModal }] = useModal();
       const [registerTable, { reload }] = useTable({
@@ -61,7 +62,6 @@
           width: 80,
           title: '操作',
           dataIndex: 'action',
-          fixed: undefined,
         },
       });
 

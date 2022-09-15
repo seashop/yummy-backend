@@ -10,7 +10,8 @@ export const columns: BasicColumn[] = [
   {
     title: '序号',
     dataIndex: 'id',
-    width: 200,
+    fixed: 'left',
+    width: 60,
   },
   {
     title: '名称',
@@ -62,7 +63,14 @@ export const columns: BasicColumn[] = [
     title: '库存',
     dataIndex: 'stock',
     format: (_, record) => {
-      return record?.stock >= 0 ? record.stock : '无限张';
+      switch (record?.stock_type) {
+        case 0:
+          return record.stock;
+        case 1:
+          return '无限张';
+        default:
+          break;
+      }
     },
     width: 200,
   },
@@ -93,7 +101,25 @@ export const formSchema: FormSchema[] = [
     field: 'stock',
     label: '发放总量',
     required: true,
-    component: 'Input',
+    component: 'InputNumber',
+    componentProps: ({ formModel }) => {
+      return {
+        onChange: () => {
+          if (!formModel.stock) {
+            formModel.stock_type = 0;
+          } else {
+            formModel.stock_type = 1;
+          }
+        },
+      };
+    },
+  },
+  {
+    field: 'stock_type',
+    label: '库存类型',
+    required: true,
+    component: 'InputNumber',
+    show: false,
   },
   {
     field: 'full',
@@ -115,7 +141,6 @@ export const formSchema: FormSchema[] = [
     componentProps: ({ formModel }) => {
       return {
         onEffect: (e: any) => {
-          console.log('onEffect', e);
           switch (e.state) {
             case 1:
               formModel.start_time = e.value[0];
@@ -160,12 +185,19 @@ export const formSchema: FormSchema[] = [
     field: 'status',
     label: '使用次数',
     required: true,
-    component: 'Input',
-  },
-  {
-    field: 'stock',
-    label: '发放总量',
-    required: true,
-    component: 'Input',
+    component: 'RadioGroup',
+    componentProps: {
+      options: [
+        {
+          label: '有限',
+          value: 1,
+        },
+        {
+          label: '无限',
+          value: 2,
+        },
+      ],
+    },
+    defaultValue: 1,
   },
 ];

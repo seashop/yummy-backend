@@ -1,9 +1,5 @@
 <template>
   <div style="background-color: #ffffff">
-    <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>订单列表</el-breadcrumb-item>
-    </el-breadcrumb>
     <div class="H10"></div>
     <!-- 搜索 -->
     <div class="search">
@@ -126,7 +122,6 @@
                     v-if="item.state == 0 && item.shipment_state == 1"
                     type="info"
                     size="mini"
-                    slot="reference"
                     @click="qrysd(item.order_id)"
                     >确认已送达</BasicButton
                   >
@@ -141,7 +136,6 @@
                     style="margin-left: 10px"
                     type="info"
                     size="mini"
-                    slot="reference"
                     @click="print_tik(item.order_num)"
                     v-if="item.payment_state == 1"
                     >打印小票</BasicButton
@@ -154,7 +148,6 @@
                     style="margin-left: 10px"
                     type="danger"
                     size="mini"
-                    slot="reference"
                     @click="del(item.order_id)"
                     >删除</BasicButton
                   >
@@ -163,7 +156,7 @@
             </Row>
           </div>
           <div class="order-01-2">
-            <div class="order-01-2-01" v-for="(ite, index) of item.ordergoods" :key="index">
+            <div class="order-01-2-01" v-for="(ite, ogIdx) of item.ordergoods" :key="ogIdx">
               <div v-if="!ite.pic">no pic</div>
               <Image v-else :width="80" :src="ite.pic.full_url" />
               <div class="order-01-2-01-name">{{ ite.title }}&nbsp;x{{ ite.number }}</div>
@@ -197,10 +190,16 @@
     Row,
     Col,
   } from 'ant-design-vue';
-  import { Loading } from '/@/components/Loading';
-  import BasicButton from '/@/components/Button/src/BasicButton.vue';
 
-  import { listOrders, printOrder, editOrderPay, editOrderCourier, editOrderReceive, deleteOrder } from '/@/api/orders/order';
+  import BasicButton from '/@/components/Button/src/BasicButton.vue';
+  import {
+    listOrders,
+    printOrder,
+    editOrderPay,
+    editOrderCourier,
+    editOrderReceive,
+    deleteOrder,
+  } from '/@/api/orders/order';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { OrderItem, selectParams } from '/@/api/orders/model/ordersModel';
 
@@ -213,10 +212,8 @@
       Select,
       SelectOption,
       Image,
-      Modal,
       Row,
       Col,
-      Loading,
       BasicButton,
     },
     setup() {
@@ -311,7 +308,7 @@
             return deleteOrder(id).then((_) => {
               createMessage.success('删除成功!');
               get_all_order();
-            })
+            });
           },
           cancelText: '取消',
           type: 'warning',

@@ -1,9 +1,9 @@
 <template>
   <div>
     <BasicTable @register="registerTable">
-      <!-- <template #toolbar>
+      <template #toolbar>
         <a-button type="primary" @click="handleCreate"> 新增等级 </a-button>
-      </template> -->
+      </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <TableAction
@@ -31,7 +31,6 @@
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue';
-  import { Image } from 'ant-design-vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { createLevel, listLevels, updateLevel } from '/@/api/customers/level';
@@ -42,7 +41,7 @@
 
   export default defineComponent({
     name: 'LevelManagement',
-    components: { BasicTable, LevelModal, TableAction, Image },
+    components: { BasicTable, LevelModal, TableAction },
     setup() {
       const [registerModal, { openModal }] = useModal();
       const [registerTable, { reload }] = useTable({

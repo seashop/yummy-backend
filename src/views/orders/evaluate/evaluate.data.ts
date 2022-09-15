@@ -51,7 +51,7 @@ export const searchFormSchema: FormSchema[] = [
 
 export const replyFormSchema: FormSchema[] = [
   {
-    field: 'textarea2',
+    field: 'reply_content',
     label: '内容',
     required: true,
     component: 'Input',

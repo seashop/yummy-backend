@@ -7,7 +7,7 @@ enum Api {
   EditOrderCourier = '/order/admin/edit_courier',
   EditOrderReceive = '/order/user/receive',
   DeleteOrder = '/order/admin/del_order',
-  PrintOrder = 'cms/print_order',
+  PrintOrder = '/cms/print_order',
 }
 
 /**
