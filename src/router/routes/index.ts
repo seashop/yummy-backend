@@ -13,7 +13,6 @@ const routeModuleList: AppRouteModule[] = [];
 // 加入到路由集合中
 Object.keys(modules).forEach((key) => {
   // 移除 demo 页面
-  console.log(key);
   if (key.indexOf('./modules/demo/') === 0) {
     return;
   }
