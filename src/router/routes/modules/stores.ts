@@ -9,7 +9,7 @@ const stores: AppRouteModule = {
   component: LAYOUT,
   redirect: '/stores/goods',
   meta: {
-    orderNo: 10,
+    orderNo: 20,
     icon: 'ion:grid-outline',
     title: t('routes.stores.stores'),
   },
