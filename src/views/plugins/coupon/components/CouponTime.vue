@@ -12,14 +12,14 @@
   </RadioGroup>
 </template>
 <script lang="ts">
-  import { defineComponent, onDeactivated, PropType, ref, unref } from 'vue';
+  import { defineComponent, PropType, ref, unref } from 'vue';
   import { Input, Radio, DatePicker } from 'ant-design-vue';
   import { useRuleFormItem } from '/@/hooks/component/useFormItem';
   import { useAttrs } from '/@/hooks/core/useAttrs';
   import { useI18n } from '/@/hooks/web/useI18n';
 
   export default defineComponent({
-    name: 'ApiRadioGroup',
+    name: 'CouponTime',
     components: {
       Input,
       RadioGroup: Radio.Group,
@@ -40,15 +40,6 @@
       // Embedded in the form, just use the hook binding to perform form verification
       const [state] = useRuleFormItem(props);
       const day = ref<number>();
-
-      onDeactivated(() => {
-        day.value = 0;
-        console.log('onActivated');
-      });
-
-      function reset() {
-        console.log('CouponTime reset');
-      }
 
       function handleChange(_, ...args) {
         emitData.value = args;
@@ -72,7 +63,6 @@
         onRangeChange,
         onDayChange,
         props,
-        reset,
       };
     },
   });

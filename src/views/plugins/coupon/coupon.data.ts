@@ -125,13 +125,13 @@ export const formSchema: FormSchema[] = [
     field: 'full',
     label: '使用门槛',
     required: true,
-    component: 'Input',
+    component: 'InputNumber',
   },
   {
     field: 'reduce',
     label: '优惠价格',
     required: true,
-    component: 'Input',
+    component: 'InputNumber',
   },
   {
     field: 'couponTime',
