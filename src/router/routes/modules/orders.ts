@@ -31,6 +31,14 @@ const orders: AppRouteModule = {
         title: t('routes.orders.evaluate'),
       },
     },
+    {
+      path: 'refund',
+      name: 'Refund',
+      component: () => import('/@/views/orders/refund/index.vue'),
+      meta: {
+        title: t('routes.orders.refund'),
+      },
+    },
   ],
 };
 

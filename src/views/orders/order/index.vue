@@ -200,9 +200,9 @@
   import { Loading } from '/@/components/Loading';
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
 
-  import { editOrderPay, listOrders, printOrder } from '/@/api/orders/order';
+  import { listOrders, printOrder, editOrderPay, editOrderCourier, editOrderReceive, deleteOrder } from '/@/api/orders/order';
   import { useMessage } from '/@/hooks/web/useMessage';
-  import { OrderItem } from '/@/api/orders/model/ordersModel';
+  import { OrderItem, selectParams } from '/@/api/orders/model/ordersModel';
 
   export default defineComponent({
     name: 'OrderManagement',
@@ -227,6 +227,9 @@
       const list = ref<Array<OrderItem>>([]);
       const all = ref<Array<OrderItem>>([]);
       const show_list = ref<Array<OrderItem>>();
+      const form = ref<selectParams>({
+        playstate: -1,
+      });
 
       function print_tik(order_num) {
         printOrder(order_num).then((_) => {
@@ -245,16 +248,18 @@
       }
       //点击配送
       function send(id) {
-        const _this = this;
-        Modal.confirm('确认配送？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        Modal.confirm({
+          title: '提示',
+          content: '确认配送？',
+          okText: '确定',
+          onOk: () => {
+            return editOrderCourier(id).then((_) => {
+              createMessage.success('商品正在配送中');
+              get_all_order();
+            });
+          },
+          cancelText: '取消',
           type: 'warning',
-        }).then(() => {
-          this.http.get('order/admin/edit_courier?id=' + id).then((res) => {
-            createMessage.success('商品正在配送中');
-            _this.get_all_order();
-          });
         });
       }
       function zf(id) {
@@ -262,7 +267,7 @@
           title: '提示',
           content: '确认修改支付？',
           okText: '确定',
-          onOk() {
+          onOk: () => {
             return editOrderPay(id).then((_) => {
               createMessage.success('修改支付状态');
               get_all_order();
@@ -273,15 +278,18 @@
         });
       }
       function qrysd(id) {
-        Modal.confirm('确认已配送到收货地址？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        Modal.confirm({
+          title: '提示',
+          content: '确认已配送到收货地址？',
+          okText: '确定',
+          onOk: () => {
+            return editOrderReceive(id).then((_) => {
+              createMessage.success('确认收货成功');
+              get_all_order();
+            });
+          },
+          cancelText: '取消',
           type: 'warning',
-        }).then(() => {
-          this.http.put_show('order/user/receive?id=' + id).then((res) => {
-            createMessage.success('确认收货成功');
-            this.get_all_order();
-          });
         });
       }
       function get_all_order() {
@@ -295,28 +303,26 @@
       get_all_order();
 
       function del(id) {
-        const that = this;
-        Modal.confirm('确定删除该订单', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        Modal.confirm({
+          title: '提示',
+          content: '确定删除该订单',
+          okText: '确定',
+          onOk: () => {
+            return deleteOrder(id).then((_) => {
+              createMessage.success('删除成功!');
+              get_all_order();
+            })
+          },
+          cancelText: '取消',
           type: 'warning',
-        }).then(() => {
-          orderModel.del_order(id).then((res) => {
-            createMessage.success('删除成功!');
-            that.get_all_order();
-          });
         });
       }
+
       function search() {
-        const _this = this;
-        let data = this.form;
-        if (data.playstate == -1) {
-          data.playstate = '';
-        }
+        let data = form.value;
         // data.playstate = Number(data.playstate);
-        searchModel.searchOrder(data).then((res) => {
-          _this.show_list = [];
-          _this.show_list = res.data;
+        listOrders(data).then((res) => {
+          show_list.value = res.items;
         });
       }
 
@@ -325,16 +331,8 @@
         total,
         list,
         all,
-        // geting: this.$getimg,
-        // 显示订单的列表
         show_list,
-        test: '',
-        form: {
-          playstate: '',
-          starttime: '',
-          endtime: '',
-          wordkey: '',
-        },
+        form,
         print_tik,
         jump_page,
         send,

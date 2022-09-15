@@ -4,6 +4,9 @@ import { OrderListResultModel, selectParams } from './model/ordersModel';
 enum Api {
   ListOrders = '/order/admin/get_order',
   EditOrderPay = '/order/admin/edit_pay',
+  EditOrderCourier = '/order/admin/edit_courier',
+  EditOrderReceive = '/order/user/receive',
+  DeleteOrder = '/order/admin/del_order',
   PrintOrder = 'cms/print_order',
 }
 
@@ -23,7 +26,30 @@ export const editOrderPay = (id: string) => {
     },
   });
 };
-
+export const editOrderCourier = (id: string) => {
+  return defHttp.get<OrderListResultModel>({
+    url: Api.EditOrderCourier,
+    params: {
+      id,
+    },
+  });
+};
+export const editOrderReceive = (id: string) => {
+  return defHttp.put<OrderListResultModel>({
+    url: Api.EditOrderReceive,
+    params: {
+      id,
+    },
+  });
+};
+export const deleteOrder = (id: string) => {
+  return defHttp.put<OrderListResultModel>({
+    url: Api.DeleteOrder,
+    params: {
+      id,
+    },
+  });
+};
 export const printOrder = (order_num: string) => {
   return defHttp.get<OrderListResultModel>({
     url: Api.PrintOrder,

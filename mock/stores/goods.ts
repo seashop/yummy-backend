@@ -17,7 +17,7 @@ const generateSpecItem = () => {
   };
 };
 
-const goodsItem = (id: number) => {
+export const goodsItem = (id: number) => {
   let imageIdx = id * 100;
   return {
     goods_id: id,
@@ -32,7 +32,7 @@ const goodsItem = (id: number) => {
     star: '@integer(1,20)',
     evaluates: '@integer(1,20)',
     img_id: '@integer(1,20)',
-    img: imageEntry(imageIdx++),
+    imgs: imageEntry(imageIdx++),
     video_id: '@integer(1,20)',
     video: imageEntry(imageIdx++),
     keywords: '@string()',

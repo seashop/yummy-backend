@@ -76,7 +76,10 @@ export interface OrderUser {
 }
 
 export interface selectParams {
-  title: string;
+  playstate: number;
+  starttime?: Date;
+  endtime?: Date;
+  wordkey?: string;
 }
 
 export type OrderListResultModel = BasicFetchResult<OrderItem>;

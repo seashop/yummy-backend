@@ -1,9 +1,6 @@
 <template>
   <div>
     <BasicTable @register="registerTable">
-      <template #toolbar>
-        <a-button type="primary" @click="handleCreate"> 新增分类 </a-button>
-      </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'pic_full_url'">
           <Image :src="record.pic_full_url" :width="60" />
@@ -12,8 +9,8 @@
           <TableAction
             :actions="[
               {
-                icon: 'clarity:note-edit-line',
-                onClick: handleEdit.bind(null, record),
+                label: 'Reply',
+                onClick: handleReply.bind(null, record),
               },
               {
                 icon: 'ant-design:delete-outlined',
@@ -29,7 +26,7 @@
         </template>
       </template>
     </BasicTable>
-    <CategoryModal @register="registerModal" @success="handleSuccess" />
+    <ReplyModal @register="registerReplyModal" @success="handleReplySuccess" />
   </div>
 </template>
 <script lang="ts">
@@ -37,20 +34,20 @@
   import { Image } from 'ant-design-vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { createCategory, listCategory, updateCategory } from '/@/api/stores/category';
+  import { addReply, deleteReply, listEvaluates } from '/@/api/orders/evaluate';
   import { useModal } from '/@/components/Modal';
   
-  import CategoryModal from './CategoryModal.vue';
-  import { columns, searchFormSchema } from './category.data';
+  import ReplyModal from './ReplyModal.vue';
+  import { columns, searchFormSchema } from './evaluate.data';
 
   export default defineComponent({
-    name: 'CategoryManagement',
-    components: { BasicTable, CategoryModal, TableAction, Image },
+    name: 'EvaluateManagement',
+    components: { BasicTable, ReplyModal, TableAction, Image },
     setup() {
-      const [registerModal, { openModal }] = useModal();
+      const [registerReplyModal, { openModal: openReplyModal }] = useModal();
       const [registerTable, { reload }] = useTable({
-        title: '分类列表',
-        api: listCategory,
+        title: '评价列表',
+        api: listEvaluates,
         columns,
         formConfig: {
           labelWidth: 120,
@@ -70,40 +67,42 @@
       });
 
       function handleCreate() {
-        openModal(true, {
+        openReplyModal(true, {
           isUpdate: false,
         });
       }
 
       function handleEdit(record: Recordable) {
-        openModal(true, {
+        openReplyModal(true, {
           record,
           isUpdate: true,
         });
       }
 
-      function handleDelete(record: Recordable) {
-        console.log(record);
+      function handleReply(record: Recordable) {
+        openReplyModal(true, { record });
       }
 
-      function handleSuccess({ isUpdate, values }) {
-        if (isUpdate) {
-          const result = updateCategory(values);
-          console.log(result);
-        } else {
-          const result = createCategory(values);
-          console.log(result);
-        }
+      async function handleDelete(record: Recordable) {
+        await deleteReply(record.id);
+        console.log(record);
+        reload();
+      }
+
+      async function handleReplySuccess({ values }) {
+        const result = await addReply(values);
+        console.log(result);
         reload();
       }
 
       return {
         registerTable,
-        registerModal,
+        registerReplyModal,
         handleCreate,
         handleEdit,
+        handleReply,
         handleDelete,
-        handleSuccess,
+        handleReplySuccess,
       };
     },
   });
