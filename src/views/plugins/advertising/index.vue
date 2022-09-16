@@ -2,10 +2,13 @@
   <div>
     <BasicTable @register="registerTable">
       <template #toolbar>
-        <Button type="primary" @click="handleCreate"> 新增满减 </Button>
+        <a-button type="primary" @click="handleCreate"> 新增广告 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'action'">
+        <template v-if="column.key === 'imgs'">
+          <Image :src="record.imgs.full_url" :width="60" />
+        </template>
+        <template v-else-if="column.key === 'action'">
           <TableAction
             :actions="[
               {
@@ -26,28 +29,28 @@
         </template>
       </template>
     </BasicTable>
-    <DiscountModal @register="registerModal" @success="handleSuccess" />
+    <AdvertisingModal @register="registerModal" @success="handleSuccess" />
   </div>
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue';
-  import { Button } from 'ant-design-vue';
+  import { Image } from 'ant-design-vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { createDiscount, listDiscounts, updateDiscount } from '/@/api/plugins/discount';
+  import { createAdContent, listAdContents, updateAdContent } from '/@/api/plugins/advertising';
   import { useModal } from '/@/components/Modal';
 
-  import DiscountModal from './DiscountModal.vue';
-  import { columns, searchFormSchema } from './discount.data';
+  import AdvertisingModal from './AdvertisingModal.vue';
+  import { columns, searchFormSchema } from './advertising.data';
 
   export default defineComponent({
-    name: 'DiscountManagement',
-    components: { BasicTable, DiscountModal, TableAction, Button },
+    name: 'AdvertisingManagement',
+    components: { BasicTable, AdvertisingModal, TableAction, Image },
     setup() {
       const [registerModal, { openModal }] = useModal();
       const [registerTable, { reload }] = useTable({
-        title: '满减列表',
-        api: listDiscounts,
+        title: '广告列表',
+        api: listAdContents,
         columns,
         formConfig: {
           labelWidth: 120,
@@ -61,6 +64,8 @@
           width: 80,
           title: '操作',
           dataIndex: 'action',
+          // slots: { customRender: 'action' },
+          fixed: undefined,
         },
       });
 
@@ -83,10 +88,10 @@
 
       async function handleSuccess({ isUpdate, values }) {
         if (isUpdate) {
-          const result = await updateDiscount(values);
+          const result = await updateAdContent(values);
           console.log(result);
         } else {
-          const result = await createDiscount(values);
+          const result = await createAdContent(values);
           console.log(result);
         }
         reload();

@@ -30,7 +30,7 @@
   import { Image } from 'ant-design-vue';
   import { useDrawer } from '/@/components/Drawer';
   import { BasicForm, useForm } from '/@/components/Form/index';
-  import { formSchema } from './category.data';
+  import { formSchema } from './advertising.data';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import PictureDrawer from '/@/components/AssetPicker/PictureDrawer.vue';
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
@@ -38,7 +38,7 @@
   import { ImageItem } from '/@/api/asset/model/imageModel';
 
   export default defineComponent({
-    name: 'CategoryModal',
+    name: 'AdvertisingModal',
     components: { Image, BasicModal, BasicForm, PictureDrawer, BasicButton },
     emits: ['success', 'register'],
     setup(_, { emit }) {
@@ -69,7 +69,7 @@
         }
       });
 
-      const getTitle = computed(() => (!unref(isUpdate) ? '新增分类' : '编辑分类'));
+      const getTitle = computed(() => (!unref(isUpdate) ? '新增广告' : '编辑广告'));
 
       function getImageUrlById(id: Number) {
         for (let index = 0; index < images.value.length; index++) {
@@ -86,9 +86,10 @@
         images.value = (await listImages()).items;
       }
 
-      function handlePictureDrawerSuccess({ ids }) {
+      function handlePictureDrawerSuccess({ ids, items }) {
         setFieldsValue({
-          category_pic: ids?.length > 0 ? ids[0] : null,
+          img_id: ids?.length > 0 ? ids[0] : null,
+          img: items?.length > 0 ? items[0] : null,
         });
       }
 
@@ -101,7 +102,7 @@
           closeModal();
           emit('success', {
             isUpdate: unref(isUpdate),
-            values: { ...values, category_id: rowId.value },
+            values: { ...values, id: rowId.value },
           });
         } finally {
           setModalProps({ confirmLoading: false });

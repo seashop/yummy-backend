@@ -49,12 +49,12 @@ export const selectGoodsStep1: BasicColumn[] = [
   {
     title: '商品信息',
     dataIndex: 'title',
-    width: 200,
+    // width: 200,
   },
   {
     title: '库存',
     dataIndex: 'stock',
-    width: 200,
+    // width: 200,
   },
 ];
 
@@ -71,17 +71,17 @@ export const selectGoodsStep2: BasicColumn[] = [
   {
     title: '商品信息',
     dataIndex: 'title',
-    width: 200,
+    // width: 200,
   },
   {
     title: '库存',
     dataIndex: 'stock',
-    width: 200,
+    // width: 200,
   },
   {
     title: '满减',
     dataIndex: 'discount',
-    width: 200,
+    // width: 200,
   },
 ];
 
@@ -138,8 +138,8 @@ export const formSchema: FormSchema[] = [
     component: 'Divider',
   },
   {
-    field: 'reduce',
-    label: '商品选择',
+    field: 'goods_ids',
+    label: '满减商品',
     required: true,
     component: 'DiscountGoodsSelect' as ComponentType,
   },
