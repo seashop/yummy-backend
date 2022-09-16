@@ -1,4 +1,4 @@
-import { imageEntry } from 'mock/asset/image';
+import { imageEntry } from '../asset/image';
 import { MockMethod } from 'vite-plugin-mock';
 import { resultPageSuccess, resultSuccess } from '../_util';
 
