@@ -21,7 +21,7 @@ export const createSearch = (data: SearchItem) => {
 };
 
 export const updateSearch = (_: number, data: SearchItem) => {
-  return defHttp.post<SearchItem>({ url: Api.CreateSearch, data });
+  return defHttp.post<SearchItem>({ url: Api.UpdateSearch, data });
 };
 
 export const deleteSearch = (name: string) => {
