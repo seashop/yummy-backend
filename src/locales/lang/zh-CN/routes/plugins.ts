@@ -4,4 +4,5 @@ export default {
   discount: '满减',
   advertising: '广告',
   article: '文章',
+  diningTable: '扫码点餐',
 };

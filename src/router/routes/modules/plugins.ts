@@ -50,6 +50,15 @@ const plugins: AppRouteModule = {
         title: t('routes.plugins.article'),
       },
     },
+    {
+      path: 'diningTable',
+      name: 'DiningTable',
+      component: () => import('/@/views/plugins/dining-table/index.vue'),
+      meta: {
+        // affix: true,
+        title: t('routes.plugins.diningTable'),
+      },
+    },
   ],
 };
 
