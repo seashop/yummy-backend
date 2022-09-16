@@ -75,7 +75,6 @@ export const formSchema: FormSchema[] = [
     label: '名称',
     required: true,
     component: 'Input',
-    defaultValue: 'a',
   },
   {
     field: 'category_id',
@@ -98,7 +97,6 @@ export const formSchema: FormSchema[] = [
     label: '商品促销语',
     required: true,
     component: 'Input',
-    defaultValue: 'a',
   },
   {
     field: 'price',
@@ -108,7 +106,6 @@ export const formSchema: FormSchema[] = [
     colProps: {
       span: 8,
     },
-    defaultValue: 0,
   },
   {
     field: 'market_price',
@@ -118,7 +115,6 @@ export const formSchema: FormSchema[] = [
     colProps: {
       span: 8,
     },
-    defaultValue: 0,
   },
   {
     field: 'fx_money',
@@ -128,7 +124,6 @@ export const formSchema: FormSchema[] = [
     colProps: {
       span: 8,
     },
-    defaultValue: 0,
   },
   {
     field: 'stock',
@@ -138,7 +133,6 @@ export const formSchema: FormSchema[] = [
     colProps: {
       span: 12,
     },
-    defaultValue: 0,
   },
   {
     field: 'sales',
@@ -148,7 +142,6 @@ export const formSchema: FormSchema[] = [
     colProps: {
       span: 12,
     },
-    defaultValue: 0,
   },
   {
     field: 'bannerimgs',
@@ -156,7 +149,6 @@ export const formSchema: FormSchema[] = [
     required: false,
     slot: 'picDrawer',
     component: 'Input',
-    defaultValue: 0,
   },
   {
     field: 'detailimgs',
@@ -164,7 +156,6 @@ export const formSchema: FormSchema[] = [
     required: false,
     slot: 'picDrawer',
     component: 'Input',
-    defaultValue: 0,
   },
   {
     field: 'video_id',
@@ -172,7 +163,6 @@ export const formSchema: FormSchema[] = [
     required: false,
     slot: 'picDrawer',
     component: 'Input',
-    defaultValue: 0,
   },
   {
     field: 'show_sku',
@@ -188,7 +178,6 @@ export const formSchema: FormSchema[] = [
     ifShow: ({ values }) => values.show_sku,
     slot: 'sku',
     component: 'Input',
-    defaultValue: 0,
   },
   {
     field: 'content',
@@ -198,6 +187,6 @@ export const formSchema: FormSchema[] = [
     componentProps: {
       showImageUpload: false,
     },
-    defaultValue: 'a',
+    defaultValue: '',
   },
 ];

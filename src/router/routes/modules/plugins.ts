@@ -41,6 +41,15 @@ const plugins: AppRouteModule = {
         title: t('routes.plugins.advertising'),
       },
     },
+    {
+      path: 'article',
+      name: 'Article',
+      component: () => import('/@/views/plugins/article/index.vue'),
+      meta: {
+        // affix: true,
+        title: t('routes.plugins.article'),
+      },
+    },
   ],
 };
 

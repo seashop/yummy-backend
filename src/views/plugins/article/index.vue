@@ -1,9 +1,12 @@
 <template>
   <div>
     <BasicTable @register="registerTable">
+      <template #toolbar>
+        <a-button type="primary" @click="handleCreate"> 新增文章 </a-button>
+      </template>
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'pic_full_url'">
-          <Image :src="record.pic_full_url" :width="60" />
+        <template v-if="column.key === 'img'">
+          <Image :src="record.img.full_url" :width="60" />
         </template>
         <template v-else-if="column.key === 'action'">
           <TableAction
@@ -26,7 +29,7 @@
         </template>
       </template>
     </BasicTable>
-    <DetailModal @register="registerModal" @success="handleUpdateSuccess" />
+    <ArticleModal @register="registerModal" @success="handleSuccess" />
   </div>
 </template>
 <script lang="ts">
@@ -34,20 +37,25 @@
   import { Image } from 'ant-design-vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { listCustomers, updateCustomer } from '/@/api/customers/customer';
+  import {
+    createArticle,
+    deleteArticle,
+    listArticles,
+    updateArticle,
+  } from '/@/api/plugins/article';
   import { useModal } from '/@/components/Modal';
 
-  import DetailModal from './DetailModal.vue';
-  import { columns, searchFormSchema } from './customer.data';
+  import ArticleModal from './ArticleModal.vue';
+  import { columns, searchFormSchema } from './article.data';
 
   export default defineComponent({
-    name: 'CustomerManagement',
-    components: { BasicTable, DetailModal, TableAction, Image },
+    name: 'ArticleManagement',
+    components: { BasicTable, ArticleModal, TableAction, Image },
     setup() {
       const [registerModal, { openModal }] = useModal();
       const [registerTable, { reload }] = useTable({
-        title: '用户列表',
-        api: listCustomers,
+        title: '文章列表',
+        api: listArticles,
         columns,
         formConfig: {
           labelWidth: 120,
@@ -61,9 +69,16 @@
           width: 80,
           title: '操作',
           dataIndex: 'action',
+          // slots: { customRender: 'action' },
           fixed: undefined,
         },
       });
+
+      function handleCreate() {
+        openModal(true, {
+          isUpdate: false,
+        });
+      }
 
       function handleEdit(record: Recordable) {
         openModal(true, {
@@ -72,22 +87,30 @@
         });
       }
 
-      function handleDelete(record: Recordable) {
-        console.log(record);
+      async function handleDelete(record: Recordable) {
+        await deleteArticle(record.id).then(() => {
+          reload();
+        });
       }
 
-      async function handleUpdateSuccess({ values }) {
-        const result = await updateCustomer(values.id, values);
-        console.log(result);
+      async function handleSuccess({ isUpdate, values }) {
+        if (isUpdate) {
+          const result = await updateArticle(values);
+          console.log(result);
+        } else {
+          const result = await createArticle(values);
+          console.log(result);
+        }
         reload();
       }
 
       return {
         registerTable,
         registerModal,
+        handleCreate,
         handleEdit,
         handleDelete,
-        handleUpdateSuccess,
+        handleSuccess,
       };
     },
   });

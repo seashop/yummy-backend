@@ -3,4 +3,5 @@ export default {
   coupon: '优惠券',
   discount: '满减',
   advertising: '广告',
+  article: '文章',
 };
