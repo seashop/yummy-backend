@@ -59,6 +59,15 @@ const plugins: AppRouteModule = {
         title: t('routes.plugins.diningTable'),
       },
     },
+    {
+      path: 'search',
+      name: 'Search',
+      component: () => import('/@/views/plugins/search/index.vue'),
+      meta: {
+        // affix: true,
+        title: t('routes.plugins.search'),
+      },
+    },
   ],
 };
 

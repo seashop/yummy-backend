@@ -5,4 +5,5 @@ export default {
   advertising: '广告',
   article: '文章',
   diningTable: '扫码点餐',
+  search: '热词',
 };
