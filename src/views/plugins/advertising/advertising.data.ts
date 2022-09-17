@@ -12,7 +12,7 @@ export const columns: BasicColumn[] = [
     title: '排序',
     dataIndex: 'sort',
     edit: true,
-    editable: false,
+    editable: true,
     editComponent: 'InputNumber',
     editComponentProps: () => {
       return {

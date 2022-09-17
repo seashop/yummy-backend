@@ -3,7 +3,7 @@
     <Tabs v-model:activeKey="activeKey">
       <TabPane v-for="tab in tabs" :key="tab.scope" :tab="tab.title" />
     </Tabs>
-    <div class="py-8 bg-white flex flex-col justify-center items-center">
+    <div class="flex flex-col items-center justify-center py-8 bg-white">
       <BasicForm @register="register" />
       <div class="flex justify-center">
         <Button @click="resetFields"> 重置 </Button>
@@ -53,7 +53,7 @@
       ] = useForm({
         size: 'large',
         baseColProps: { span: 24 },
-        labelWidth: 100,
+        labelWidth: 160,
         showActionButtonGroup: false,
         schemas: [],
       });

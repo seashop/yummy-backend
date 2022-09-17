@@ -1,23 +1,23 @@
 <template>
   <div>
-    <BasicTable
-      @register="registerTable"
-      @edit-end="handleEditEnd"
-      @edit-cancel="handleEditCancel"
-      :beforeEditSubmit="beforeEditSubmit"
-    >
+    <BasicTable @register="registerTable">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate"> 新增广告 </a-button>
+        <a-button type="primary" @click="handleCreate"> 新增管理员 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'imgs'">
-          <Image :src="record.imgs.full_url" :width="60" />
+        <template v-if="column.key === 'img'">
+          <Image :src="record.img.full_url" :width="60" />
         </template>
         <template v-else-if="column.key === 'action'">
           <TableAction
             :actions="[
               {
+                icon: 'ant-design:credit-card-twotone',
+                onClick: handlePassword.bind(null, record),
+              },
+              {
                 icon: 'clarity:note-edit-line',
+                ifShow: () => false,
                 onClick: handleEdit.bind(null, record),
               },
               {
@@ -34,29 +34,34 @@
         </template>
       </template>
     </BasicTable>
-    <AdvertisingModal @register="registerModal" @success="handleSuccess" />
+    <PasswordModal @register="registerPasswordModal" @success="handlePasswordSuccess" />
+    <UserModal @register="registerModal" @success="handleSuccess" />
   </div>
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue';
-  import { Image } from 'ant-design-vue';
-
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { createAdContent, listAdContents, updateAdContent } from '/@/api/plugins/advertising';
+  import {
+    createUser,
+    updateUser,
+    deleteUser,
+    listUsers,
+    updateUserPassword,
+  } from '/@/api/system/user';
   import { useModal } from '/@/components/Modal';
 
-  import AdvertisingModal from './AdvertisingModal.vue';
-  import { columns, searchFormSchema } from './advertising.data';
-  import { set } from 'lodash-es';
+  import PasswordModal from './PasswordModal.vue';
+  import UserModal from './UserModal.vue';
+  import { columns, searchFormSchema } from './user.data';
 
   export default defineComponent({
-    name: 'AdvertisingManagement',
-    components: { BasicTable, AdvertisingModal, TableAction, Image },
+    name: 'UserManagement',
+    components: { BasicTable, TableAction, Image, PasswordModal, UserModal },
     setup() {
       const [registerModal, { openModal }] = useModal();
       const [registerTable, { reload }] = useTable({
-        title: '广告列表',
-        api: listAdContents,
+        title: '管理员列表',
+        api: listUsers,
         columns,
         formConfig: {
           labelWidth: 120,
@@ -67,7 +72,7 @@
         bordered: true,
         showIndexColumn: false,
         actionColumn: {
-          width: 80,
+          width: 120,
           title: '操作',
           dataIndex: 'action',
           // slots: { customRender: 'action' },
@@ -88,36 +93,36 @@
         });
       }
 
-      function handleEditEnd({ record, index, key, value }: Recordable) {
-        console.log(record, index, key, value);
-        return false;
-      }
-
-      async function beforeEditSubmit({ record, index, key, value }) {
-        console.log('单元格数据正在准备提交', { record, index, key, value });
-        const values = { id: record.id };
-        set(values, key, value);
-        handleSuccess({ isUpdate: true, values });
-      }
-
-      function handleEditCancel({ record, index, key, value }: Recordable) {
-        console.log('cancel', record, index, key, value);
-        return false;
-      }
-
-      function handleDelete(record: Recordable) {
-        console.log(record);
+      async function handleDelete(record: Recordable) {
+        await deleteUser(record.id).then(() => {
+          reload();
+        });
       }
 
       async function handleSuccess({ isUpdate, values }) {
         if (isUpdate) {
-          const result = await updateAdContent(values);
+          const result = await updateUser(values.id, values);
           console.log(result);
         } else {
-          const result = await createAdContent(values);
+          const result = await createUser(values);
           console.log(result);
         }
         reload();
+      }
+
+      const [registerPasswordModal, { openModal: openPasswordModal }] = useModal();
+
+      function handlePassword(record: Recordable) {
+        openPasswordModal(true, {
+          record,
+          isUpdate: true,
+        });
+      }
+
+      function handlePasswordSuccess({ values }) {
+        updateUserPassword(values.id, values).then(() => {
+          reload();
+        });
       }
 
       return {
@@ -125,11 +130,11 @@
         registerModal,
         handleCreate,
         handleEdit,
-        handleEditEnd,
-        beforeEditSubmit,
-        handleEditCancel,
+        handlePassword,
         handleDelete,
         handleSuccess,
+        registerPasswordModal,
+        handlePasswordSuccess,
       };
     },
   });

@@ -23,6 +23,15 @@ const system: AppRouteModule = {
         title: t('routes.system.config'),
       },
     },
+    {
+      path: 'user',
+      name: 'User',
+      component: () => import('/@/views/system/user/index.vue'),
+      meta: {
+        // affix: true,
+        title: t('routes.system.user'),
+      },
+    },
   ],
 };
 
