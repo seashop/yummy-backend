@@ -5,10 +5,10 @@ import { resultPageSuccess, resultSuccess } from '../_util';
 export const diningTableEntry = (id: number) => {
   return {
     id,
-    zh_num: '@name()',
-    bz: '@string',
+    dt_code: '@name()',
+    remark: '@string',
     h5_img: Random.image('400x400', Random.color(), Random.color(), Random.first()),
-    xcx_img: Random.image('400x400', Random.color(), Random.color(), Random.first()),
+    mp_img: Random.image('400x400', Random.color(), Random.color(), Random.first()),
     created_at: '@datetime',
     updated_at: '@datetime',
     deleted_at: '@datetime',

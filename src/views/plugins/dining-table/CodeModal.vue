@@ -9,7 +9,7 @@
   >
     <QrCode :vale="invite" />
     <Image :src="codes.h5_img" />
-    <Image :src="codes.xcx_img" />
+    <Image :src="codes.mp_img" />
   </BasicModal>
 </template>
 
@@ -28,7 +28,7 @@
       const invite = ref('');
       const codes = ref({
         h5_img: '',
-        xcx_img: '',
+        mp_img: '',
       });
 
       const [registerDrawer, { openDrawer }] = useDrawer();
@@ -37,7 +37,7 @@
         setModalProps({ confirmLoading: false });
         console.log(codes);
         codes.value = { ...data.codes };
-        invite.value = 'h5/#/pages/index/index?type=code_order&table_num=' + data.record.zh_num;
+        invite.value = 'h5/#/pages/index/index?type=code_order&table_num=' + data.record.dt_code;
       });
 
       const getTitle = '二维码';

@@ -11,7 +11,7 @@ export interface SearchItem {
 
 export interface SearchCodeItem {
   h5_img: string;
-  xcx_img: string;
+  mp_img: string;
 }
 
 export interface selectParams {

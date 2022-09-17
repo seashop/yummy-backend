@@ -38,7 +38,7 @@ export interface OrderItem {
   pay_cate: string;
   ucid: number;
   table_num: string;
-  yzcode: string;
+  pick_code: string;
   invite_code: any;
   fx_money: number;
   created_at: Date;

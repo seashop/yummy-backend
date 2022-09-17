@@ -2,10 +2,10 @@ import { BasicFetchResult } from '/@/api/model/baseModel';
 
 export interface DiningTableItem {
   id: number;
-  zh_num: string;
-  bz: string;
+  dt_code: string;
+  remark: string;
   h5_img: string;
-  xcx_img: string;
+  mp_img: string;
   created_at: Date;
   updated_at: Date;
   deleted_at?: Date;
@@ -13,7 +13,7 @@ export interface DiningTableItem {
 
 export interface DiningTableCodeItem {
   h5_img: string;
-  xcx_img: string;
+  mp_img: string;
 }
 
 export interface selectParams {
