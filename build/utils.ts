@@ -56,7 +56,7 @@ function getConfFiles() {
     const mode = result[1] as string;
     return ['.env', `.env.${mode}`];
   }
-  return ['.env', '.env.production'];
+  return ['.env', '.env.local', '.env.production', '.env.production.local'];
 }
 
 /**
@@ -67,6 +67,9 @@ function getConfFiles() {
 export function getEnvConfig(match = 'VITE_GLOB_', confFiles = getConfFiles()) {
   let envConfig = {};
   confFiles.forEach((item) => {
+    if (!fs.existsSync(path.resolve(process.cwd(), item))) {
+      return;
+    }
     try {
       const env = dotenv.parse(fs.readFileSync(path.resolve(process.cwd(), item)));
       envConfig = { ...envConfig, ...env };
