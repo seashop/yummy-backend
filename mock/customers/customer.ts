@@ -16,7 +16,7 @@ export const customerEntry = (id: number) => {
     level_id: '@integer(1, 10)',
     headpic: '@string()',
     mobile: '@string()',
-    user_name: '@string()',
+    username: '@string()',
     invite_code: '@string()',
     invite_url: '@string()',
     points: '@integer(1, 10000)',

@@ -14,7 +14,7 @@ export interface CustomerItem {
   level_id: number;
   headpic: string;
   mobile: string;
-  user_name: string;
+  username: string;
   invite_code: string;
   invite_url: string;
   points: number;
