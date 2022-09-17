@@ -47,10 +47,14 @@ export const columns: BasicColumn[] = [
           record.pendingStatus = true;
           const newStatus = checked ? true : false;
           const { createMessage } = useMessage();
-          switchArticle(record.id, { is_hidden: newStatus })
-            .then(() => {
-              record.is_hidden = newStatus;
-              createMessage.success(`已成功修改文章状态`);
+          switchArticle(record.id, { field: 'is_hidden' })
+            .then((res) => {
+              if (res) {
+                record.is_hidden = newStatus;
+                createMessage.success(`已成功修改文章状态`);
+              } else {
+                createMessage.success(`修改文章状态失败`);
+              }
             })
             .catch(() => {
               createMessage.error('修改文章状态失败');

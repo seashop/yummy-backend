@@ -12,6 +12,10 @@
           <TableAction
             :actions="[
               {
+                icon: 'ant-design:qrcode-outlined',
+                onClick: handleCode.bind(null, record),
+              },
+              {
                 icon: 'clarity:note-edit-line',
                 onClick: handleEdit.bind(null, record),
               },
@@ -30,29 +34,32 @@
       </template>
     </BasicTable>
     <DiningTableModal @register="registerModal" @success="handleSuccess" />
+    <CodeModal @register="registerCodeModal" />
   </div>
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue';
   import { Image } from 'ant-design-vue';
-
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import {
     createDiningTable,
     deleteDiningTable,
+    getDiningTableCode,
     listDiningTables,
     updateDiningTable,
   } from '/@/api/plugins/diningTable';
   import { useModal } from '/@/components/Modal';
 
   import DiningTableModal from './DiningTableModal.vue';
+  import CodeModal from './CodeModal.vue';
   import { columns, searchFormSchema } from './diningTable.data';
 
   export default defineComponent({
     name: 'DiningTableManagement',
-    components: { BasicTable, DiningTableModal, TableAction, Image },
+    components: { BasicTable, TableAction, Image, DiningTableModal, CodeModal },
     setup() {
       const [registerModal, { openModal }] = useModal();
+      const [registerCodeModal, { openModal: openCodeModal }] = useModal();
       const [registerTable, { reload }] = useTable({
         title: '餐桌列表',
         api: listDiningTables,
@@ -66,13 +73,22 @@
         bordered: true,
         showIndexColumn: false,
         actionColumn: {
-          width: 80,
+          width: 120,
           title: '操作',
           dataIndex: 'action',
           // slots: { customRender: 'action' },
           fixed: undefined,
         },
       });
+
+      async function handleCode(record: Recordable) {
+        const resp = await getDiningTableCode(record.id);
+        console.log(resp);
+        openCodeModal(true, {
+          record,
+          codes: resp,
+        });
+      }
 
       function handleCreate() {
         openModal(true, {
@@ -95,11 +111,9 @@
 
       async function handleSuccess({ isUpdate, values }) {
         if (isUpdate) {
-          const result = await updateDiningTable(values);
-          console.log(result);
+          await updateDiningTable(values);
         } else {
-          const result = await createDiningTable(values);
-          console.log(result);
+          await createDiningTable(values);
         }
         reload();
       }
@@ -107,7 +121,9 @@
       return {
         registerTable,
         registerModal,
+        registerCodeModal,
         handleCreate,
+        handleCode,
         handleEdit,
         handleDelete,
         handleSuccess,
@@ -115,3 +131,5 @@
     },
   });
 </script>
+
+function GetDiningTableCode() { throw new Error('Function not implemented.'); }

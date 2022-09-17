@@ -17,15 +17,18 @@
   import { computed, defineComponent, onMounted, ref, unref, watch } from 'vue';
   import { Button, Card, Tabs } from 'ant-design-vue';
   import { set } from 'lodash-es';
-  import { listConfigGroups, listConfigs } from '/@/api/system/config';
+  import { batchUpdateConfig, listConfigGroups, listConfigs } from '/@/api/system/config';
   import { ConfigGroupItem } from '/@/api/system/model/configModel';
   import { BasicForm, useForm } from '/@/components/Form';
   import { ComponentType } from '/@/components/Form/src/types';
+  import { useMessage } from '/@/hooks/web/useMessage';
 
   export default defineComponent({
     name: 'ConfigManagement',
     components: { Button, Card, Tabs, TabPane: Tabs.TabPane, BasicForm },
     setup() {
+      const { createMessage } = useMessage();
+
       const activeKey = ref('');
       const groups = ref<Array<ConfigGroupItem>>([]);
       const tabs = computed(() => {
@@ -55,36 +58,43 @@
         schemas: [],
       });
 
-      watch(
-        () => activeKey.value,
-        async () => {
-          resetSchema([]);
-          const { items } = await listConfigs({ scope: unref(activeKey) });
-          let values = {};
-          items.forEach((item) => {
-            set(values, item.key, item.value);
-            const formSchema = {
-              field: item.key,
-              component: item.type as ComponentType,
-              componentProps: { ...item.props },
-              label: item.title,
-              required: true,
-            };
-            appendSchemaByField(formSchema, '');
-          });
-          setFieldsValue(values);
-        },
-      );
+      watch([activeKey], async () => {
+        resetSchema([]);
+        const { items } = await listConfigs({ scope: unref(activeKey) });
+        let values = {};
+        items.forEach((item) => {
+          const formSchema = {
+            field: item.key,
+            component: item.component as ComponentType,
+            label: item.title,
+            required: true,
+          };
+          if (item.props instanceof Object) {
+            set(formSchema, 'componentProps', { ...item.props });
+          }
+          switch (item.component) {
+            case 'Switch':
+              set(values, item.key, item.value === '1');
+              break;
+            case 'RadioGroup':
+            case 'InputNumber':
+              set(values, item.key, parseInt(item.value));
+              break;
+            default:
+              set(values, item.key, item.value);
+              break;
+          }
+          appendSchemaByField(formSchema, '');
+        });
+        setFieldsValue(values);
+      });
 
       async function handleSubmit() {
         try {
           const values = await validate();
-          const { passwordOld, passwordNew } = values;
-
-          // TODO custom api
-          console.log(passwordOld, passwordNew);
-          // const { router } = useRouter();
-          // router.push(pageEnum.BASE_LOGIN);
+          return batchUpdateConfig(unref(activeKey), values).then(() => {
+            createMessage.success('修改成功');
+          });
         } catch (error) {}
       }
 

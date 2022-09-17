@@ -43,7 +43,7 @@ export const formSchema: FormSchema[] = [
   {
     field: 'bz',
     label: '备注',
-    required: true,
+    required: false,
     component: 'Input',
   },
 ];

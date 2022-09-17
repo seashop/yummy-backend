@@ -101,7 +101,7 @@
           closeModal();
           emit('success', {
             isUpdate: unref(isUpdate),
-            values: { ...values, category_id: rowId.value },
+            values: { ...values, category_id: unref(isUpdate) ? rowId.value : undefined },
           });
         } finally {
           setModalProps({ confirmLoading: false });

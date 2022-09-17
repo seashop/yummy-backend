@@ -62,7 +62,7 @@
         images.value = (await listImages()).items;
 
         if (unref(isUpdate)) {
-          rowId.value = data.record.category_id;
+          rowId.value = data.record.id;
           setFieldsValue({
             ...data.record,
           });
@@ -102,7 +102,7 @@
           closeModal();
           emit('success', {
             isUpdate: unref(isUpdate),
-            values: { ...values, id: rowId.value },
+            values: { ...values, id: unref(isUpdate) ? rowId.value : undefined },
           });
         } finally {
           setModalProps({ confirmLoading: false });

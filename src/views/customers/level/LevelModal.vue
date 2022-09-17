@@ -64,7 +64,7 @@
           closeModal();
           emit('success', {
             isUpdate: unref(isUpdate),
-            values: { ...values, id: unref(rowId), sort: 0 },
+            values: { ...values, id: unref(isUpdate) ? rowId.value : undefined, sort: 0 },
           });
         } finally {
           setModalProps({ confirmLoading: false });

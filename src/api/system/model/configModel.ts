@@ -6,7 +6,7 @@ export interface ConfigItem {
   value: string;
   title: string;
   desc: string;
-  type: string;
+  component: string;
   props: object;
   created_at: Date;
   updated_at: Date;

@@ -41,7 +41,7 @@ export const deleteDiningTable = (id: number) => {
 };
 
 export const getDiningTableCode = (id: number) => {
-  return defHttp.put<DiningTableCodeItem>({
+  return defHttp.get<DiningTableCodeItem>({
     url: Api.GetDiningTableCode,
     params: {
       id,

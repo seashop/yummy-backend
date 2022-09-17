@@ -13,15 +13,13 @@
 
 <script lang="ts">
   import { defineComponent, ref, computed } from 'vue';
-  import { Image } from 'ant-design-vue';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { BasicModal, useModalInner } from '/@/components/Modal';
-  import BasicButton from '/@/components/Button/src/BasicButton.vue';
   import { replyFormSchema } from './evaluate.data';
 
   export default defineComponent({
     name: 'CategoryDrawer',
-    components: { Image, BasicModal, BasicForm, BasicButton },
+    components: { BasicModal, BasicForm },
     emits: ['success', 'register'],
     setup(_, { emit }) {
       const rowId = ref('');

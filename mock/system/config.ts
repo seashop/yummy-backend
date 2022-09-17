@@ -18,8 +18,8 @@ export const configEntry = (id: number) => {
     id,
     key: '@string()',
     value: function () {
-      const type = this.type as String;
-      switch (type) {
+      const component = this.component as String;
+      switch (component) {
         case 'Input':
           return Mock.mock('@word()');
         case 'Switch':
@@ -32,10 +32,10 @@ export const configEntry = (id: number) => {
     },
     title: '@cname()',
     desc: '@title(3,5)',
-    'type|1': ['Input', 'Switch', 'RadioGroup'],
+    'component|1': ['Input', 'Switch', 'RadioGroup'],
     props: function () {
-      const type = this.type as String;
-      switch (type) {
+      const component = this.component as String;
+      switch (component) {
         case 'RadioGroup':
           return {
             options: [
@@ -73,7 +73,7 @@ const configList = (() => {
 export default [
   // mock config
   {
-    url: '/basic-api/cms/get_config_groups',
+    url: '/basic-api/cms/config:groups',
     timeout: 200,
     method: 'get',
     response: ({ query }) => {
@@ -82,7 +82,7 @@ export default [
     },
   },
   {
-    url: '/basic-api/cms/get_config',
+    url: '/basic-api/cms/configs',
     timeout: 200,
     method: 'get',
     response: ({ query }) => {
@@ -91,7 +91,7 @@ export default [
     },
   },
   {
-    url: '/basic-api/cms/edit_config',
+    url: '/basic-api/cms/configs:batch',
     timeout: 200,
     method: 'post',
     response: ({ data }) => {

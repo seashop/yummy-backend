@@ -5,7 +5,7 @@ import { t } from '/@/hooks/web/useI18n';
 
 const system: AppRouteModule = {
   path: '/system',
-  name: 'Plugins',
+  name: 'System',
   component: LAYOUT,
   redirect: '/system/config',
   meta: {

@@ -11,6 +11,14 @@ export const columns: BasicColumn[] = [
   {
     title: '排序',
     dataIndex: 'sort',
+    edit: true,
+    editable: false,
+    editComponent: 'InputNumber',
+    editComponentProps: () => {
+      return {
+        min: 0,
+      };
+    },
     width: 200,
   },
   {

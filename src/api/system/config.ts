@@ -1,15 +1,14 @@
 import { defHttp } from '/@/utils/http/axios';
 import {
   ConfigGroupsListResultModel,
-  ConfigItem,
   ConfigsListResultModel,
   selectParams,
 } from './model/configModel';
 
 export enum Api {
-  ListConfigGroups = '/cms/get_config_groups',
-  ListConfigs = '/cms/get_config',
-  UpdateConfig = '/cms/edit_config',
+  ListConfigGroups = '/cms/config:groups',
+  ListConfigs = '/cms/configs',
+  BatchUpdateConfig = '/cms/configs:batch',
 }
 
 /**
@@ -24,6 +23,6 @@ export const listConfigs = (params?: selectParams) => {
   return defHttp.get<ConfigsListResultModel>({ url: Api.ListConfigs, params });
 };
 
-export const updateConfig = (_: number, data: ConfigItem) => {
-  return defHttp.post<ConfigItem>({ url: Api.UpdateConfig, data });
+export const batchUpdateConfig = (scope: string, data: object) => {
+  return defHttp.post({ url: Api.BatchUpdateConfig + `/${scope}`, data });
 };
