@@ -1,3 +1,4 @@
+import { ImageItem } from '../../asset/model/imageModel';
 import { BasicFetchResult } from '/@/api/model/baseModel';
 
 export interface CategoryItem {
@@ -8,7 +9,7 @@ export interface CategoryItem {
   level: number;
   is_visible: string;
   img_id: string;
-  pic_full_url: string;
+  img: ImageItem;
 }
 
 export interface selectParams {

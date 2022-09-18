@@ -12,7 +12,7 @@
           <li v-for="(spec, specIdx) in attr.spec" :key="specIdx">
             <div class="spgg_r_02_2">
               <Input v-model:value="spec.cName" />
-              <div class="in_clo" @click="del_canshu(attrIdx, specIdx)">
+              <div class="in_clo" @click="delSpu(attrIdx, specIdx)">
                 <i class="el-icon-error" style="color: #cecece"></i>
               </div>
             </div>
@@ -29,7 +29,7 @@
           </li>
           <li>
             &emsp;
-            <button class="btn" type="button" @click="add_canshu(attrIdx)">添加</button>
+            <button class="btn" type="button" @click="addSpu(attrIdx)">添加</button>
           </li>
         </ul>
         <div class="spgg_r_04" v-if="useSpecImg && attrIdx == 0">
@@ -47,28 +47,28 @@
           添加规格项目
         </Button>
       </div>
-      <div class="form-table" v-show="tableData">
+      <div class="form-table" v-show="tableSpu">
         <div class="stock-title">商品库存</div>
         <table class="table-sku" border="1px solid #ccc">
           <thead>
             <tr>
-              <th v-for="(list, index) in tableData" :key="index">{{ list['pName'] }}</th>
+              <th v-for="(list, index) in tableSpu" :key="index">{{ list['pName'] }}</th>
               <th width="200">价格</th>
               <th width="200">库存</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="row in rows" :key="row">
-              <template v-for="(item, index2) in tableData">
-                <td v-if="!((row - 1) % item.rowspan)" :rowspan="item.rowspan" :key="index2">
-                  {{ getName(item, row) }}
+            <tr v-for="(sku, index) in tableSku" :key="index">
+              <template v-for="(spu, spuIdx) in tableSpu">
+                <td v-if="!(index % spu.rowspan)" :rowspan="spu.rowspan" :key="spuIdx">
+                  {{ getName(spu, index) }}
                 </td>
               </template>
               <td>
-                <InputNumber v-model:value="tableList[row - 1].price" placeholder="单价" />
+                <InputNumber v-model:value="sku.price" placeholder="单价" />
               </td>
               <td>
-                <InputNumber v-model:value="tableList[row - 1].stock_num" placeholder="库存" />
+                <InputNumber v-model:value="sku.stock_num" placeholder="库存" />
               </td>
             </tr>
           </tbody>
@@ -77,7 +77,7 @@
     </div>
     <PictureDrawer
       :images="images"
-      :length="length"
+      :length="1"
       @register="registerDrawer"
       @reload="handlePictureDrawerRealod"
       @success="handlePictureDrawerSuccess"
@@ -86,9 +86,9 @@
 </template>
 
 <script lang="ts">
-  import { computed, defineComponent, ref, watch } from 'vue';
+  import { computed, defineComponent, reactive, ref, toRefs, watch } from 'vue';
   import { Button, Checkbox, Image, Input, InputNumber } from 'ant-design-vue';
-  import { set } from 'lodash-es';
+  import { get } from 'lodash-es';
   import PictureDrawer from '/@/components/AssetPicker/PictureDrawer.vue';
   import { useDrawer } from '/@/components/Drawer';
   import { Icon } from '/@/components/Icon';
@@ -96,7 +96,7 @@
   import { listImages } from '/@/api/asset/image';
   import { GoodsSkuArr, GoodsSkuItem } from '/@/api/stores/model/goodsModel';
 
-  interface SkuSpec {
+  interface SpuItem {
     cName: string;
     pic?: string;
   }
@@ -104,12 +104,12 @@
   interface SkuAttr {
     pName: string;
     rowspan: number;
-    spec: Array<SkuSpec>;
+    spec: Array<SpuItem>;
   }
 
-  interface SkuData {
+  interface SpuBox {
     pName: string;
-    spec: Array<SkuSpec>;
+    spec: Array<SpuItem>;
     price: number | null;
     stock_num: number | null;
     specLen: number;
@@ -137,42 +137,42 @@
     setup(props, { emit }) {
       const [registerDrawer, { openDrawer }] = useDrawer();
 
-      const images = ref<ImageItem[]>([]);
-      const useSpecImg = ref<boolean>(false);
-      const drawer = ref<boolean>(false);
-      const sku_img_index = ref<number>();
-      const attrs = ref<Array<SkuAttr>>([]);
-      const attrsImageId = ref<Array<number>>([]);
-      const edit_data = ref<GoodsSkuArr | undefined>();
-      const img_list = ref<Array<Object>>([]);
-      const imageUrl = ref<Array<String>>([]);
-      const get_img = ref<Function>();
+      const state = reactive({
+        images: ref<ImageItem[]>([]),
+        useSpecImg: ref<boolean>(false),
+        drawer: ref<boolean>(false),
+        attrs: ref<Array<SkuAttr>>([]),
+        attrsImageId: ref<Array<number>>([]),
+        ovConfig: ref<GoodsSkuArr | undefined>(), // 原修改数据
+        imgList: ref<Array<Object>>([]),
+        imageUrl: ref<Array<String>>([]),
+      });
 
       // Computed
       // 规格table
-      const tableData = computed(() => {
-        if (attrs.value.length == 0) {
+      const tableSpu = computed(() => {
+        if (state.attrs.length == 0) {
           return [];
         }
-        let tData: Array<SkuData> = [];
+        let tData: Array<SpuBox> = [];
         // 初始化tableData
-        for (let i = 0; i < attrs.value.length; i++) {
-          let row: SkuData = {
-            pName: attrs.value[i].pName,
+        for (let i = 0; i < state.attrs.length; i++) {
+          let row: SpuBox = {
+            pName: state.attrs[i].pName,
             spec: [],
             price: null,
             stock_num: null,
             specLen: 0,
             rowspan: 1,
           };
-          let len2 = attrs.value[i].spec.length;
+          let len2 = state.attrs[i].spec.length;
           let specLen = 0;
           for (let j = 0; j < len2; j++) {
-            let cName = attrs.value[i].spec[j].cName;
+            let cName = state.attrs[i].spec[j].cName;
             if (!cName) {
               continue;
             }
-            let spe: SkuSpec = {
+            let spe: SpuItem = {
               cName,
             };
             ++specLen;
@@ -196,37 +196,40 @@
       // 规格条数
       const rows = computed(() => {
         let rows = 1;
-        let len = tableData.value.length;
+        let len = tableSpu.value.length;
         if (len == 0) {
           return 0;
         }
         for (let i = 0; i < len; i++) {
-          let specLen = tableData.value[i].specLen || 1;
+          let specLen = tableSpu.value[i].specLen || 1;
           rows *= specLen;
         }
         // 每条rowspan都为1情况
         if (rows == 1) {
-          return tableData.value[0].spec.length; // 2
+          return tableSpu.value[0].spec.length; // 2
         }
         return rows;
       });
 
-      const tableList = computed(() => {
-        let tList: Array<GoodsSkuItem> = [];
-        if (!tableData.value) {
+      function ovValue(i: number, field: string) {
+        const ov = state.ovConfig?.list;
+        if (ov && ov[i]) {
+          return get(ov[i], field, undefined);
+        }
+        return undefined;
+      }
+
+      const tableSku = computed(() => {
+        if (!tableSpu.value) {
           return [];
         }
-        let srcData = tableData.value;
+        let spuList: Array<GoodsSkuItem> = [];
+        const srcData = tableSpu.value;
         for (let i = 0; i < rows.value; i++) {
-          let listItem: GoodsSkuItem = {};
-          if (edit_data?.value?.list) {
-            let e = edit_data?.value.list;
-            // 判断 e[i]['price']，如果 e[i]不存在就会报错
-            if (e[i]) {
-              listItem.price = e[i].price;
-              listItem.stock_num = e[i].stock_num;
-            }
-          }
+          let skuItem: GoodsSkuItem = {
+            price: ovValue(i, 'price'),
+            stock_num: ovValue(i, 'stock_num'),
+          };
           //构建动态项
           for (let j = 0; j < srcData.length; j++) {
             //构造第一类目
@@ -238,19 +241,20 @@
             }
             let spec = srcData[j].spec;
             let index = parseInt(i / rowspan) % len;
-            set(listItem, key, spec[index].cName);
+            skuItem[key] = spec[index].cName;
           }
-          tList.push(listItem);
+          spuList.push(skuItem);
         }
-        return tList;
+        return spuList;
       });
 
       // 修改时的原数据
       watch(
         () => props.rdata,
         (e) => {
-          edit_data.value = e;
-          edit_old(e);
+          console.log(e);
+          state.ovConfig = e;
+          editOld(e);
         },
         {
           immediate: true,
@@ -258,27 +262,33 @@
       );
 
       // 父组件点击提交按钮，本组件传递数据出去
-      watch([tableList, useSpecImg], () => {
-        emit('result', {
-          list: tableList.value,
-          sku_img_id: useSpecImg.value ? attrsImageId.value : [],
-        });
-      });
+      watch(
+        [tableSku, state.attrsImageId],
+        () => {
+          emit('result', {
+            list: tableSku.value,
+            sku_img_id: state.useSpecImg ? state.attrsImageId : [],
+          });
+        },
+        {
+          immediate: true,
+        },
+      );
 
       // Methods
       async function handlePictureDrawerRealod() {
-        images.value = (await listImages()).items;
+        state.images = (await listImages()).items;
       }
       handlePictureDrawerRealod();
 
       function handlePictureDrawerSuccess({ data, items }) {
         let item = items?.length > 0 ? (items[0] as ImageItem) : undefined;
-        attrs.value[0].spec[data.specIdx].pic = item?.full_url;
-        attrsImageId.value[data.specIdx] = item ? item.id : 0;
+        state.attrs[0].spec[data.specIdx].pic = item?.full_url;
+        state.attrsImageId[data.specIdx] = item ? item.id : 0;
       }
 
       // 获取修改数据
-      function edit_old(res: any) {
+      function editOld(res: any) {
         if (res === undefined) {
           return;
         }
@@ -290,11 +300,11 @@
             if (tk == 0) {
               if (vv.img_id) {
                 arr[vk]['pic'] = vv.imgUrl;
-                imageUrl.value.splice(vk, 1, vv.imgUrl);
-                attrsImageId.value.splice(vk, 1, vv.img_id);
-                useSpecImg.value = true;
+                state.imageUrl.splice(vk, 1, vv.imgUrl);
+                state.attrsImageId.splice(vk, 1, vv.img_id);
+                state.useSpecImg = true;
               } else {
-                useSpecImg.value = false;
+                state.useSpecImg = false;
               }
             }
           }
@@ -304,12 +314,13 @@
             spec: arr,
           };
           console.log('sku_img', arr);
-          if (attrs.value.length >= 3) {
+          if (state.attrs.length >= 3) {
             return;
           }
-          attrs.value.push(obj);
+          state.attrs.push(obj);
         }
       }
+
       //新增规格名称
       function addItem() {
         let obj = {
@@ -317,29 +328,29 @@
           rowspan: 1,
           spec: [{ cName: '' }],
         };
-        if (attrs.value.length >= 3) {
+        if (state.attrs.length >= 3) {
           return;
         }
-        attrs.value.push(obj);
+        state.attrs.push(obj);
       }
       function toDelete(index) {
-        img_list.value = [];
-        attrs.value.splice(index, 1);
+        state.imgList = [];
+        state.attrs.splice(index, 1);
       }
       //新增规格参数
-      function add_canshu(index) {
-        attrs.value[index].spec.push({
+      function addSpu(index) {
+        state.attrs[index].spec.push({
           cName: '',
         });
       }
       //删除规格参数
-      function del_canshu(index, index2) {
-        attrs.value[index].spec.splice(index2, 1);
+      function delSpu(index, index2) {
+        state.attrs[index].spec.splice(index2, 1);
       }
 
       function getName(obj, index) {
         if (obj) {
-          let r = parseInt((index - 1) / obj['rowspan']);
+          let r = parseInt(index / obj['rowspan']);
           let l = obj['specLen'] || 1;
           let key = r % l;
           return obj['spec'] && obj['spec'][key] && obj['spec'][key]['cName'];
@@ -348,38 +359,26 @@
 
       // 父组件提交成功后，清空本组件数据
       function clear() {
-        attrs.value = [];
+        state.attrs = [];
       }
 
       return {
+        ...toRefs(state),
         registerDrawer,
         openDrawer,
         handlePictureDrawerRealod,
         handlePictureDrawerSuccess,
-        images,
-        oncli: '',
-        img_list,
-        drawer,
-        length: 1,
-        useSpecImg,
-        sku_img_index, //规格图片下标
-        attrs,
-        inputVisible: false,
-        inputValue: '',
-        edit_data, //原修改数据
-        get_img,
-        imageUrl,
-        attrsImageId,
         // computed
-        tableData,
         rows,
-        tableList,
+        tableSpu,
+        tableSku,
         // method
         addItem,
         toDelete,
-        add_canshu,
-        del_canshu,
+        addSpu,
+        delSpu,
         getName,
+        ovValue,
         clear,
       };
     },

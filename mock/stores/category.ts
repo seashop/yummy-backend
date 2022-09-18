@@ -1,6 +1,6 @@
 import { MockMethod } from 'vite-plugin-mock';
-import { Random } from 'mockjs';
 import { resultPageSuccess } from '../_util';
+import { imageEntry } from 'mock/asset/image';
 
 const categoryList = (() => {
   const result: any[] = [];
@@ -13,7 +13,7 @@ const categoryList = (() => {
       level: 1,
       is_visible: '@boolean',
       img_id: '@string()',
-      pic_full_url: Random.image('400x400', Random.color(), Random.color(), Random.first()),
+      img: imageEntry(index),
       created_at: '@datetime',
       updated_at: '@datetime',
     });

@@ -113,7 +113,8 @@
 
       const getTitle = computed(() => (!unref(isUpdate) ? '新增商品' : '编辑商品'));
 
-      function fillSkuInfo(values, skuInfo) {
+      function fillSkuInfo(values) {
+        console.log(values, skuInfo);
         if (values?.show_sku) {
           values.sku = skuInfo['list'];
           values.sku_img_ids = skuInfo['sku_img_id'];
@@ -179,17 +180,16 @@
         return { ...values, goods_id: rowId.value };
       }
 
-      let skuInfo = null;
+      let skuInfo: Object = {};
       async function handleSkuResult(info: any) {
         skuInfo = info;
-        console.log(skuInfo);
       }
 
       async function handleSubmit() {
         try {
           let values = await validate();
           if (values.show_sku) {
-            values = fillSkuInfo(values, skuInfo);
+            values = fillSkuInfo(values);
           }
 
           setModalProps({ confirmLoading: true });

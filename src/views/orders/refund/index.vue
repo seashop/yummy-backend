@@ -2,10 +2,7 @@
   <div>
     <BasicTable @register="registerTable">
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'pic_full_url'">
-          <Image :src="record.pic_full_url" :width="60" />
-        </template>
-        <template v-else-if="column.key === 'action'">
+        <template v-if="column.key === 'action'">
           <TableAction
             :actions="[
               {
@@ -30,18 +27,17 @@
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue';
-  import { Image } from 'ant-design-vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { acceptRefunds, listRefunds, rejectRefunds } from '/@/api/orders/refund';
   import { useModal } from '/@/components/Modal';
-  
+
   import RejectModal from './RejectModal.vue';
   import { columns, searchFormSchema } from './refund.data';
 
   export default defineComponent({
     name: 'EvaluateManagement',
-    components: { BasicTable, RejectModal, TableAction, Image },
+    components: { BasicTable, RejectModal, TableAction },
     setup() {
       const [registerRejectModal, { openModal: openRejectModal }] = useModal();
       const [registerTable, { reload }] = useTable({

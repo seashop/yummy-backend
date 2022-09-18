@@ -15,7 +15,7 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '图片',
-    dataIndex: 'pic_full_url',
+    dataIndex: 'img',
     width: 180,
   },
 ];

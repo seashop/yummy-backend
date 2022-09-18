@@ -2,10 +2,7 @@
   <div>
     <BasicTable @register="registerTable">
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'pic_full_url'">
-          <Image :src="record.pic_full_url" :width="60" />
-        </template>
-        <template v-else-if="column.key === 'action'">
+        <template v-if="column.key === 'action'">
           <TableAction
             :actions="[
               {
@@ -31,7 +28,6 @@
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue';
-  import { Image } from 'ant-design-vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { listCustomers, updateCustomer } from '/@/api/customers/customer';
@@ -42,7 +38,7 @@
 
   export default defineComponent({
     name: 'CustomerManagement',
-    components: { BasicTable, DetailModal, TableAction, Image },
+    components: { BasicTable, DetailModal, TableAction },
     setup() {
       const [registerModal, { openModal }] = useModal();
       const [registerTable, { reload }] = useTable({

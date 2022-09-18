@@ -5,8 +5,8 @@
         <a-button type="primary" @click="handleCreate"> 新增分类 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'pic_full_url'">
-          <Image :src="record.pic_full_url" :width="60" />
+        <template v-if="column.key === 'img'">
+          <Image :src="record?.img?.full_url" :width="60" />
         </template>
         <template v-else-if="column.key === 'action'">
           <TableAction
@@ -39,7 +39,7 @@
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { createCategory, listCategory, updateCategory } from '/@/api/stores/category';
   import { useModal } from '/@/components/Modal';
-  
+
   import CategoryModal from './CategoryModal.vue';
   import { columns, searchFormSchema } from './category.data';
 
