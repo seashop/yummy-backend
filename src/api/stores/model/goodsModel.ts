@@ -20,9 +20,27 @@ export interface GoodsItem {
   sku_arr: GoodsSkuArr;
 }
 
+export interface SpuValue {
+  id: string;
+  name: string;
+  img_id: number;
+  imgUrl?: string;
+}
+
+export interface Spu {
+  k: string;
+  v: Array<SpuValue>;
+  k_s: string;
+}
+
+export interface Sku {
+  price: number;
+  stock_num: number;
+}
+
 export interface GoodsSkuArr {
-  tree: Array<Object>;
-  list: Array<GoodsSkuItem>;
+  tree: Array<Spu>;
+  list: Array<Sku>;
 }
 
 export interface GoodsSkuItem {

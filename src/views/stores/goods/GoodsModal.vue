@@ -181,8 +181,8 @@
       }
 
       let skuInfo: Object = {};
-      async function handleSkuResult(info: any) {
-        skuInfo = info;
+      async function handleSkuResult(info: object) {
+        skuInfo = { ...info };
       }
 
       async function handleSubmit() {

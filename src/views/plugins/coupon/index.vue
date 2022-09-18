@@ -37,7 +37,7 @@
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { createCoupon, listCoupons, updateCoupon } from '/@/api/plugins/coupon';
   import { useModal } from '/@/components/Modal';
-  
+
   import CouponModal from './CouponModal.vue';
   import { columns, searchFormSchema } from './coupon.data';
 

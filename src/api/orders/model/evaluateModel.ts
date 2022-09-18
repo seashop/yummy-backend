@@ -13,7 +13,10 @@ export interface EvaluateItem {
   updated_at: Date;
 }
 
-export interface ReplyItem {}
+export interface ReplyItem {
+  reply_content: string;
+  reply_time: Date;
+}
 
 export interface selectParams {
   playstate: number;

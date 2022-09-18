@@ -2,19 +2,24 @@
   <div id="sku_tag">
     <div class="form-group">
       <div class="form-h">商品规格</div>
+      <BasicButton @click="debugPrint">Debug</BasicButton>
       <div class="form-item" v-for="(attr, attrIdx) in attrs" :key="attrIdx">
         <div class="form-title">
           <Input class="sku-name" v-model:value="attr.pName" placeholder="规格名" />
           <Checkbox v-model:checked="useSpecImg" v-if="attrIdx == 0">添加规格图片</Checkbox>
-          <span class="delete" @click="toDelete(attrIdx)">×</span>
+          <Button type="text" style="float: right" @click="toDelete(attrIdx)">
+            <template #icon>
+              <Icon icon="ant-design:delete-outlined" color="red" />
+            </template>
+          </Button>
         </div>
         <ul class="form-list">
           <li v-for="(spec, specIdx) in attr.spec" :key="specIdx">
             <div class="spgg_r_02_2">
               <Input v-model:value="spec.cName" />
-              <div class="in_clo" @click="delSpu(attrIdx, specIdx)">
-                <i class="el-icon-error" style="color: #cecece"></i>
-              </div>
+              <Button type="text" class="in_clo" @click="delSpu(attrIdx, specIdx)">
+                <Icon icon="ant-design:close-outlined" style="color: #cecece" />
+              </Button>
             </div>
             <div v-if="useSpecImg && attrIdx == 0">
               <div
@@ -29,7 +34,7 @@
           </li>
           <li>
             &emsp;
-            <button class="btn" type="button" @click="addSpu(attrIdx)">添加</button>
+            <BasicButton @click="addSpu(attrIdx)">添加</BasicButton>
           </li>
         </ul>
         <div class="spgg_r_04" v-if="useSpecImg && attrIdx == 0">
@@ -90,6 +95,7 @@
   import { Button, Checkbox, Image, Input, InputNumber } from 'ant-design-vue';
   import { get } from 'lodash-es';
   import PictureDrawer from '/@/components/AssetPicker/PictureDrawer.vue';
+  import BasicButton from '/@/components/Button/src/BasicButton.vue';
   import { useDrawer } from '/@/components/Drawer';
   import { Icon } from '/@/components/Icon';
   import { ImageItem } from '/@/api/asset/model/imageModel';
@@ -126,6 +132,7 @@
       Input,
       InputNumber,
       PictureDrawer,
+      BasicButton,
     },
     props: {
       rdata: {
@@ -211,7 +218,7 @@
         return rows;
       });
 
-      function ovValue(i: number, field: string) {
+      function getOvValue(i: number, field: string) {
         const ov = state.ovConfig?.list;
         if (ov && ov[i]) {
           return get(ov[i], field, undefined);
@@ -219,41 +226,45 @@
         return undefined;
       }
 
-      const tableSku = computed(() => {
-        if (!tableSpu.value) {
-          return [];
-        }
-        let spuList: Array<GoodsSkuItem> = [];
-        const srcData = tableSpu.value;
-        for (let i = 0; i < rows.value; i++) {
-          let skuItem: GoodsSkuItem = {
-            price: ovValue(i, 'price'),
-            stock_num: ovValue(i, 'stock_num'),
-          };
-          //构建动态项
-          for (let j = 0; j < srcData.length; j++) {
-            //构造第一类目
-            let key = srcData[j].pName as string;
-            let rowspan = srcData[j].rowspan;
-            let len = srcData[j].specLen;
-            if (!len) {
-              continue;
-            }
-            let spec = srcData[j].spec;
-            let index = parseInt(i / rowspan) % len;
-            skuItem[key] = spec[index].cName;
+      const tableSku = computed({
+        get: () => {
+          if (!tableSpu.value) {
+            return [];
           }
-          spuList.push(skuItem);
-        }
-        return spuList;
+          let spuList: Array<GoodsSkuItem> = [];
+          const srcData = tableSpu.value;
+          for (let i = 0; i < rows.value; i++) {
+            let skuItem: GoodsSkuItem = {
+              price: getOvValue(i, 'price'),
+              stock_num: getOvValue(i, 'stock_num'),
+            };
+            // 构建动态项
+            for (let j = 0; j < srcData.length; j++) {
+              // 构造第一类目
+              let key = srcData[j].pName as string;
+              let rowspan = srcData[j].rowspan;
+              let len = srcData[j].specLen;
+              if (!len) {
+                continue;
+              }
+              let spec = srcData[j].spec;
+              let index = parseInt(i / rowspan) % len;
+              skuItem[key] = spec[index].cName;
+            }
+            spuList.push(skuItem);
+          }
+          return spuList;
+        },
+        set: (value) => {
+          console.log(value);
+        },
       });
 
       // 修改时的原数据
       watch(
         () => props.rdata,
         (e) => {
-          console.log(e);
-          state.ovConfig = e;
+          state.ovConfig = e ? { ...e } : undefined;
           editOld(e);
         },
         {
@@ -265,10 +276,7 @@
       watch(
         [tableSku, state.attrsImageId],
         () => {
-          emit('result', {
-            list: tableSku.value,
-            sku_img_id: state.useSpecImg ? state.attrsImageId : [],
-          });
+          emit('result', getResult());
         },
         {
           immediate: true,
@@ -276,6 +284,13 @@
       );
 
       // Methods
+      function getResult() {
+        return {
+          list: tableSku.value,
+          sku_img_id: state.useSpecImg ? state.attrsImageId : [],
+        };
+      }
+
       async function handlePictureDrawerRealod() {
         state.images = (await listImages()).items;
       }
@@ -288,19 +303,21 @@
       }
 
       // 获取修改数据
-      function editOld(res: any) {
+      function editOld(res?: GoodsSkuArr) {
         if (res === undefined) {
           return;
         }
-        for (let [tk, tv] of Object.entries(res?.tree)) {
-          let arr = [];
-          for (let [vk, vv] of Object.entries(tv.v)) {
-            arr[vk] = {};
-            arr[vk]['cName'] = vv.name;
+        for (let tk = 0; tk < res.tree.length; tk++) {
+          const tv = res.tree[tk];
+          let spec: Array<any> = [];
+          for (let vk = 0; vk < tv.v.length; vk++) {
+            const vv = tv.v[vk];
+            spec[vk] = {};
+            spec[vk]['cName'] = vv.name;
             if (tk == 0) {
               if (vv.img_id) {
-                arr[vk]['pic'] = vv.imgUrl;
-                state.imageUrl.splice(vk, 1, vv.imgUrl);
+                spec[vk]['pic'] = vv.imgUrl;
+                state.imageUrl.splice(vk, 1, vv.imgUrl ?? '');
                 state.attrsImageId.splice(vk, 1, vv.img_id);
                 state.useSpecImg = true;
               } else {
@@ -308,16 +325,16 @@
               }
             }
           }
-          let obj = {
+          const attr = {
             pName: tv.k,
             rowspan: 1,
-            spec: arr,
+            spec,
           };
-          console.log('sku_img', arr);
+          console.log('sku_img', spec);
           if (state.attrs.length >= 3) {
             return;
           }
-          state.attrs.push(obj);
+          state.attrs.push(attr);
         }
       }
 
@@ -373,12 +390,15 @@
         tableSpu,
         tableSku,
         // method
+        debugPrint: () => {
+          console.log(getResult());
+        },
         addItem,
         toDelete,
         addSpu,
         delSpu,
         getName,
-        ovValue,
+        getOvValue,
         clear,
       };
     },
@@ -560,8 +580,8 @@
 
   .in_clo {
     position: absolute;
-    top: -13px;
-    right: -5px;
+    top: -15px;
+    right: -23px;
   }
 
   .sku-name {
@@ -592,15 +612,6 @@
       height: 72px;
       border: 1px solid #bfbfbf;
       border-radius: 3px;
-    }
-
-    .el-icon-circle-close {
-      position: absolute;
-      top: -13px;
-      right: -10px;
-      color: #7c7c7c;
-      font-size: 25px;
-      cursor: pointer;
     }
   }
 </style>

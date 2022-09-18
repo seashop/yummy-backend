@@ -73,8 +73,6 @@
     },
     emits: ['success', 'reload', 'register'],
     setup(props, { emit }) {
-      const { limit } = props;
-
       const activeKey = ref('1');
       const ids = ref<Array<number>>([]);
       const items = ref<Array<ImageItem>>([]);
@@ -93,6 +91,7 @@
 
       //选择一张图片进入选择列表
       function chooseImg(item: ImageItem) {
+        const { limit } = props;
         if (ids.value.indexOf(item.id) !== -1) {
           let index = ids.value.indexOf(item.id);
           ids.value.splice(index, 1);

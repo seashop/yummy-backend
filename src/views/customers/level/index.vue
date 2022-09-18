@@ -35,7 +35,7 @@
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { createLevel, listLevels, updateLevel } from '/@/api/customers/level';
   import { useModal } from '/@/components/Modal';
-  
+
   import LevelModal from './LevelModal.vue';
   import { columns, searchFormSchema } from './level.data';
 
