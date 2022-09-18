@@ -25,9 +25,9 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '等级',
-    dataIndex: 'level.name_l',
+    dataIndex: 'level.title',
     format: (_, record) => {
-      return record?.level?.name_l;
+      return record?.level?.title;
     },
     width: 180,
   },
@@ -56,7 +56,7 @@ export const formSchema: FormSchema[] = [
     componentProps: {
       api: listLevels,
       resultField: 'items',
-      labelField: 'name_l',
+      labelField: 'title',
       valueField: 'id',
     },
     defaultValue: 0,

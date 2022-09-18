@@ -12,7 +12,7 @@ export interface CustomerItem {
   sign_time: Date;
   sing_day: Date;
   level_id: number;
-  headpic: string;
+  avatar: string;
   mobile: string;
   username: string;
   invite_code: string;
@@ -24,7 +24,7 @@ export interface CustomerItem {
 }
 
 export interface selectParams {
-  name_l: string;
+  title: string;
 }
 
 export type CustomersListResultModel = BasicFetchResult<CustomerItem>;

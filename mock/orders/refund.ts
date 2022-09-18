@@ -7,11 +7,11 @@ const refundList = (() => {
     result.push({
       id: index,
       order_num: '@string()',
-      tui_num: '@string()',
+      refund_num: '@string()',
       nickname: '@string()',
       money: '@integer()',
       message: '@string()',
-      because: '@string()',
+      reason: '@string()',
       status: '@integer(0,2)',
       created_at: '@datetime',
       updated_at: '@datetime',

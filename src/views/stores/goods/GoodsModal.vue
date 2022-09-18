@@ -23,7 +23,7 @@
       </template>
       <template #sku="{}">
         <FormItemRest>
-          <Sku ref="skuRef" :rdata="rdata" />
+          <Sku :rdata="rdata" @result="handleSkuResult" />
         </FormItemRest>
       </template>
     </BasicForm>
@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref, computed, unref, getCurrentInstance } from 'vue';
+  import { defineComponent, ref, computed, unref } from 'vue';
   import { Image } from 'ant-design-vue';
   import { FormItemRest } from 'ant-design-vue/es/form';
   import { useDrawer } from '/@/components/Drawer';
@@ -114,7 +114,7 @@
       const getTitle = computed(() => (!unref(isUpdate) ? '新增商品' : '编辑商品'));
 
       function fillSkuInfo(values, skuInfo) {
-        if (values?.show_sku == 1) {
+        if (values?.show_sku) {
           values.sku = skuInfo['list'];
           values.sku_img_ids = skuInfo['sku_img_id'];
         } else {
@@ -146,8 +146,8 @@
       }
 
       function checkData(values) {
-        if (values.bannerimgs && !values.bannerimgs[0]) {
-          console.log(values, values.bannerimgs);
+        if (values.banner_imgs && !values.banner_imgs[0]) {
+          console.log(values, values.banner_imgs);
           createMessage.error('未选择商品图片');
           return false;
         }
@@ -167,7 +167,7 @@
         if (!checkData(values)) {
           return;
         }
-        if (values.sku[0]) {
+        if (values?.sku !== undefined) {
           values.price = values.sku[0].price;
           values.stock = values.sku[0].stock_num;
         }
@@ -179,16 +179,19 @@
         return { ...values, goods_id: rowId.value };
       }
 
+      let skuInfo = null;
+      async function handleSkuResult(info: any) {
+        skuInfo = info;
+        console.log(skuInfo);
+      }
+
       async function handleSubmit() {
         try {
-          const instance = getCurrentInstance();
-          if (instance == null) {
-            return;
-          }
-          const { proxy } = instance;
-          const skuInfo = proxy.$refs.skuRef?.result();
           let values = await validate();
-          values = fillSkuInfo(values, skuInfo);
+          if (values.show_sku) {
+            values = fillSkuInfo(values, skuInfo);
+          }
+
           setModalProps({ confirmLoading: true });
           values = isUpdate.value ? doUpdate(values) : doCreate(values);
           if (values === undefined) {
@@ -209,11 +212,11 @@
         sub,
         sku_comfirm,
         rdata,
-        fillSkuInfo,
         images,
         registerModal,
         registerForm,
         getTitle,
+        handleSkuResult,
         handleSubmit,
         registerDrawer,
         openDrawer,

@@ -4,7 +4,7 @@ import { resultPageSuccess, resultSuccess } from '../_util';
 export const levelEntry = (id: number) => {
   return {
     id,
-    name_l: '@name()',
+    title: '@name()',
     discount: '@float(0,1,1,1)',
     sort: 0,
     created_at: '@datetime',

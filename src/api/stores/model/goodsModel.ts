@@ -14,8 +14,8 @@ export interface GoodsItem {
   state: boolean;
   img_id: number;
   img: ImageItem;
-  bannerimgs: Array<number>;
-  detailimgs: Array<number>;
+  banner_imgs: Array<number>;
+  detail_imgs: Array<number>;
   sort: number;
   sku_arr: GoodsSkuArr;
 }

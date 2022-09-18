@@ -9,7 +9,7 @@ export const couponEntry = (id: number) => {
     status: '@integer(0,1)',
     is_show: '@boolean',
     stock: '@integer(-1,5)',
-    stock_type: '@integer(1,5)',
+    stock_limited: '@boolean',
     full: '@integer(1,200)',
     reduce: '@integer(1,20)',
     start_time: id % 2 == 1 ? null : '@datetime',

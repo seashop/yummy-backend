@@ -14,7 +14,7 @@ export const customerEntry = (id: number) => {
     sign_time: '@datetime',
     sing_day: '@datetime',
     level_id: '@integer(1, 10)',
-    headpic: '@string()',
+    avatar: '@string()',
     mobile: '@string()',
     username: '@string()',
     invite_code: '@string()',

@@ -11,7 +11,7 @@
         <template v-else-if="column.key === 'title'">
           <div style="display: flex">
             <div class="product-img" v-if="record.img_id">
-              <Image :src="record.imgs.full_url" :width="50" />
+              <Image :src="record.img.full_url" :width="50" />
             </div>
             <div class="product-mes">
               <p>{{ record.title }}</p>

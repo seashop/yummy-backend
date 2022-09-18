@@ -3,11 +3,11 @@ import { BasicFetchResult } from '/@/api/model/baseModel';
 export interface RefundItem {
   id: number;
   order_num: string;
-  tui_num: string;
+  refund_num: string;
   nickname: string;
   money: number;
   message: string;
-  because: string;
+  reason: string;
   status: number;
   created_at: Date;
   updated_at: Date;

@@ -10,7 +10,7 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '名称',
-    dataIndex: 'category_name',
+    dataIndex: 'title',
     width: 200,
   },
   {
@@ -22,7 +22,7 @@ export const columns: BasicColumn[] = [
 
 export const searchFormSchema: FormSchema[] = [
   {
-    field: 'category_name',
+    field: 'title',
     label: '名称',
     component: 'Input',
     colProps: { span: 8 },
@@ -41,13 +41,13 @@ export const formSchema: FormSchema[] = [
       params: {
         withRoot: true,
       },
-      labelField: 'category_name',
+      labelField: 'title',
       valueField: 'category_id',
     },
     defaultValue: 0,
   },
   {
-    field: 'category_name',
+    field: 'title',
     label: '名称',
     required: true,
     component: 'Input',

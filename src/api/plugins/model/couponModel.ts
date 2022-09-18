@@ -7,7 +7,7 @@ export interface CouponItem {
   status: number;
   is_show: boolean;
   stock: number;
-  stock_type: number;
+  stock_limited: boolean;
   full: number;
   reduce: number;
   start_time?: Date;

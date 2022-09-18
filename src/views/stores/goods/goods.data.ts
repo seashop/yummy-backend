@@ -62,7 +62,7 @@ export const columns: BasicColumn[] = [
 
 export const searchFormSchema: FormSchema[] = [
   {
-    field: 'category_name',
+    field: 'title',
     label: '名称',
     component: 'Input',
     colProps: { span: 8 },
@@ -87,7 +87,7 @@ export const formSchema: FormSchema[] = [
       params: {
         withRoot: true,
       },
-      labelField: 'category_name',
+      labelField: 'title',
       valueField: 'category_id',
     },
     defaultValue: 0,
@@ -144,16 +144,16 @@ export const formSchema: FormSchema[] = [
     },
   },
   {
-    field: 'bannerimgs',
+    field: 'banner_imgs',
     label: '商品轮播图',
-    required: false,
+    required: true,
     slot: 'picDrawer',
     component: 'Input',
   },
   {
-    field: 'detailimgs',
+    field: 'detail_imgs',
     label: '商品详情图',
-    required: false,
+    required: true,
     slot: 'picDrawer',
     component: 'Input',
   },

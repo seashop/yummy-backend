@@ -10,8 +10,8 @@
         <a-button type="primary" @click="handleCreate"> 新增广告 </a-button>
       </template>
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'imgs'">
-          <Image :src="record.imgs.full_url" :width="60" />
+        <template v-if="column.key === 'img'">
+          <Image :src="record.img.full_url" :width="60" />
         </template>
         <template v-else-if="column.key === 'action'">
           <TableAction

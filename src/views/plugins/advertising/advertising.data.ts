@@ -1,4 +1,5 @@
 import { listAdPositions } from '/@/api/plugins/advertising';
+import { listArticles } from '/@/api/plugins/article';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
 
@@ -39,7 +40,7 @@ export const columns: BasicColumn[] = [
     dataIndex: 'type',
     format: (_, record) => {
       switch (record.type) {
-        case '':
+        case 'no_jump':
           return '不跳转';
         case 'article':
           return '文章';
@@ -51,7 +52,7 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '缩略图',
-    dataIndex: 'imgs',
+    dataIndex: 'img',
     width: 180,
   },
 ];
@@ -97,8 +98,8 @@ export const formSchema: FormSchema[] = [
       options: [
         {
           label: '不跳转',
-          value: 'silent',
-          key: 'silent',
+          value: 'no_jump',
+          key: 'no_jump',
         },
         {
           label: '文章',
@@ -107,29 +108,20 @@ export const formSchema: FormSchema[] = [
         },
       ],
     },
-    defaultValue: 'silent',
+    defaultValue: 'no_jump',
   },
   {
     field: 'jump_id',
     label: '跳转选项',
-    required: false,
-    ifShow: ({ values }) => values.type !== 'silent',
-    component: 'Select',
+    required: ({ values }) => values.type !== 'no_jump',
+    ifShow: ({ values }) => values.type !== 'no_jump',
+    component: 'ApiSelect',
     componentProps: {
-      options: [
-        {
-          label: '选项1',
-          value: '1',
-          key: '1',
-        },
-        {
-          label: '选项2',
-          value: '2',
-          key: '2',
-        },
-      ],
+      api: listArticles,
+      resultField: 'items',
+      labelField: 'title',
+      valueField: 'id',
     },
-    defaultValue: 0,
   },
   {
     field: 'img_id',

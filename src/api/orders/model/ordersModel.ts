@@ -66,13 +66,13 @@ export interface OrderGoodsItem {
   created_at: Date;
   updated_at: Date;
   deleted_at?: Date;
-  imgs: ImageItem;
+  img: ImageItem;
 }
 
 export interface OrderUser {
   id: number;
   nickname: string;
-  headpic: string;
+  avatar: string;
 }
 
 export interface selectParams {

@@ -2,7 +2,7 @@ import { BasicFetchResult } from '/@/api/model/baseModel';
 
 export interface CategoryItem {
   category_id: number;
-  category_name: string;
+  title: string;
   short_name: string;
   pid: number;
   level: number;
@@ -13,7 +13,7 @@ export interface CategoryItem {
 
 export interface selectParams {
   withRoot: boolean;
-  category_name: string;
+  title: string;
 }
 
 export type CategoryListResultModel = BasicFetchResult<CategoryItem>;

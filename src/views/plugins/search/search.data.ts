@@ -32,7 +32,7 @@ export const formSchema: FormSchema[] = [
   },
   {
     field: 'num',
-    label: '备注',
+    label: '搜索次数',
     required: true,
     component: 'InputNumber',
   },

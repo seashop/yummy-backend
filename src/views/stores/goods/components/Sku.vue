@@ -5,7 +5,7 @@
       <div class="form-item" v-for="(attr, attrIdx) in attrs" :key="attrIdx">
         <div class="form-title">
           <Input class="sku-name" v-model:value="attr.pName" placeholder="规格名" />
-          <Checkbox v-model:checked="checked" v-if="attrIdx == 0">添加规格图片</Checkbox>
+          <Checkbox v-model:checked="useSpecImg" v-if="attrIdx == 0">添加规格图片</Checkbox>
           <span class="delete" @click="toDelete(attrIdx)">×</span>
         </div>
         <ul class="form-list">
@@ -16,8 +16,12 @@
                 <i class="el-icon-error" style="color: #cecece"></i>
               </div>
             </div>
-            <div v-if="checked && attrIdx == 0">
-              <div class="sku_idx_img" @click="() => openDrawer(true, { specIdx })" v-if="checked">
+            <div v-if="useSpecImg && attrIdx == 0">
+              <div
+                class="sku_idx_img"
+                @click="() => openDrawer(true, { specIdx })"
+                v-if="useSpecImg"
+              >
                 <Image v-if="spec.pic" :src="spec.pic" />
                 <Icon v-else icon="ant-design:plus-outlined" class="sku-img" />
               </div>
@@ -28,7 +32,7 @@
             <button class="btn" type="button" @click="add_canshu(attrIdx)">添加</button>
           </li>
         </ul>
-        <div class="spgg_r_04" v-if="checked && attrIdx == 0">
+        <div class="spgg_r_04" v-if="useSpecImg && attrIdx == 0">
           仅支持为第一组规格设置规格图片，建议尺寸：160*160像素
         </div>
       </div>
@@ -124,13 +128,17 @@
       PictureDrawer,
     },
     props: {
-      rdata: Object as PropType<GoodsSkuArr>, // 修改时的原数据
+      rdata: {
+        type: Object as PropType<GoodsSkuArr>,
+        defualt: null,
+      }, // 修改时的原数据
     },
-    setup(props) {
+    emits: ['result'],
+    setup(props, { emit }) {
       const [registerDrawer, { openDrawer }] = useDrawer();
 
       const images = ref<ImageItem[]>([]);
-      const checked = ref<boolean>(false);
+      const useSpecImg = ref<boolean>(false);
       const drawer = ref<boolean>(false);
       const sku_img_index = ref<number>();
       const attrs = ref<Array<SkuAttr>>([]);
@@ -139,18 +147,6 @@
       const img_list = ref<Array<Object>>([]);
       const imageUrl = ref<Array<String>>([]);
       const get_img = ref<Function>();
-
-      // 修改时的原数据
-      watch(
-        () => props.rdata,
-        (e) => {
-          edit_data.value = e;
-          edit_old(e);
-        },
-        {
-          immediate: true,
-        },
-      );
 
       // Computed
       // 规格table
@@ -249,6 +245,26 @@
         return tList;
       });
 
+      // 修改时的原数据
+      watch(
+        () => props.rdata,
+        (e) => {
+          edit_data.value = e;
+          edit_old(e);
+        },
+        {
+          immediate: true,
+        },
+      );
+
+      // 父组件点击提交按钮，本组件传递数据出去
+      watch([tableList, useSpecImg], () => {
+        emit('result', {
+          list: tableList.value,
+          sku_img_id: useSpecImg.value ? attrsImageId.value : [],
+        });
+      });
+
       // Methods
       async function handlePictureDrawerRealod() {
         images.value = (await listImages()).items;
@@ -266,24 +282,24 @@
         if (res === undefined) {
           return;
         }
-        for (let [k, v] of Object.entries(res?.tree)) {
+        for (let [tk, tv] of Object.entries(res?.tree)) {
           let arr = [];
-          for (let [x, y] of Object.entries(v.v)) {
-            arr[x] = {};
-            arr[x]['cName'] = y.name;
-            if (k == 0) {
-              if (y.img_id) {
-                arr[x]['pic'] = y.imgUrl;
-                imageUrl.value.splice(x, 1, y.imgUrl);
-                attrsImageId.value.splice(x, 1, y.img_id);
-                checked.value = true;
+          for (let [vk, vv] of Object.entries(tv.v)) {
+            arr[vk] = {};
+            arr[vk]['cName'] = vv.name;
+            if (tk == 0) {
+              if (vv.img_id) {
+                arr[vk]['pic'] = vv.imgUrl;
+                imageUrl.value.splice(vk, 1, vv.imgUrl);
+                attrsImageId.value.splice(vk, 1, vv.img_id);
+                useSpecImg.value = true;
               } else {
-                checked.value = false;
+                useSpecImg.value = false;
               }
             }
           }
           let obj = {
-            pName: v.k,
+            pName: tv.k,
             rowspan: 1,
             spec: arr,
           };
@@ -335,14 +351,6 @@
         attrs.value = [];
       }
 
-      // 父组件点击提交按钮，本组件传递数据出去
-      function result() {
-        return {
-          list: tableList.value,
-          sku_img_id: checked.value ? attrsImageId.value : [],
-        };
-      }
-
       return {
         registerDrawer,
         openDrawer,
@@ -353,7 +361,7 @@
         img_list,
         drawer,
         length: 1,
-        checked,
+        useSpecImg,
         sku_img_index, //规格图片下标
         attrs,
         inputVisible: false,
@@ -373,7 +381,6 @@
         del_canshu,
         getName,
         clear,
-        result,
       };
     },
   });

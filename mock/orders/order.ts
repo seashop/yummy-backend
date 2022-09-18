@@ -6,7 +6,7 @@ export const orderUser = (id: number) => {
   return {
     id: id,
     nickname: '@string()',
-    headpic: Random.image('400x400', Random.color(), Random.color(), Random.first()),
+    avatar: Random.image('400x400', Random.color(), Random.color(), Random.first()),
   };
 };
 

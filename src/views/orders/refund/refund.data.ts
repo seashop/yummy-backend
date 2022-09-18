@@ -13,7 +13,7 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '退款单号',
-    dataIndex: 'tui_num',
+    dataIndex: 'refund_num',
     width: 80,
   },
   {
@@ -33,7 +33,7 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '退款原因',
-    dataIndex: 'because',
+    dataIndex: 'reason',
     width: 120,
   },
   {

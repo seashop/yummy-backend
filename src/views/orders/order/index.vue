@@ -1,51 +1,10 @@
 <template>
   <div style="background-color: #ffffff">
-    <div class="H10"></div>
-    <!-- 搜索 -->
-    <div class="search">
-      <Col :span="4" class="col">
-        <span>支付状态</span>
-        <Select v-model="form.playstate" placeholder="支付状态">
-          <SelectOption label="全部" value="-1"></SelectOption>
-          <SelectOption label="已支付" value="1"></SelectOption>
-          <SelectOption label="待支付" value="0"></SelectOption>
-        </Select>
-      </Col>
-
-      <Col :span="6" class="col col_center">
-        <span>日期范围</span>
-        <Col :span="11">
-          <DatePicker
-            type="date"
-            placeholder="开始日期"
-            v-model="form.starttime"
-            style="width: 100%"
-            value-format="yyyy-MM-dd"
-          ></DatePicker>
-        </Col>
-        <Col class="line" :span="2">-</Col>
-        <Col :span="11">
-          <DatePicker
-            type="date"
-            placeholder="结束日期"
-            v-model="form.endtime"
-            style="width: 100%"
-            value-format="yyyy-MM-dd"
-          ></DatePicker>
-        </Col>
-      </Col>
-
-      <Col :span="4" class="col">
-        <span>关键词</span>
-        <Input v-model="form.wordkey" placeholder="输入 订单号 或 手机号"></Input>
-      </Col>
-
-      <Col :span="1" class="col">
-        <BasicButton size="mini" type="primary" @click="search">搜索</BasicButton>
-      </Col>
+    <div class="p-4 mb-2 bg-white">
+      <BasicForm @register="registerForm" />
+      <BasicButton type="primary" @click="submitSearch"> 搜索 </BasicButton>
     </div>
-    <!-- 搜索 end -->
-    <div class="H10"></div>
+
     <div class="order">
       <div v-for="(item, index) of show_list" :key="index">
         <div class="order-01">
@@ -157,41 +116,32 @@
           </div>
           <div class="order-01-2">
             <div class="order-01-2-01" v-for="(ite, ogIdx) of item.ordergoods" :key="ogIdx">
-              <div v-if="!ite.pic">no pic</div>
-              <Image v-else :width="80" :src="ite.pic.full_url" />
+              <div v-if="!ite.img">no pic</div>
+              <Image v-else :width="80" :src="ite.img.full_url" />
               <div class="order-01-2-01-name">{{ ite.title }}&nbsp;x{{ ite.number }}</div>
             </div>
           </div>
         </div>
-        <div class="BH10"></div>
       </div>
+      <Pagination
+        style="padding-top: 60px; text-align: center"
+        background
+        layout="prev, pager, next"
+        :total="total"
+        :page-size="size"
+        @current-change="jump_page"
+      />
     </div>
-    <Pagination
-      style="padding-top: 60px; text-align: center"
-      background
-      layout="prev, pager, next"
-      :total="total"
-      :page-size="size"
-      @current-change="jump_page"
-    />
   </div>
 </template>
 
 <script lang="ts">
   import { defineComponent, ref } from 'vue';
-  import {
-    Pagination,
-    DatePicker,
-    Input,
-    Select,
-    SelectOption,
-    Image,
-    Modal,
-    Row,
-    Col,
-  } from 'ant-design-vue';
-
+  import { Pagination, Image, Modal, Row, Col } from 'ant-design-vue';
+  import { useMessage } from '/@/hooks/web/useMessage';
+  import { BasicForm, useForm } from '/@/components/Form/index';
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
+
   import {
     listOrders,
     printOrder,
@@ -200,17 +150,15 @@
     editOrderReceive,
     deleteOrder,
   } from '/@/api/orders/order';
-  import { useMessage } from '/@/hooks/web/useMessage';
   import { OrderItem, selectParams } from '/@/api/orders/model/ordersModel';
+
+  import { searchFormSchema } from './order.data';
 
   export default defineComponent({
     name: 'OrderManagement',
     components: {
+      BasicForm,
       Pagination,
-      DatePicker,
-      Input,
-      Select,
-      SelectOption,
       Image,
       Row,
       Col,
@@ -218,6 +166,13 @@
     },
     setup() {
       const { createMessage } = useMessage();
+
+      const [registerForm, { validate }] = useForm({
+        labelWidth: 90,
+        baseColProps: { span: 24 },
+        schemas: searchFormSchema,
+        showActionButtonGroup: false,
+      });
 
       const size = ref(8);
       const total = ref(0);
@@ -240,7 +195,6 @@
       function jump_page(e) {
         let start = (e - 1) * size.value;
         let end = e * size.value;
-        console.log(start, end);
         show_list.value = all.value.slice(start, end);
       }
       //点击配送
@@ -289,9 +243,9 @@
           type: 'warning',
         });
       }
+
       function get_all_order() {
         listOrders().then((res) => {
-          console.log(res);
           all.value = res.items;
           show_list.value = res.items.slice(0, size.value);
           total.value = res.items.length;
@@ -315,8 +269,8 @@
         });
       }
 
-      function search() {
-        let data = form.value;
+      async function submitSearch() {
+        let data = await validate();
         // data.playstate = Number(data.playstate);
         listOrders(data).then((res) => {
           show_list.value = res.items;
@@ -324,6 +278,7 @@
       }
 
       return {
+        registerForm,
         size,
         total,
         list,
@@ -337,7 +292,7 @@
         qrysd,
         get_all_order,
         del,
-        search,
+        submitSearch,
       };
     },
   });

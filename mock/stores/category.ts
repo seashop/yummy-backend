@@ -7,7 +7,7 @@ const categoryList = (() => {
   for (let index = 0; index < 200; index++) {
     result.push({
       category_id: index,
-      category_name: '@name()',
+      title: '@name()',
       short_name: '@name()',
       pid: 0,
       level: 1,

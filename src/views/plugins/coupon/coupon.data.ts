@@ -63,10 +63,10 @@ export const columns: BasicColumn[] = [
     title: '库存',
     dataIndex: 'stock',
     format: (_, record) => {
-      switch (record?.stock_type) {
-        case 0:
+      switch (record?.stock_limited) {
+        case true:
           return record.stock;
-        case 1:
+        case false:
           return '无限张';
         default:
           break;
@@ -100,26 +100,29 @@ export const formSchema: FormSchema[] = [
   {
     field: 'stock',
     label: '发放总量',
+    helpMessage: '当为0时,无限发放',
     required: true,
     component: 'InputNumber',
     componentProps: ({ formModel }) => {
       return {
         onChange: () => {
-          if (!formModel.stock) {
-            formModel.stock_type = 0;
+          if (formModel.stock === 0) {
+            formModel.stock_limited = 0;
           } else {
-            formModel.stock_type = 1;
+            formModel.stock_limited = 1;
           }
         },
       };
     },
+    defaultValue: 0,
   },
   {
-    field: 'stock_type',
+    field: 'stock_limited',
     label: '库存类型',
     required: true,
     component: 'InputNumber',
     show: false,
+    defaultValue: 0,
   },
   {
     field: 'full',
