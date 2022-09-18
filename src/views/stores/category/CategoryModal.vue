@@ -88,7 +88,7 @@
 
       function handlePictureDrawerSuccess({ ids }) {
         setFieldsValue({
-          category_pic: ids?.length > 0 ? ids[0] : null,
+          img_id: ids?.length > 0 ? ids[0] : null,
         });
       }
 

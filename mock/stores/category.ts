@@ -12,7 +12,7 @@ const categoryList = (() => {
       pid: 0,
       level: 1,
       is_visible: '@boolean',
-      category_pic: '@string()',
+      img_id: '@string()',
       pic_full_url: Random.image('400x400', Random.color(), Random.color(), Random.first()),
       created_at: '@datetime',
       updated_at: '@datetime',

@@ -59,7 +59,7 @@ export const formSchema: FormSchema[] = [
     component: 'Input',
   },
   {
-    field: 'category_pic',
+    field: 'img_id',
     label: '图片',
     required: true,
     slot: 'picDrawer',

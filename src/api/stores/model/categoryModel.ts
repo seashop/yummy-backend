@@ -7,7 +7,7 @@ export interface CategoryItem {
   pid: number;
   level: number;
   is_visible: string;
-  category_pic: string;
+  img_id: string;
   pic_full_url: string;
 }
 
