@@ -23,7 +23,7 @@ const evaluateList = (() => {
 export default [
   // mock evaluate
   {
-    url: '/basic-api/rate/admin/get_all_rate',
+    url: '/basic-api/evaluate/admin/get_all_rate',
     timeout: 200,
     method: 'get',
     response: ({ query }) => {
@@ -32,7 +32,7 @@ export default [
     },
   },
   {
-    url: '/basic-api/rate/admin/add_reply',
+    url: '/basic-api/evaluate/admin/add_reply',
     timeout: 200,
     method: 'post',
     response: ({ body }) => {

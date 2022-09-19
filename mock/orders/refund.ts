@@ -32,7 +32,7 @@ export default [
     },
   },
   {
-    url: '/basic-api/rate/admin/add_reply',
+    url: '/basic-api/evaluate/admin/add_reply',
     timeout: 200,
     method: 'post',
     response: ({ body }) => {

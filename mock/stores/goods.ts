@@ -53,7 +53,7 @@ export const goodsItem = (id: number) => {
     sales: '@integer(1,20)',
     collects: '@integer(1,20)',
     star: '@integer(1,20)',
-    evaluates: '@integer(1,20)',
+    evaluate_cnt: '@integer(1,20)',
     img_id: '@integer(1,20)',
     video_id: '@integer(1,20)',
     video: imageEntry(imageIdx++),

@@ -2,9 +2,9 @@ import { defHttp } from '/@/utils/http/axios';
 import { EvaluatesListResultModel, ReplyItem, selectParams } from './model/evaluateModel';
 
 export enum Api {
-  ListEvaluates = '/rate/admin/get_all_rate',
-  DeleteReply = '/rate/admin/del_rate',
-  AddReply = '/rate/admin/add_reply',
+  ListEvaluates = '/evaluate/admin/get_all_rate',
+  DeleteReply = '/evaluate/admin/del_rate',
+  AddReply = '/evaluate/admin/add_reply',
 }
 
 /**
