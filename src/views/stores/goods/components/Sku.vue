@@ -2,6 +2,7 @@
   <div id="sku_tag">
     <div class="form-group">
       <div class="form-h">商品规格</div>
+      {{ counter }}
       <BasicButton @click="debugPrint">Debug</BasicButton>
       <div class="form-item" v-for="(attr, attrIdx) in attrs" :key="attrIdx">
         <div class="form-title">
@@ -70,10 +71,10 @@
                 </td>
               </template>
               <td>
-                <InputNumber v-model:value="sku.price" placeholder="单价" />
+                <InputNumber v-model:value="sku.price" @change="counter++" placeholder="单价" />
               </td>
               <td>
-                <InputNumber v-model:value="sku.stock_num" placeholder="库存" />
+                <InputNumber v-model:value="sku.stock_num" @change="counter++" placeholder="库存" />
               </td>
             </tr>
           </tbody>
@@ -145,6 +146,7 @@
       const [registerDrawer, { openDrawer }] = useDrawer();
 
       const state = reactive({
+        counter: ref<number>(0),
         images: ref<ImageItem[]>([]),
         useSpecImg: ref<boolean>(false),
         drawer: ref<boolean>(false),
@@ -152,7 +154,7 @@
         attrsImageId: ref<Array<number>>([]),
         ovConfig: ref<GoodsSkuArr | undefined>(), // 原修改数据
         imgList: ref<Array<Object>>([]),
-        imageUrl: ref<Array<String>>([]),
+        tableSku: ref<Array<GoodsSkuItem>>([]),
       });
 
       // Computed
@@ -226,46 +228,44 @@
         return undefined;
       }
 
-      const tableSku = computed({
-        get: () => {
-          if (!tableSpu.value) {
-            return [];
-          }
-          let spuList: Array<GoodsSkuItem> = [];
-          const srcData = tableSpu.value;
-          for (let i = 0; i < rows.value; i++) {
-            let skuItem: GoodsSkuItem = {
-              price: getOvValue(i, 'price'),
-              stock_num: getOvValue(i, 'stock_num'),
-            };
-            // 构建动态项
-            for (let j = 0; j < srcData.length; j++) {
-              // 构造第一类目
-              let key = srcData[j].pName as string;
-              let rowspan = srcData[j].rowspan;
-              let len = srcData[j].specLen;
-              if (!len) {
-                continue;
-              }
-              let spec = srcData[j].spec;
-              let index = parseInt(i / rowspan) % len;
-              skuItem[key] = spec[index].cName;
+      function reloadSkuTable() {
+        // 联动: tableSpu
+        if (!tableSpu.value) {
+          state.tableSku = [];
+        }
+        let spuList: Array<GoodsSkuItem> = [];
+        const srcData = tableSpu.value;
+        // 联动: rows
+        for (let i = 0; i < rows.value; i++) {
+          let skuItem: GoodsSkuItem = {
+            price: getOvValue(i, 'price'),
+            stock_num: getOvValue(i, 'stock_num'),
+          };
+          // 构建动态项
+          for (let j = 0; j < srcData.length; j++) {
+            // 构造第一类目
+            let key = srcData[j].pName as string;
+            let rowspan = srcData[j].rowspan;
+            let len = srcData[j].specLen;
+            if (!len) {
+              continue;
             }
-            spuList.push(skuItem);
+            let spec = srcData[j].spec;
+            let index = parseInt(i / rowspan) % len;
+            skuItem[key] = spec[index].cName;
           }
-          return spuList;
-        },
-        set: (value) => {
-          console.log(value);
-        },
-      });
+          spuList.push(skuItem);
+        }
+
+        state.tableSku = [...spuList];
+      }
 
       // 修改时的原数据
       watch(
         () => props.rdata,
         (e) => {
           state.ovConfig = e ? { ...e } : undefined;
-          editOld(e);
+          pickAttrsAndImgsFromOv(e);
         },
         {
           immediate: true,
@@ -274,9 +274,21 @@
 
       // 父组件点击提交按钮，本组件传递数据出去
       watch(
-        [tableSku, state.attrsImageId],
+        [toRefs(state).counter, state.tableSku, state.attrsImageId],
         () => {
-          emit('result', getResult());
+          emitResult();
+        },
+        {
+          immediate: true,
+          deep: true,
+        },
+      );
+
+      watch(
+        [state.attrs, state.ovConfig],
+        () => {
+          reloadSkuTable();
+          emitResult();
         },
         {
           immediate: true,
@@ -284,11 +296,11 @@
       );
 
       // Methods
-      function getResult() {
-        return {
-          list: tableSku.value,
+      function emitResult() {
+        emit('result', {
+          list: state.tableSku,
           sku_img_id: state.useSpecImg ? state.attrsImageId : [],
-        };
+        });
       }
 
       async function handlePictureDrawerRealod() {
@@ -303,11 +315,15 @@
       }
 
       // 获取修改数据
-      function editOld(res?: GoodsSkuArr) {
+      function pickAttrsAndImgsFromOv(res?: GoodsSkuArr) {
         if (res === undefined) {
           return;
         }
         for (let tk = 0; tk < res.tree.length; tk++) {
+          // 属性维度限制到三层
+          if (state.attrs.length >= 3) {
+            continue;
+          }
           const tv = res.tree[tk];
           let spec: Array<any> = [];
           for (let vk = 0; vk < tv.v.length; vk++) {
@@ -317,7 +333,6 @@
             if (tk == 0) {
               if (vv.img_id) {
                 spec[vk]['pic'] = vv.imgUrl;
-                state.imageUrl.splice(vk, 1, vv.imgUrl ?? '');
                 state.attrsImageId.splice(vk, 1, vv.img_id);
                 state.useSpecImg = true;
               } else {
@@ -330,10 +345,7 @@
             rowspan: 1,
             spec,
           };
-          console.log('sku_img', spec);
-          if (state.attrs.length >= 3) {
-            return;
-          }
+          console.log('ov attr', attr);
           state.attrs.push(attr);
         }
       }
@@ -388,10 +400,9 @@
         // computed
         rows,
         tableSpu,
-        tableSku,
         // method
         debugPrint: () => {
-          console.log(getResult());
+          console.log(emitResult());
         },
         addItem,
         toDelete,

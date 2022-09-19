@@ -1,4 +1,5 @@
 import { MockMethod } from 'vite-plugin-mock';
+import Mock from 'mockjs';
 import { resultPageSuccess, resultSuccess } from '../_util';
 import { imageEntry } from '../asset/image';
 
@@ -14,6 +15,29 @@ const generateSpecItem = () => {
     k: '@cword()',
     v: [generateSpecValue(), generateSpecValue()],
     k_s: '@cname()',
+  };
+};
+
+const generateSkuArr = () => {
+  return {
+    tree: [generateSpecItem(), generateSpecItem()],
+    list: function () {
+      const res: Array<any> = [];
+      let num = 0;
+      if (this.tree.length > 0) {
+        num = 1;
+      }
+      for (let index = 0; index < this.tree.length; index++) {
+        num *= this.tree[index].v.length;
+      }
+      for (let index = 0; index < num; index++) {
+        res.push({
+          price: Mock.mock('@float(1,20,2,2)'),
+          stock_num: Mock.mock('@integer(1,100)'),
+        });
+      }
+      return res;
+    },
   };
 };
 
@@ -50,10 +74,7 @@ export const goodsItem = (id: number) => {
     rate: [],
     rate_fen: '@float(0,5)',
     rate_num: '@integer(1,20)',
-    sku_arr: {
-      tree: [generateSpecItem(), generateSpecItem()],
-      list: [],
-    },
+    sku_arr: generateSkuArr(),
   };
 };
 
