@@ -9,7 +9,7 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '桌号',
-    dataIndex: 'dt_code',
+    dataIndex: 'title',
     width: 200,
   },
   {
@@ -26,7 +26,7 @@ export const columns: BasicColumn[] = [
 
 export const searchFormSchema: FormSchema[] = [
   {
-    field: 'dt_code',
+    field: 'title',
     label: '桌号',
     component: 'Input',
     colProps: { span: 8 },
@@ -35,7 +35,7 @@ export const searchFormSchema: FormSchema[] = [
 
 export const formSchema: FormSchema[] = [
   {
-    field: 'dt_code',
+    field: 'title',
     label: '桌号',
     required: true,
     component: 'Input',

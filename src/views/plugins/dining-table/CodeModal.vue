@@ -7,9 +7,9 @@
     width="500px"
     @ok="handleSubmit"
   >
-    <QrCode :vale="invite" />
-    <Image :src="codes.h5_img" />
-    <Image :src="codes.mp_img" />
+    <QrCode :vale="invite" alt="Invite Code" />
+    <Image :src="codes.h5_img_url" alt="H5 Code" />
+    <Image :src="codes.mp_img_url" alt="MP Code" />
   </BasicModal>
 </template>
 
@@ -27,8 +27,8 @@
     setup() {
       const invite = ref('');
       const codes = ref({
-        h5_img: '',
-        mp_img: '',
+        h5_img_url: '',
+        mp_img_url: '',
       });
 
       const [registerDrawer, { openDrawer }] = useDrawer();
@@ -37,7 +37,7 @@
         setModalProps({ confirmLoading: false });
         console.log(codes);
         codes.value = { ...data.codes };
-        invite.value = 'h5/#/pages/index/index?type=code_order&table_num=' + data.record.dt_code;
+        invite.value = 'h5/#/pages/index/index?type=code_order&table_num=' + data.record.id;
       });
 
       const getTitle = '二维码';

@@ -2,8 +2,6 @@
   <div id="sku_tag">
     <div class="form-group">
       <div class="form-h">商品规格</div>
-      {{ counter }}
-      <BasicButton @click="debugPrint">Debug</BasicButton>
       <div class="form-item" v-for="(attr, attrIdx) in attrs" :key="attrIdx">
         <div class="form-title">
           <Input class="sku-name" v-model:value="attr.pName" placeholder="规格名" />
