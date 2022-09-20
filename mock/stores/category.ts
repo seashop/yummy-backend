@@ -1,6 +1,6 @@
 import { MockMethod } from 'vite-plugin-mock';
 import { resultPageSuccess } from '../_util';
-import { imageEntry } from 'mock/asset/image';
+import { imageEntry } from '../asset/image';
 
 const categoryList = (() => {
   const result: any[] = [];
