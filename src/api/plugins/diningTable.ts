@@ -5,14 +5,15 @@ import {
   DiningTablesListResultModel,
   selectParams,
 } from './model/diningTableModel';
+import { bindParams } from '../util';
 
 export enum Api {
-  ListDiningTables = '/index/admin/get_all_zz',
-  GetDiningTable = '/index/admin/get_zz',
-  CreateDiningTable = '/index/admin/add_zz',
-  UpdateDiningTable = '/index/admin/edit_zz',
-  DeleteDiningTable = '/index/admin/del_zz',
-  GetDiningTableCode = '/order/admin/code_order',
+  ListDiningTables = '/diningTable/admin',
+  GetDiningTable = '/diningTable/admin/{id}/info',
+  CreateDiningTable = '/diningTable/admin',
+  UpdateDiningTable = '/diningTable/admin/{id}/update',
+  DeleteDiningTable = '/diningTable/admin/{id}/destory',
+  GetDiningTableCode = '/diningTable/admin/{id}/codes',
 }
 
 /**
@@ -20,31 +21,31 @@ export enum Api {
  */
 
 export const listDiningTables = (params?: selectParams) => {
-  return defHttp.get<DiningTablesListResultModel>({ url: Api.ListDiningTables, params });
+  return defHttp.get<DiningTablesListResultModel>({
+    url: Api.ListDiningTables,
+    params,
+  });
 };
 
 export const createDiningTable = (data: DiningTableItem) => {
   return defHttp.post<DiningTableItem>({ url: Api.CreateDiningTable, data });
 };
 
-export const updateDiningTable = (data: DiningTableItem) => {
-  return defHttp.post<DiningTableItem>({ url: Api.UpdateDiningTable, data });
+export const updateDiningTable = (id: number, data: DiningTableItem) => {
+  return defHttp.put<DiningTableItem>({
+    url: bindParams(Api.UpdateDiningTable, { id }),
+    data,
+  });
 };
 
 export const deleteDiningTable = (id: number) => {
-  return defHttp.put({
-    url: Api.DeleteDiningTable,
-    params: {
-      id,
-    },
+  return defHttp.delete({
+    url: bindParams(Api.DeleteDiningTable, { id }),
   });
 };
 
 export const getDiningTableCode = (id: number) => {
   return defHttp.get<DiningTableCodeItem>({
-    url: Api.GetDiningTableCode,
-    params: {
-      id,
-    },
+    url: bindParams(Api.GetDiningTableCode, { id }),
   });
 };

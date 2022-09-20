@@ -26,7 +26,7 @@ const diningTableList = (() => {
 export default [
   // mock diningTable
   {
-    url: '/basic-api/index/admin/get_all_zz',
+    url: '/basic-api/diningTable/admin',
     timeout: 200,
     method: 'get',
     response: ({ query }) => {
@@ -35,7 +35,7 @@ export default [
     },
   },
   {
-    url: '/basic-api/index/admin/add_zz',
+    url: '/basic-api/diningTable/admin',
     timeout: 200,
     method: 'post',
     response: ({ data }) => {
@@ -43,7 +43,7 @@ export default [
     },
   },
   {
-    url: '/basic-api/index/admin/edit_zz',
+    url: '/basic-api/diningTable/admin/1/update',
     timeout: 200,
     method: 'post',
     response: ({ data }) => {
@@ -51,7 +51,7 @@ export default [
     },
   },
   {
-    url: '/basic-api/index/admin/del_zz',
+    url: '/basic-api/diningTable/admin/1/delete',
     timeout: 200,
     method: 'put',
     response: ({ data }) => {
@@ -59,7 +59,7 @@ export default [
     },
   },
   {
-    url: '/basic-api/order/admin/code_order',
+    url: '/basic-api/diningTable/admin/1/codes',
     timeout: 200,
     method: 'put',
     response: ({ data }) => {

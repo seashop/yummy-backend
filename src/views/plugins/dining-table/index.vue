@@ -111,7 +111,7 @@
 
       async function handleSuccess({ isUpdate, values }) {
         if (isUpdate) {
-          await updateDiningTable(values);
+          await updateDiningTable(values.id, values);
         } else {
           await createDiningTable(values);
         }
