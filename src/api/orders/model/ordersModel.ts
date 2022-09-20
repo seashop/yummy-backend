@@ -8,7 +8,7 @@ export interface OrderItem {
   state: number;
   shipment_state: number;
   payment_state: number;
-  rate_id: number;
+  evaluate_id: number;
   coupon_id: number;
   order_from: string;
   payment_type: string;
@@ -28,7 +28,7 @@ export interface OrderItem {
   courier: any;
   remark_one: any;
   remark_two: any;
-  drive_type: string;
+  delivery_method: string;
   prepay_id: any;
   pay_time: any;
   other: string;

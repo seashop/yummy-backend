@@ -1,8 +1,6 @@
 import { defHttp } from '/@/utils/http/axios';
 import { UsersListResultModel, selectParams, UserItem } from './model/userModel';
-import { template, templateSettings } from 'lodash-es';
-
-templateSettings.interpolate = /{([\s\S]+?)}/g;
+import { bindParams } from '../util';
 
 export enum Api {
   ListUsers = '/cms/admin/users',
@@ -25,13 +23,13 @@ export const createUser = (data: UserItem) => {
 };
 
 export const updateUser = (id: number, data: UserItem) => {
-  return defHttp.patch({ url: template(Api.UpdateUser)({ id }), data });
+  return defHttp.patch({ url: bindParams(Api.UpdateUser, { id }), data });
 };
 
 export const updateUserPassword = (id: number, data: UserItem) => {
-  return defHttp.patch({ url: template(Api.UpdateUserPassword)({ id }), data });
+  return defHttp.patch({ url: bindParams(Api.UpdateUserPassword, { id }), data });
 };
 
 export const deleteUser = (id: number) => {
-  return defHttp.delete({ url: template(Api.DeleteUser)({ id }) });
+  return defHttp.delete({ url: bindParams(Api.DeleteUser, { id }) });
 };

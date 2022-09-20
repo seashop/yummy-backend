@@ -23,13 +23,13 @@
               <Col :span="3">
                 <div><span class="cu">应付金额：</span>{{ item.order_money }}</div>
               </Col>
-              <Col :span="4" v-if="item.drive_type == '配送'">
+              <Col :span="4" v-if="item.delivery_method == '配送'">
                 <div
                   ><span class="cu">地址：</span
                   >{{ item.receiver_city + item.receiver_address }}</div
                 >
               </Col>
-              <Col :span="4" v-if="item.drive_type == '店内就餐'">
+              <Col :span="4" v-if="item.delivery_method == '店内就餐'">
                 <div><span class="cu">桌号：</span>{{ item.table_num }}号桌</div>
               </Col>
               <Col :span="5">
