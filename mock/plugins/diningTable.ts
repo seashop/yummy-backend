@@ -45,15 +45,15 @@ export default [
   {
     url: '/basic-api/diningTable/admin/1/update',
     timeout: 200,
-    method: 'post',
+    method: 'patch',
     response: ({ data }) => {
       return resultSuccess(data);
     },
   },
   {
-    url: '/basic-api/diningTable/admin/1/delete',
+    url: '/basic-api/diningTable/admin/1/destroy',
     timeout: 200,
-    method: 'put',
+    method: 'delete',
     response: ({ data }) => {
       return resultSuccess(data);
     },

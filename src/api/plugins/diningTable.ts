@@ -32,7 +32,7 @@ export const createDiningTable = (data: DiningTableItem) => {
 };
 
 export const updateDiningTable = (id: number, data: DiningTableItem) => {
-  return defHttp.put<DiningTableItem>({
+  return defHttp.patch<DiningTableItem>({
     url: bindParams(Api.UpdateDiningTable, { id }),
     data,
   });
