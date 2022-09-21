@@ -37,7 +37,7 @@
         setModalProps({ confirmLoading: false });
         console.log(codes);
         codes.value = { ...data.codes };
-        invite.value = 'h5/#/pages/index/index?type=code_order&table_num=' + data.record.id;
+        invite.value = 'h5/#/pages/index/index?type=code_order&dintbl_id=' + data.record.id;
       });
 
       const getTitle = '二维码';

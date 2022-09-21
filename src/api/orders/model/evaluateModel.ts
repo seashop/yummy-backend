@@ -20,8 +20,8 @@ export interface ReplyItem {
 
 export interface selectParams {
   playstate: number;
-  starttime?: Date;
-  endtime?: Date;
+  since_at?: Date;
+  until_at?: Date;
   wordkey?: string;
 }
 

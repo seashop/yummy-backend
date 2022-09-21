@@ -30,7 +30,7 @@
                 >
               </Col>
               <Col :span="4" v-if="item.delivery_method == '店内就餐'">
-                <div><span class="cu">桌号：</span>{{ item.table_num }}号桌</div>
+                <div><span class="cu">桌号：</span>{{ item.dintbl_id }}号桌</div>
               </Col>
               <Col :span="5">
                 <div><span class="cu">日期：</span>{{ item.created_at }}</div>

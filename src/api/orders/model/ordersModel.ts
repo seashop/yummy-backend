@@ -18,7 +18,7 @@ export interface OrderItem {
   edit_money: string;
   order_money: string;
   user_ip: any;
-  goods_picture: any;
+  goods_img_ids: any;
   message: string;
   receiver_name: string;
   receiver_mobile: string;
@@ -37,7 +37,7 @@ export interface OrderItem {
   count: number;
   pay_cate: string;
   ucid: number;
-  table_num: string;
+  dintbl_id: string;
   pick_code: string;
   invite_code: any;
   fx_money: number;
@@ -77,8 +77,8 @@ export interface OrderUser {
 
 export interface selectParams {
   playstate: number;
-  starttime?: Date;
-  endtime?: Date;
+  since_at?: Date;
+  until_at?: Date;
   wordkey?: string;
 }
 
