@@ -21,6 +21,7 @@
   import { BasicModal, useModalInner } from '/@/components/Modal';
 
   import { formSchema } from './discount.data';
+  import { getDiscount } from '/@/api/plugins/discount';
 
   export default defineComponent({
     name: 'CouponModal',
@@ -44,9 +45,10 @@
           isUpdate.value = !!data?.isUpdate;
 
           if (unref(isUpdate)) {
+            const record = await getDiscount(data.record.id);
             rowId.value = data.record.id;
             setFieldsValue({
-              ...data.record,
+              ...record,
             });
           }
         },

@@ -124,6 +124,9 @@ export const formSchema: FormSchema[] = [
     required: true,
     component: 'RangePicker',
     componentProps: ({ formModel }) => {
+      if (formModel.start_time && formModel.end_time) {
+        formModel.time_range = [formModel.start_time, formModel.end_time];
+      }
       return {
         onChange: (e: any) => {
           console.log('time_range', e);

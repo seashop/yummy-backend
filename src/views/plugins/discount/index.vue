@@ -83,7 +83,7 @@
 
       async function handleSuccess({ isUpdate, values }) {
         if (isUpdate) {
-          const result = await updateDiscount(values);
+          const result = await updateDiscount(values.id, values);
           console.log(result);
         } else {
           const result = await createDiscount(values);
