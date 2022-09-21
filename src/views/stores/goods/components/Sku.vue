@@ -232,7 +232,7 @@
           state.tableSku = [];
         }
         let spuList: Array<GoodsSkuItem> = [];
-        const srcData = tableSpu.value;
+        const spuItem = tableSpu.value;
         // 联动: rows
         for (let i = 0; i < rows.value; i++) {
           let skuItem: GoodsSkuItem = {
@@ -240,15 +240,15 @@
             stock_num: getOvValue(i, 'stock_num'),
           };
           // 构建动态项
-          for (let j = 0; j < srcData.length; j++) {
+          for (let j = 0; j < spuItem.length; j++) {
             // 构造第一类目
-            let key = srcData[j].pName as string;
-            let rowspan = srcData[j].rowspan;
-            let len = srcData[j].specLen;
+            let key = spuItem[j].pName as string;
+            let rowspan = spuItem[j].rowspan;
+            let len = spuItem[j].specLen;
             if (!len) {
               continue;
             }
-            let spec = srcData[j].spec;
+            let spec = spuItem[j].spec;
             let index = parseInt(i / rowspan) % len;
             skuItem[key] = spec[index].cName;
           }

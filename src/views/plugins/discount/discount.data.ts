@@ -126,11 +126,26 @@ export const formSchema: FormSchema[] = [
     componentProps: ({ formModel }) => {
       return {
         onChange: (e: any) => {
+          console.log('time_range', e);
           formModel.start_time = e[0];
           formModel.end_time = e[1];
         },
       };
     },
+  },
+  {
+    field: 'start_time',
+    label: '生效开始时间',
+    required: true,
+    component: 'DatePicker',
+    show: false,
+  },
+  {
+    field: 'end_time',
+    label: '生效结束时间',
+    required: true,
+    component: 'DatePicker',
+    show: false,
   },
   {
     field: 'divider-select-goods',

@@ -12,7 +12,7 @@ export enum Api {
   GetDiningTable = '/diningTable/admin/{id}/info',
   CreateDiningTable = '/diningTable/admin',
   UpdateDiningTable = '/diningTable/admin/{id}/update',
-  DeleteDiningTable = '/diningTable/admin/{id}/destory',
+  DeleteDiningTable = '/diningTable/admin/{id}/destroy',
   GetDiningTableCode = '/diningTable/admin/{id}/codes',
 }
 

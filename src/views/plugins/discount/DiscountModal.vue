@@ -8,10 +8,10 @@
     @ok="handleSubmit"
   >
     <BasicForm v-if="getVisible" @register="registerForm" />
-    <template #insertFooter>
+    <!-- <template #insertFooter>
       <a-button type="primary" danger>上一步</a-button>
       <a-button type="primary" danger>下一步</a-button>
-    </template>
+    </template> -->
   </BasicModal>
 </template>
 
@@ -55,8 +55,6 @@
       const getTitle = computed(() => (!unref(isUpdate) ? '新增活动' : '编辑活动'));
 
       async function handleSubmit() {
-        console.log(isUpdate, await validate());
-        return;
         try {
           const values = await validate();
           setModalProps({ confirmLoading: true });

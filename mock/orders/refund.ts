@@ -23,7 +23,7 @@ const refundList = (() => {
 export default [
   // mock refund
   {
-    url: '/basic-api/order/admin/get_tui_all',
+    url: '/basic-api/order/admin/refund',
     timeout: 200,
     method: 'get',
     response: ({ query }) => {

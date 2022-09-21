@@ -1,10 +1,11 @@
 import { defHttp } from '/@/utils/http/axios';
 import { OrderListResultModel, selectParams } from './model/ordersModel';
+import { bindParams } from '../util';
 
 enum Api {
-  ListOrders = '/order/admin/get_order',
-  EditOrderPay = '/order/admin/edit_pay',
-  EditOrderCourier = '/order/admin/edit_courier',
+  ListOrders = '/order/admin',
+  EditOrderPay = '/order/admin/{id}/pay',
+  EditOrderCourier = '/order/admin/{id}/courier',
   EditOrderReceive = '/order/user/receive',
   DeleteOrder = '/order/admin/del_order',
   PrintOrder = '/cms/print_order',
@@ -20,10 +21,7 @@ export const listOrders = (data?: selectParams) => {
 
 export const editOrderPay = (id: string) => {
   return defHttp.get<OrderListResultModel>({
-    url: Api.EditOrderPay,
-    params: {
-      id,
-    },
+    url: bindParams(Api.EditOrderPay, { id }),
   });
 };
 export const editOrderCourier = (id: string) => {

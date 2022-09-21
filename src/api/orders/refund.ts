@@ -2,7 +2,7 @@ import { defHttp } from '/@/utils/http/axios';
 import { RefundsListResultModel, selectParams } from './model/refundModel';
 
 export enum Api {
-  ListRefunds = '/order/admin/get_tui_all',
+  ListRefunds = '/order/admin/refund',
   RejectRefunds = '/order/admin/tui_bohui',
   AcceptRefunds = '/order/admin/tui_money',
 }
