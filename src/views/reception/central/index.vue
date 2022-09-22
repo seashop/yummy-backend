@@ -1,6 +1,6 @@
 <template>
   <Row type="flex" :class="prefixCls">
-    <Col :flex="2">
+    <Col :span="10">
       <PageWrapper :class="prefixCls" title="下单">
         <div :class="`${prefixCls}__top`">
           <Row :gutter="12">
@@ -28,11 +28,17 @@
                       class="icon"
                       v-if="goodsStack[item.goods_id].img"
                       :src="goodsStack[item.goods_id].img.full_url"
+                      :width="60"
                     />
                   </template>
                   <template #title>
                     <span>{{ goodsStack[item.goods_id].title }}</span>
-                    <div class="extra"> 已上餐 </div>
+                    <div class="extra">
+                      <BasicButton type="link" danger @click="() => handleDeleteGoods(item)">
+                        删除
+                      </BasicButton>
+                      <BasicButton type="link">待上餐</BasicButton>
+                    </div>
                   </template>
                   <template #description>
                     <div class="description">
@@ -55,21 +61,19 @@
               </ListItem>
             </template>
           </List>
-          <div>
-            <BasicButton @click="submit">提交</BasicButton>
-          </div>
         </div>
       </PageWrapper>
     </Col>
-    <Col :flex="1">
+    <Col :span="2">
       <ScrollContainer>
+        <BasicButton @click="cartPlace">上菜</BasicButton>
         <template v-for="index in 8" :key="index">
           <BasicButton>Action{{ index }}</BasicButton>
           <br />
         </template>
       </ScrollContainer>
     </Col>
-    <Col :flex="2">
+    <Col :span="12">
       <ScrollContainer>
         <BasicButton @click="() => handleCategoryClick(0)">全部</BasicButton>
         <BasicButton
@@ -79,7 +83,6 @@
         >
           {{ category.title }}
         </BasicButton>
-
         <div :class="`${prefixCls}__content`">
           <List>
             <Row :gutter="16">
@@ -109,7 +112,13 @@
   import { PageWrapper } from '/@/components/Page';
 
   import ProductCard from './components/ProductCard.vue';
-  import { appendCart, createCart, getCart, updateGoods } from '/@/api/reception/dining';
+  import {
+    appendCart,
+    createCart,
+    deleteGoods,
+    getCart,
+    updateGoods,
+  } from '/@/api/reception/dining';
   import { DiningCartItem, DiningGoodsItem } from '/@/api/reception/model/diningModel';
 
   export default defineComponent({
@@ -174,7 +183,20 @@
       }
 
       async function handelChangeQuantity(id, quantity) {
-        await updateGoods(id, { quantity });
+        const goods = await updateGoods(id, { quantity });
+        state.items = state.items.map((item) => {
+          if (item.id == id) {
+            item.quantity = goods.quantity;
+            item.served_num = goods.served_num;
+          }
+          return item;
+        });
+      }
+
+      async function handleDeleteGoods({ id }) {
+        await deleteGoods(id).then(() => {
+          state.items = state.items.filter((item) => item.id != id);
+        });
       }
 
       async function handleCategoryClick(id) {
@@ -192,14 +214,13 @@
           quantity: 1,
           served_num: 0,
         };
-        appendCart(props.cartId, item)
+        await appendCart(props.cartId, item)
           .then((cart) => {
             return reloadCart(cart);
           })
           .then(async () => {
             const goods = await getGoods(goods_id);
             state.goodsStack[goods.goods_id] = goods;
-            state.items.push(item);
           });
       }
 
@@ -207,9 +228,10 @@
         ...toRefs(state),
         prefixCls: 'central',
         handelChangeQuantity,
+        handleDeleteGoods,
         handleCategoryClick,
         handleProdcutSelected,
-        submit: async () => {
+        cartPlace: async () => {
           await createCart({
             dintbl_id: props.cartId,
             goods: state.items as Array<DiningGoodsItem>,
