@@ -89,7 +89,7 @@ const goodsList = (() => {
 export default [
   // mock goods list
   {
-    url: '/basic-api/product/admin/all_goods_info',
+    url: '/basic-api/product/admin',
     timeout: 200,
     method: 'get',
     response: ({ query }) => {

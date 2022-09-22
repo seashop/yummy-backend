@@ -4,9 +4,9 @@ import { bindParams } from '../util';
 
 enum Api {
   CreateGoods = '/product/admin/add_product',
-  GetGoods = '/product/{id}',
+  GetGoods = '/product/{id}/show',
   UpdateGoods = '/product/admin/edit_product',
-  ListGoods = '/product/admin/all_goods_info',
+  ListGoods = '/product/admin',
   SwitchGoods = '/order/admin/update',
 }
 
@@ -14,7 +14,7 @@ enum Api {
  * @description: category management
  */
 
-export const listGoods = (params?: selectParams) => {
+export const listGoods = (params?: Partial<selectParams>) => {
   return defHttp.get<GoodsListResultModel>({ url: Api.ListGoods, params });
 };
 

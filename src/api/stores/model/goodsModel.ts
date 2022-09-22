@@ -4,6 +4,8 @@ import { BasicFetchResult } from '/@/api/model/baseModel';
 export interface GoodsItem {
   goods_id: number;
   title: string;
+  description: string;
+  content: string;
   market_price: number;
   price: number;
   stock: number;
@@ -50,6 +52,8 @@ export interface GoodsSkuItem {
 
 export interface selectParams {
   title: string;
+  category_id: number;
+  goods_ids: Array<number>;
 }
 
 export type GoodsListResultModel = BasicFetchResult<GoodsItem>;
