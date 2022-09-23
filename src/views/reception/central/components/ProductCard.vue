@@ -1,13 +1,22 @@
 <template>
   <Card :hoverable="true" :class="`${prefixCls}__card`">
     <div :class="`${prefixCls}__card-title`">
-      <Image class="icon" :src="goods.img.full_url" />
+      <!-- <Image class="icon" :src="goods.img.full_url" /> -->
+      <Image class="icon" :src="goods.img.full_url && defaultIma" />
+
       {{ goods.title }}
     </div>
-    <div :class="`${prefixCls}__card-detail`">
-      {{ goods.description }}
+    <div @click="handleAdd">
+      <div :class="`${prefixCls}__card-detail`">
+        {{ goods.description }}
+      </div>
+      <div :class="`${prefixCls}__card-detail`">
+        <span class="goods_price">$99.99</span>
+        <s>$199.00</s>
+        <!-- {{ goods.description }} -->
+      </div>
     </div>
-    <BasicButton @click="handleAdd">Add</BasicButton>
+    <!-- <BasicButton @click="handleAdd">Add</BasicButton> -->
   </Card>
 </template>
 
@@ -15,10 +24,14 @@
   import { defineComponent } from 'vue';
   import { Card, Image } from 'ant-design-vue';
   import { GoodsItem } from '/@/api/stores/model/goodsModel';
-  import BasicButton from '/@/components/Button/src/BasicButton.vue';
+  // import BasicButton from '/@/components/Button/src/BasicButton.vue';
 
   export default defineComponent({
-    components: { Card, Image, BasicButton },
+    components: {
+      Card,
+      Image,
+      // BasicButton,
+    },
     props: {
       goods: {
         type: Object as PropType<GoodsItem>,
@@ -27,6 +40,8 @@
     },
     emits: ['selected'],
     setup(props, { emit }) {
+      const defaultIma =
+        'https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc';
       function handleAdd() {
         emit('selected', { goods_id: props.goods.goods_id });
       }
@@ -34,6 +49,7 @@
       return {
         prefixCls: 'product_card',
         handleAdd,
+        defaultIma,
       };
     },
   });
@@ -69,5 +85,9 @@
         color: @text-color-secondary;
       }
     }
+  }
+  .goods_price {
+    color: #ff4258;
+    margin-right: 5px;
   }
 </style>

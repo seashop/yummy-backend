@@ -4,18 +4,22 @@
       <!-- <Col :xs="24" :sm="24" :md="24" :lg="24" :xl="9" class="cart_list"> -->
       <PageWrapper :class="prefixCls" title="下单">
         <div :class="`${prefixCls}__top`">
-          <Row :gutter="12">
-            <Col :span="8" :class="`${prefixCls}__top-col`">
+          <Row :gutter="10">
+            <Col :span="6" :class="`${prefixCls}__top-col`">
               <div>下单时间</div>
               <p>{{ cart.created_at }}</p>
             </Col>
-            <Col :span="8" :class="`${prefixCls}__top-col`">
+            <Col :span="6" :class="`${prefixCls}__top-col`">
               <div>桌号</div>
               <p>001</p>
             </Col>
-            <Col :span="8" :class="`${prefixCls}__top-col`">
+            <Col :span="6" :class="`${prefixCls}__top-col`">
               <div>未上菜数</div>
               <p>2个</p>
+            </Col>
+            <Col :span="6" :class="`${prefixCls}__top-col`">
+              <div>总价格</div>
+              <p>¥99.00</p>
             </Col>
           </Row>
         </div>
@@ -28,7 +32,7 @@
                     <Image
                       class="icon"
                       v-if="goodsStack[item.goods_id].img"
-                      :src="goodsStack[item.goods_id].img.full_url"
+                      :src="goodsStack[item.goods_id].img.full_url && defaultIma"
                       :width="60"
                     />
                   </template>
@@ -47,13 +51,14 @@
                     </div>
                     <div class="info">
                       <div><span>Owner</span>{{ item.author }}</div>
-                      <div><span>点餐时间</span>{{ item.datetime }}</div>
+                      <div><span>点餐时间</span>2022/09/22 18:00{{ item.datetime }}</div>
+                      <div><span>价格</span>$99.99{{ item.price }}</div>
                     </div>
                     <div class="progress">
                       <span>{{ item.served_num }}</span> /
                       <InputNumber
                         v-model:value="item.quantity"
-                        :min="item.served_num"
+                        :min="1"
                         @change="(quantity) => ChangeQuantity(item.id, quantity)"
                       />
                       <!-- @change="(quantity) => handelChangeQuantity(item.id, quantity)" -->
@@ -75,15 +80,15 @@
           <ScrollContainer>
             <div class="category_style">
               <BasicButton type="primary" @click="() => handleCategoryClick(0)">全部</BasicButton>
-              <BasicButton
-                style="margin: 5px 0"
-                type="primary"
-                v-for="(category, index) in categoryItems"
-                :key="index"
-                @click="() => handleCategoryClick(category.category_id)"
-              >
-                {{ category.title }}
-              </BasicButton>
+              <div v-for="(category, index) in categoryItems" :key="index">
+                <BasicButton
+                  style="margin: 5px 0"
+                  type="primary"
+                  @click="() => handleCategoryClick(category.category_id)"
+                >
+                  {{ category.title }}
+                </BasicButton>
+              </div>
             </div>
             <div :class="`${prefixCls}__content`" v-if="false">
               <List>
@@ -189,6 +194,8 @@
         loading: false,
         tip: '加载中...',
       });
+      const defaultIma =
+        'https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc';
       const router = useRouter();
       const times: any = ref(null);
       function openLoading(absolute: boolean) {
@@ -303,6 +310,7 @@
       return {
         ...toRefs(state),
         ...toRefs(compState),
+        defaultIma,
         prefixCls: 'central',
         handelChangeQuantity,
         ChangeQuantity,
@@ -388,6 +396,7 @@
 
           span {
             display: block;
+            color: #000;
           }
         }
       }
