@@ -1,6 +1,7 @@
 <template>
   <Row type="flex" :class="prefixCls">
-    <Col :span="10">
+    <Col :span="9" class="cart_list">
+      <!-- <Col :xs="24" :sm="24" :md="24" :lg="24" :xl="9" class="cart_list"> -->
       <PageWrapper :class="prefixCls" title="下单">
         <div :class="`${prefixCls}__top`">
           <Row :gutter="12">
@@ -53,8 +54,9 @@
                       <InputNumber
                         v-model:value="item.quantity"
                         :min="item.served_num"
-                        @change="(quantity) => handelChangeQuantity(item.id, quantity)"
+                        @change="(quantity) => ChangeQuantity(item.id, quantity)"
                       />
+                      <!-- @change="(quantity) => handelChangeQuantity(item.id, quantity)" -->
                     </div>
                   </template>
                 </ListItemMeta>
@@ -64,28 +66,64 @@
         </div>
       </PageWrapper>
     </Col>
-    <Col :span="2">
+    <!-- 商品分类 -->
+    <Col :span="3">
       <ScrollContainer>
         <BasicButton @click="cartPlace">上菜</BasicButton>
-        <template v-for="index in 8" :key="index">
-          <BasicButton>Action{{ index }}</BasicButton>
-          <br />
-        </template>
+        <!-- <BasicButton @click="settlementOrder">去结算</BasicButton> -->
+        <Col :span="24">
+          <ScrollContainer>
+            <div class="category_style">
+              <BasicButton type="primary" @click="() => handleCategoryClick(0)">全部</BasicButton>
+              <BasicButton
+                style="margin: 5px 0"
+                type="primary"
+                v-for="(category, index) in categoryItems"
+                :key="index"
+                @click="() => handleCategoryClick(category.category_id)"
+              >
+                {{ category.title }}
+              </BasicButton>
+            </div>
+            <div :class="`${prefixCls}__content`" v-if="false">
+              <List>
+                <Row :gutter="16">
+                  <template v-for="goods in goodsItems" :key="goods.goods_id">
+                    <Col :span="6">
+                      <ListItem>
+                        <ProductCard :goods="goods" @selected="handleProdcutSelected" />
+                      </ListItem>
+                    </Col>
+                  </template>
+                </Row>
+              </List>
+            </div>
+          </ScrollContainer>
+        </Col>
+        <div v-if="false">
+          <template v-for="index in 8" :key="index">
+            <BasicButton>Action{{ index }}</BasicButton>
+            <br />
+          </template>
+        </div>
       </ScrollContainer>
     </Col>
-    <Col :span="12">
+    <!-- 商品展示区域 -->
+    <Col :span="12" class="goods_list">
       <ScrollContainer>
-        <BasicButton @click="() => handleCategoryClick(0)">全部</BasicButton>
-        <BasicButton
-          v-for="(category, index) in categoryItems"
-          :key="index"
-          @click="() => handleCategoryClick(category.category_id)"
-        >
-          {{ category.title }}
-        </BasicButton>
+        <template v-if="false">
+          <BasicButton @click="() => handleCategoryClick(0)">全部</BasicButton>
+          <BasicButton
+            v-for="(category, index) in categoryItems"
+            :key="index"
+            @click="() => handleCategoryClick(category.category_id)"
+          >
+            {{ category.title }}
+          </BasicButton>
+        </template>
         <div :class="`${prefixCls}__content`">
           <List>
-            <Row :gutter="16">
+            <Row :gutter="16" v-if="goodsItems && goodsItems.length">
               <template v-for="goods in goodsItems" :key="goods.goods_id">
                 <Col :span="6">
                   <ListItem>
@@ -94,14 +132,17 @@
                 </Col>
               </template>
             </Row>
+            <Row :gutter="16" v-else> 该分类下暂无菜品 </Row>
           </List>
         </div>
       </ScrollContainer>
     </Col>
   </Row>
+  <Loading :loading="loading" :absolute="absolute" tip="加载中" />
 </template>
 <script lang="ts">
-  import { defineComponent, onMounted, reactive, toRefs, watch } from 'vue';
+  import { defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
+  import { useRouter } from 'vue-router';
   import { Row, Col, List, InputNumber, Image } from 'ant-design-vue';
   import { listCategory } from '/@/api/stores/category';
   import { getGoods, listGoods } from '/@/api/stores/goods';
@@ -120,7 +161,7 @@
     updateGoods,
   } from '/@/api/reception/dining';
   import { DiningCartItem, DiningGoodsItem } from '/@/api/reception/model/diningModel';
-
+  import { Loading } from '/@/components/Loading';
   export default defineComponent({
     components: {
       Row,
@@ -134,6 +175,7 @@
       ScrollContainer,
       PageWrapper,
       ProductCard,
+      Loading,
     },
     props: {
       cartId: {
@@ -142,6 +184,17 @@
       },
     },
     setup(props) {
+      const compState = reactive({
+        absolute: false,
+        loading: false,
+        tip: '加载中...',
+      });
+      const router = useRouter();
+      const times: any = ref(null);
+      function openLoading(absolute: boolean) {
+        compState.absolute = absolute;
+        compState.loading = true;
+      }
       const state = reactive({
         categoryItems: [] as Array<CategoryItem>,
         goodsItems: [] as Array<GoodsItem>,
@@ -151,18 +204,22 @@
       });
 
       onMounted(async () => {
+        openLoading(true);
         state.categoryItems = (await listCategory()).items;
         state.goodsItems = (await listGoods()).items;
+        compState.loading = false;
       });
 
       watch(
         [() => props.cartId],
         async ([id]) => {
+          openLoading(true);
           if (!id) {
             return;
           }
           const cart = await getCart(id);
           await reloadCart(cart);
+          compState.loading = false;
         },
         {
           immediate: true,
@@ -170,6 +227,7 @@
       );
 
       async function reloadCart(cart) {
+        openLoading(true);
         state.cart = cart;
         (
           await listGoods({
@@ -180,9 +238,17 @@
         });
 
         state.items = [...cart.goods];
+        compState.loading = false;
       }
-
+      // 购物车防抖
+      const ChangeQuantity = (id, quantity) => {
+        if (times.value) clearTimeout(times.value);
+        times.value = setTimeout(() => {
+          handelChangeQuantity(id, quantity);
+        }, 300);
+      };
       async function handelChangeQuantity(id, quantity) {
+        openLoading(true);
         const goods = await updateGoods(id, { quantity });
         state.items = state.items.map((item) => {
           if (item.id == id) {
@@ -191,23 +257,29 @@
           }
           return item;
         });
+        compState.loading = false;
       }
 
       async function handleDeleteGoods({ id }) {
+        openLoading(true);
         await deleteGoods(id).then(() => {
           state.items = state.items.filter((item) => item.id != id);
         });
+        compState.loading = false;
       }
 
       async function handleCategoryClick(id) {
+        openLoading(true);
         state.goodsItems = (
           await listGoods({
             category_id: id,
           })
         ).items;
+        compState.loading = false;
       }
 
       async function handleProdcutSelected({ goods_id, sku }) {
+        openLoading(true);
         const item = {
           goods_id: goods_id,
           sku_id: sku,
@@ -222,20 +294,29 @@
             const goods = await getGoods(goods_id);
             state.goodsStack[goods.goods_id] = goods;
           });
+        compState.loading = false;
       }
-
+      // 订单结算
+      function settlementOrder() {
+        router.push({ path: '/orders/order' });
+      }
       return {
         ...toRefs(state),
+        ...toRefs(compState),
         prefixCls: 'central',
         handelChangeQuantity,
+        ChangeQuantity,
         handleDeleteGoods,
         handleCategoryClick,
         handleProdcutSelected,
+        settlementOrder,
         cartPlace: async () => {
+          openLoading(true);
           await createCart({
             dintbl_id: props.cartId,
             goods: state.items as Array<DiningGoodsItem>,
           });
+          compState.loading = false;
         },
       };
     },
@@ -316,6 +397,18 @@
         // width: 15%;
         // vertical-align: top;
       }
+    }
+    .category_style {
+      margin-top: 10px;
+      background: #0960bd;
+    }
+    .cart_list {
+      height: 1000px;
+      overflow-y: auto;
+    }
+    .goods_list {
+      height: 1000px;
+      overflow-y: auto;
     }
   }
 </style>

@@ -90,3 +90,12 @@ export const withInstall = <T>(component: T, alias?: string) => {
   };
   return component as T & Plugin;
 };
+
+// 防抖操作
+export function debounce(fn: any, delay = 300) {
+  let timer: any;
+  return function () {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(fn, delay);
+  };
+}
