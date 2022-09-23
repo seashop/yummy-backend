@@ -75,6 +75,8 @@
     <Col :span="3">
       <ScrollContainer>
         <BasicButton @click="cartPlace">上菜</BasicButton>
+        <BasicButton @click="submitOrder">下单</BasicButton>
+
         <!-- <BasicButton @click="settlementOrder">去结算</BasicButton> -->
         <Col :span="24">
           <ScrollContainer>
@@ -164,7 +166,9 @@
     deleteGoods,
     getCart,
     updateGoods,
+    PlaceDining,
   } from '/@/api/reception/dining';
+  import { PlaceOrder } from '/@/api/orders/order';
   import { DiningCartItem, DiningGoodsItem } from '/@/api/reception/model/diningModel';
   import { Loading } from '/@/components/Loading';
   export default defineComponent({
@@ -303,10 +307,15 @@
           });
         compState.loading = false;
       }
-      // 订单结算
-      function settlementOrder() {
-        router.push({ path: '/orders/order' });
+      // 下单
+      async function submitOrder() {
+        const res = await PlaceDining(1);
+        console.log(res);
       }
+      // // 订单结算
+      // function settlementOrder() {
+      //   router.push({ path: '/orders/order' });
+      // }
       return {
         ...toRefs(state),
         ...toRefs(compState),
@@ -317,7 +326,9 @@
         handleDeleteGoods,
         handleCategoryClick,
         handleProdcutSelected,
-        settlementOrder,
+        // settlementOrder,
+        submitOrder,
+        PlaceOrder,
         cartPlace: async () => {
           openLoading(true);
           await createCart({

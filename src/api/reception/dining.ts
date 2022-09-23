@@ -15,8 +15,8 @@ enum Api {
   AppendCart = '/dining/admin/cart/{id}/append',
   UpdateGoods = '/dining/admin/goods/{id}/update',
   DeleteGoods = '/dining/admin/goods/{id}/delete',
+  PlaceDining = '/diningTable/admin/{id}/place',
 }
-
 /**
  * @description: category management
  */
@@ -58,5 +58,11 @@ export const updateGoods = (id: number, data: Partial<DiningGoodsItem>) => {
 export const deleteGoods = (id: number) => {
   return defHttp.delete<DiningCartItem>({
     url: bindParams(Api.DeleteGoods, { id }),
+  });
+};
+
+export const PlaceDining = (id: number) => {
+  return defHttp.get<DiningCartItem>({
+    url: bindParams(Api.PlaceDining, { id }),
   });
 };

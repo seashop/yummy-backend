@@ -23,6 +23,15 @@ const reception: AppRouteModule = {
         title: t('routes.reception.central'),
       },
     },
+    {
+      path: 'management',
+      name: 'Management',
+      component: () => import('/@/views/reception/management/index.vue'),
+      meta: {
+        // affix: true,
+        title: t('routes.reception.management'),
+      },
+    },
   ],
 };
 

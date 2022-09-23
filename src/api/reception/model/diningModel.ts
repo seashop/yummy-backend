@@ -25,5 +25,4 @@ export interface selectParams {
   dincart_id: number;
   goods_id: number;
 }
-
 export type DiningCartListResultModel = BasicFetchResult<DiningCartItem>;

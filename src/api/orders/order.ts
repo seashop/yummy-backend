@@ -1,5 +1,5 @@
 import { defHttp } from '/@/utils/http/axios';
-import { OrderListResultModel, selectParams } from './model/ordersModel';
+import { OrderListResultModel, selectParams, PlaceOrderType } from './model/ordersModel';
 import { bindParams } from '../util';
 
 enum Api {
@@ -9,6 +9,7 @@ enum Api {
   EditOrderReceive = '/order/admin/{id}/receive',
   DeleteOrder = '/order/admin/{id}/destroy',
   PrintOrder = '/cms/print_order',
+  PlaceOrder = '/order/admin/place',
 }
 
 /**
@@ -46,4 +47,7 @@ export const printOrder = (order_num: string) => {
       order_num,
     },
   });
+};
+export const PlaceOrder = (data: PlaceOrderType) => {
+  return defHttp.post<OrderListResultModel>({ url: Api.PlaceOrder, data });
 };

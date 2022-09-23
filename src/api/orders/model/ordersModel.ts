@@ -81,5 +81,11 @@ export interface selectParams {
   until_at?: Date;
   wordkey?: string;
 }
-
+export interface PlaceOrderType {
+  dintbl_id?: number;
+  pick_code?: number;
+  user_id?: number;
+  message?: string;
+  invite_code?: string;
+}
 export type OrderListResultModel = BasicFetchResult<OrderItem>;
