@@ -74,10 +74,9 @@
     <!-- 商品分类 -->
     <Col :span="3">
       <ScrollContainer>
-        <BasicButton @click="cartPlace">上菜</BasicButton>
         <BasicButton @click="submitOrder">下单</BasicButton>
-
-        <!-- <BasicButton @click="settlementOrder">去结算</BasicButton> -->
+        <BasicButton @click="cartPlace">上菜</BasicButton>
+        <BasicButton @click="settlementOrder">去结算</BasicButton>
         <Col :span="24">
           <ScrollContainer>
             <div class="category_style">
@@ -144,8 +143,8 @@
         </div>
       </ScrollContainer>
     </Col>
+    <Loading :loading="loading" :absolute="absolute" tip="加载中" />
   </Row>
-  <Loading :loading="loading" :absolute="absolute" tip="加载中" />
 </template>
 <script lang="ts">
   import { defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
@@ -313,9 +312,9 @@
         console.log(res);
       }
       // // 订单结算
-      // function settlementOrder() {
-      //   router.push({ path: '/orders/order' });
-      // }
+      function settlementOrder() {
+        router.push({ path: '/orders/order' });
+      }
       return {
         ...toRefs(state),
         ...toRefs(compState),
@@ -326,7 +325,7 @@
         handleDeleteGoods,
         handleCategoryClick,
         handleProdcutSelected,
-        // settlementOrder,
+        settlementOrder,
         submitOrder,
         PlaceOrder,
         cartPlace: async () => {
