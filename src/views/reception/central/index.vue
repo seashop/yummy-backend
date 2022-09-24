@@ -11,7 +11,7 @@
             </Col>
             <Col :span="6" :class="`${prefixCls}__top-col`">
               <div>桌号</div>
-              <p>001</p>
+              <p>{{ dintbl_id }}</p>
             </Col>
             <Col :span="6" :class="`${prefixCls}__top-col`">
               <div>未上菜数</div>
@@ -77,6 +77,7 @@
         <BasicButton @click="submitOrder">下单</BasicButton>
         <BasicButton @click="cartPlace">上菜</BasicButton>
         <BasicButton @click="settlementOrder">去结算</BasicButton>
+        <BasicButton @click="managementOrder">桌台管理</BasicButton>
         <Col :span="24">
           <ScrollContainer>
             <div class="category_style">
@@ -148,7 +149,7 @@
 </template>
 <script lang="ts">
   import { defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router';
   import { Row, Col, List, InputNumber, Image } from 'ant-design-vue';
   import { listCategory } from '/@/api/stores/category';
   import { getGoods, listGoods } from '/@/api/stores/goods';
@@ -200,11 +201,16 @@
       const defaultIma =
         'https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc';
       const router = useRouter();
+      const route = useRoute();
       const times: any = ref(null);
       function openLoading(absolute: boolean) {
         compState.absolute = absolute;
         compState.loading = true;
       }
+      console.log('route', route.query);
+      const dintbl_id = route.query.id ?? '';
+      if (!dintbl_id) router.push({ path: '/reception/management' });
+      console.log('dintbl_id', dintbl_id);
       const state = reactive({
         categoryItems: [] as Array<CategoryItem>,
         goodsItems: [] as Array<GoodsItem>,
@@ -315,10 +321,16 @@
       function settlementOrder() {
         router.push({ path: '/orders/order' });
       }
+      function managementOrder() {
+        router.push({
+          path: '/reception/management',
+        });
+      }
       return {
         ...toRefs(state),
         ...toRefs(compState),
         defaultIma,
+        dintbl_id,
         prefixCls: 'central',
         handelChangeQuantity,
         ChangeQuantity,
@@ -326,6 +338,7 @@
         handleCategoryClick,
         handleProdcutSelected,
         settlementOrder,
+        managementOrder,
         submitOrder,
         PlaceOrder,
         cartPlace: async () => {
