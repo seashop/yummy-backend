@@ -16,8 +16,8 @@ enum Api {
  * @description: order management
  */
 
-export const listOrders = (data?: selectParams) => {
-  return defHttp.get<OrderListResultModel>({ url: Api.ListOrders, data });
+export const listOrders = (params?: selectParams) => {
+  return defHttp.get<OrderListResultModel>({ url: Api.ListOrders, params });
 };
 
 export const editOrderPay = (id: string) => {
