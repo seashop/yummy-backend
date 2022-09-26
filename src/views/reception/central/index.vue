@@ -774,9 +774,9 @@
     // height: 389px;
   }
   ::v-deep .ant-card-body:active {
-    border: 8px solid #000;
-    border-radius: 20px;
-    background: #000;
+    // border: 8px solid #000;
+    // border-radius: 20px;
+    // background: #000;
   }
   ::v-deep .ant-card-bordered {
     border-radius: 7px;
