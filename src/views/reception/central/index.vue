@@ -144,7 +144,7 @@
             <s>$199.00</s>
           </div>
         </div>
-        <div class="submit_order_btn">下单</div>
+        <div class="submit_order_btn" @click="submitOrder">下单</div>
       </div>
     </Col>
     <!-- 商品分类 -->
@@ -259,6 +259,7 @@
   import { getGoods, listGoods } from '/@/api/stores/goods';
   import { CategoryItem } from '/@/api/stores/model/categoryModel';
   import { GoodsItem } from '/@/api/stores/model/goodsModel';
+  import { listDiningTables } from '/@/api/plugins/diningTable';
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
   import { ScrollContainer } from '/@/components/Container';
   import { PageWrapper } from '/@/components/Page';
@@ -266,8 +267,9 @@
   import ProductCard from './components/ProductCard.vue';
   import Tag from './components/tag.vue';
   import {
+    // ListCart,
     appendCart,
-    // createCart,
+    createCart,
     deleteGoods,
     getCart,
     updateGoods,
@@ -316,7 +318,7 @@
         compState.absolute = absolute;
         compState.loading = true;
       }
-      const dintbl_id = route.query.id ?? '';
+      const dintbl_id = route.query.id ?? undefined;
       if (!dintbl_id) router.push({ path: '/reception/management' });
       console.log('dintbl_id', dintbl_id);
       const state = reactive({
@@ -333,7 +335,19 @@
         state.goodsItems = (await listGoods()).items;
         compState.loading = false;
       });
-
+      const getListDiningTables = async () => {
+        const res = await listDiningTables();
+        console.log('getListDiningTables', res);
+      };
+      getListDiningTables();
+      const getCreateCart = async () => {
+        if (!dintbl_id) return;
+        const res = await createCart({
+          dintbl_id: 1,
+        });
+        console.log('getCreateCart', res);
+      };
+      getCreateCart();
       watch(
         [() => props.cartId],
         async ([id]) => {
@@ -423,7 +437,15 @@
       }
       // 下单
       async function submitOrder() {
-        const res = await PlaceDining(1);
+        console.log('下单');
+        // const data = {
+        // dintbl_id: 1,
+        // pick_code: 0,
+        // user_id: 0,
+        // message: '',
+        // invite_code: '',
+        // };
+        const res = await PlaceOrder(1);
         console.log(res);
       }
       // // 订单结算
@@ -451,7 +473,6 @@
         settlementOrder,
         managementOrder,
         submitOrder,
-        PlaceOrder,
         // cartPlace: async () => {
         //   openLoading(true);
         //   await createCart({

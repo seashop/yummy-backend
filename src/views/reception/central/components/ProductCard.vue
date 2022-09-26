@@ -39,8 +39,8 @@
           {{ 1500 }}
         </div>
         <div class="detai_price">
-          <s>$199.00</s>
-          <span class="goods_price">$99.99</span>
+          <s>${{ goods.market_price }}</s>
+          <span class="goods_price">${{ goods.price }}</span>
         </div>
         <!-- {{ goods.description }} -->
       </div>
