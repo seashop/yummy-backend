@@ -4,15 +4,44 @@
       <!-- <Image class="icon" :src="goods.img.full_url" /> -->
       <Image class="icon" :src="goods.img.full_url && defaultIma" />
 
-      {{ goods.title }}
+      <div
+        style="
+          height: 58px;
+          width: 200px;
+          word-break: break-all;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2; /* 这里是超出几行省略 */
+          overflow: hidden;
+        "
+      >
+        <!-- Lucienne Bechtelar Nettie RaynorLucienne Bechtelar Nettie Raynor -->
+        {{ goods.title }} {{ goods.description }}
+      </div>
     </div>
     <div @click="handleAdd">
       <div :class="`${prefixCls}__card-detail`">
-        {{ goods.description }}
+        <div style="display: flex; margin-bottom: 10px">
+          <Tag text="9折" color="#ff0000" />
+          <Tag text="新品" color="#42CFBE"
+        /></div>
+        <!-- {{ goods.description }} -->
       </div>
-      <div :class="`${prefixCls}__card-detail`">
-        <span class="goods_price">$99.99</span>
-        <s>$199.00</s>
+      <div
+        :class="`${prefixCls}__card-detail`"
+        style="display: flex; justify-content: space-between; align-items: center;margin"
+      >
+        <div class="detai_icon">
+          <ShoppingCartOutlined />
+          {{ 100 }}
+          <LikeOutlined />
+          {{ 1500 }}
+        </div>
+        <div class="detai_price">
+          <s>$199.00</s>
+          <span class="goods_price">$99.99</span>
+        </div>
         <!-- {{ goods.description }} -->
       </div>
     </div>
@@ -23,13 +52,18 @@
 <script lang="ts">
   import { defineComponent } from 'vue';
   import { Card, Image } from 'ant-design-vue';
+  import { ShoppingCartOutlined, LikeOutlined } from '@ant-design/icons-vue';
   import { GoodsItem } from '/@/api/stores/model/goodsModel';
+  import Tag from './tag.vue';
   // import BasicButton from '/@/components/Button/src/BasicButton.vue';
 
   export default defineComponent({
     components: {
       Card,
       Image,
+      Tag,
+      ShoppingCartOutlined,
+      LikeOutlined,
       // BasicButton,
     },
     props: {
@@ -61,10 +95,6 @@
       width: 100%;
       margin-bottom: -8px;
 
-      .ant-card-body {
-        padding: 16px;
-      }
-
       &-title {
         margin-bottom: 5px;
         font-size: 16px;
@@ -84,9 +114,15 @@
         font-size: 14px;
         color: @text-color-secondary;
       }
+      .card-detail {
+        display: flex;
+        justify-content: space-between;
+      }
     }
   }
   .goods_price {
+    font-size: 18px;
+    font-weight: 400;
     color: #ff4258;
     margin-right: 5px;
   }

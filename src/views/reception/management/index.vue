@@ -19,7 +19,7 @@
   import { useRouter } from 'vue-router';
   import TableItem from './components/TableItem.vue';
   const router = useRouter();
-  const handelClickOrder = (id) => {
+  const handelClickOrder = (id: number) => {
     router.push({
       path: '/reception/central',
       query: {

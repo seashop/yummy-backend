@@ -2,8 +2,8 @@
   <Row type="flex" :class="prefixCls">
     <Col :span="9" class="cart_list">
       <!-- <Col :xs="24" :sm="24" :md="24" :lg="24" :xl="9" class="cart_list"> -->
-      <PageWrapper :class="prefixCls" title="下单">
-        <div :class="`${prefixCls}__top`">
+      <PageWrapper :class="prefixCls" title="下单" v-if="false">
+        <div :class="`${prefixCls}__top`" v-if="false">
           <Row :gutter="10">
             <Col :span="6" :class="`${prefixCls}__top-col`">
               <div>下单时间</div>
@@ -23,7 +23,7 @@
             </Col>
           </Row>
         </div>
-        <div :class="`${prefixCls}__content`">
+        <div :class="`${prefixCls}__content`" v-if="false">
           <List>
             <template v-for="item in items" :key="item.id">
               <ListItem class="list">
@@ -39,7 +39,7 @@
                   <template #title>
                     <span>{{ goodsStack[item.goods_id].title }}</span>
                     <div class="extra">
-                      <BasicButton type="link" danger @click="() => handleDeleteGoods(item)">
+                      <BasicButton type="link" danger @click="handleDeleteGoods(item)">
                         删除
                       </BasicButton>
                       <BasicButton type="link">待上餐</BasicButton>
@@ -70,26 +70,130 @@
           </List>
         </div>
       </PageWrapper>
+      <!-- order Header -->
+      <div class="order_header">
+        <div class="header_title"> 下单 </div>
+        <div class=""> 桌号</div>
+        <div class=""> 人数 </div>
+      </div>
+      <!-- 购物车列表 -->
+      <div class="cart_list_box">
+        <div class="cart_list_item" v-for="item in items" :key="item.id">
+          <div class="godds_img_box">
+            <div class="godds_img">
+              <img
+                src="https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc"
+                alt=""
+              />
+            </div>
+          </div>
+          <div class="goods_details">
+            <div class="goods_details_title">
+              <div class="title">
+                {{ goodsStack[item.goods_id].title }}
+              </div>
+              <div class="goods_tag">
+                <Tag text="9折" color="#FF0000" size="mini" />
+                <Tag text="新品" color="#42CFBE" size="mini" />
+              </div>
+            </div>
+            <div>2022.09.25</div>
+          </div>
+          <!-- 操作 -->
+          <div class="operations">
+            <div class="delete_icon" @click="handleDeleteGoods(item)">
+              <img src="/@/assets/icons/Group645.png" alt="" />
+            </div>
+            <div class="input_number">
+              <span @click="ChangeQuantity(item.id, --item.quantity)">
+                <img src="/@/assets/icons/Group620.png" alt="" />
+              </span>
+              <div class="num">{{ item.quantity }}</div>
+              <span @click="ChangeQuantity(item.id, ++item.quantity)">
+                <img src="/@/assets/icons/Group621.png" alt="" />
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- desc -->
+      <div class="desc">
+        <InputTextArea
+          v-model:value="order_desc"
+          placeholder="请输入备注信息"
+          :showCount="false"
+          :rows="3"
+        />
+      </div>
+      <div class="operate">
+        <div class="operate_item">催菜</div>
+        <div class="operate_item">换桌</div>
+        <div class="operate_item">结账</div>
+      </div>
+      <!-- submitOrder -->
+      <div class="submit_order">
+        <div class="total_price">
+          <div class="total_icon">
+            <img
+              src="https://img1.baidu.com/it/u=3006115626,1399856917&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500"
+              alt=""
+            />
+          </div>
+          <div class="total_text">
+            <span>$99.00</span>
+            <s>$199.00</s>
+          </div>
+        </div>
+        <div class="submit_order_btn">下单</div>
+      </div>
     </Col>
     <!-- 商品分类 -->
-    <Col :span="3">
+    <Col :span="3" style="height: 100vh; overflow: auto">
       <ScrollContainer>
-        <BasicButton @click="submitOrder">下单</BasicButton>
-        <BasicButton @click="cartPlace">上菜</BasicButton>
+        <!-- <BasicButton @click="submitOrder">下单</BasicButton>
         <BasicButton @click="settlementOrder">去结算</BasicButton>
-        <BasicButton @click="managementOrder">桌台管理</BasicButton>
+        <BasicButton @click="managementOrder">桌台管理</BasicButton> -->
         <Col :span="24">
           <ScrollContainer>
             <div class="category_style">
-              <BasicButton type="primary" @click="() => handleCategoryClick(0)">全部</BasicButton>
-              <div v-for="(category, index) in categoryItems" :key="index">
-                <BasicButton
-                  style="margin: 5px 0"
-                  type="primary"
-                  @click="() => handleCategoryClick(category.category_id)"
-                >
-                  {{ category.title }}
-                </BasicButton>
+              <!-- <BasicButton type="primary" @click="() => handleCategoryClick(0)">全部</BasicButton> -->
+              <template v-if="false">
+                <div v-for="(category, index) in categoryItems" :key="index">
+                  <BasicButton
+                    style="margin: 5px 0"
+                    type="primary"
+                    @click="() => handleCategoryClick(category.category_id)"
+                  >
+                    {{ category.title }}
+                  </BasicButton>
+                </div>
+              </template>
+              <!-- ------------------------------- -->
+              <div
+                class="category_item"
+                :class="{ active_class: 0 == currentId }"
+                @click="handleCategoryClick(0)"
+              >
+                <div class="category_item_img">
+                  <div class="item_img">
+                    <img src="/@/assets/icons/Juice.png" alt="" />
+                  </div>
+                </div>
+                <div class="category_item_title"> 全部</div>
+              </div>
+              <div
+                class="category_item"
+                :class="{ active_class: category.category_id == currentId }"
+                v-for="(category, index) in categoryItems"
+                :key="index"
+                @click="handleCategoryClick(category.category_id)"
+              >
+                <div class="category_item_img">
+                  <div class="item_img">
+                    <img src="/@/assets/icons/Juice.png" alt="" />
+                  </div>
+                </div>
+                <div class="category_item_title"> {{ category.title }}</div>
               </div>
             </div>
             <div :class="`${prefixCls}__content`" v-if="false">
@@ -132,7 +236,7 @@
           <List>
             <Row :gutter="16" v-if="goodsItems && goodsItems.length">
               <template v-for="goods in goodsItems" :key="goods.goods_id">
-                <Col :span="6">
+                <Col :span="8">
                   <ListItem>
                     <ProductCard :goods="goods" @selected="handleProdcutSelected" />
                   </ListItem>
@@ -150,7 +254,7 @@
 <script lang="ts">
   import { defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
-  import { Row, Col, List, InputNumber, Image } from 'ant-design-vue';
+  import { Row, Col, List, Input, InputNumber, Image } from 'ant-design-vue';
   import { listCategory } from '/@/api/stores/category';
   import { getGoods, listGoods } from '/@/api/stores/goods';
   import { CategoryItem } from '/@/api/stores/model/categoryModel';
@@ -160,9 +264,10 @@
   import { PageWrapper } from '/@/components/Page';
 
   import ProductCard from './components/ProductCard.vue';
+  import Tag from './components/tag.vue';
   import {
     appendCart,
-    createCart,
+    // createCart,
     deleteGoods,
     getCart,
     updateGoods,
@@ -185,6 +290,8 @@
       PageWrapper,
       ProductCard,
       Loading,
+      Tag,
+      InputTextArea: Input.TextArea,
     },
     props: {
       cartId: {
@@ -198,6 +305,8 @@
         loading: false,
         tip: '加载中...',
       });
+      const currentId = ref(0);
+      const order_desc = ref('');
       const defaultIma =
         'https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc';
       const router = useRouter();
@@ -207,7 +316,6 @@
         compState.absolute = absolute;
         compState.loading = true;
       }
-      console.log('route', route.query);
       const dintbl_id = route.query.id ?? '';
       if (!dintbl_id) router.push({ path: '/reception/management' });
       console.log('dintbl_id', dintbl_id);
@@ -285,6 +393,7 @@
       }
 
       async function handleCategoryClick(id) {
+        currentId.value = id;
         openLoading(true);
         state.goodsItems = (
           await listGoods({
@@ -331,6 +440,8 @@
         ...toRefs(compState),
         defaultIma,
         dintbl_id,
+        currentId,
+        order_desc,
         prefixCls: 'central',
         handelChangeQuantity,
         ChangeQuantity,
@@ -341,14 +452,14 @@
         managementOrder,
         submitOrder,
         PlaceOrder,
-        cartPlace: async () => {
-          openLoading(true);
-          await createCart({
-            dintbl_id: props.cartId,
-            goods: state.items as Array<DiningGoodsItem>,
-          });
-          compState.loading = false;
-        },
+        // cartPlace: async () => {
+        //   openLoading(true);
+        //   await createCart({
+        //     dintbl_id: props.cartId,
+        //     goods: state.items as Array<DiningGoodsItem>,
+        //   });
+        //   compState.loading = false;
+        // },
       };
     },
   });
@@ -384,7 +495,7 @@
     &__content {
       padding: 24px;
       margin-top: 12px;
-      background-color: @component-background;
+      // background-color: @component-background;
 
       .list {
         position: relative;
@@ -431,16 +542,243 @@
       }
     }
     .category_style {
-      margin-top: 10px;
-      background: #0960bd;
+      // margin-top: 10px;
+      // background: #0960bd;
+    }
+    .category_item {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      height: 192px;
+      margin: 15px 0;
+      background: #061527;
+
+      border-top-left-radius: 17px;
+      border-bottom-left-radius: 17px;
+      opacity: 1;
+      .category_item_img {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100px;
+        height: 100px;
+        background-color: #fff;
+        border-radius: 50%;
+        .item_img {
+          width: 30px;
+          height: 30px;
+          img {
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+      .category_item_title {
+        margin-top: 10px;
+        color: #fff;
+      }
+    }
+    .active_class {
+      height: 400px;
+      background-color: #ffc165;
     }
     .cart_list {
-      height: 1000px;
+      height: 100vh;
       overflow-y: auto;
+      background: #fff;
+      // order_header
+      .order_header {
+        display: flex;
+        height: 60px;
+        margin: 10px 50px;
+        border: 1px solid #ffc165;
+        border-radius: 30px;
+        .header_title {
+          margin-left: 30px;
+          font-size: 30px;
+          font-weight: 700;
+          border-left: 3px solid #ffc165;
+        }
+      }
+      .cart_list_box {
+        height: 600px;
+        overflow: auto;
+        padding: 12px;
+        .cart_list_item {
+          display: flex;
+          height: 90px;
+          margin: 10px;
+          // padding: 12px;
+          border: 1px solid #ccc;
+          box-shadow: 0 0px 3px 4px rgb(236, 236, 236);
+          -webkit-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //Google Chrome
+          -moz-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //Firefix
+          -o-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //opera
+          -ms-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //IE
+          .godds_img_box {
+            width: 120px;
+            display: flex;
+            align-items: center;
+            // padding: 12px;
+            .godds_img {
+              width: 120px;
+              img {
+                width: 100%;
+              }
+            }
+          }
+
+          .goods_details {
+            flex: 1;
+            display: flex;
+            padding: 8px 5px;
+            flex-direction: column;
+            justify-content: space-between;
+            .goods_details_title {
+              .title {
+                height: 31px;
+                font-size: 14px;
+                font-weight: 400;
+                color: #000000;
+                // line-height: 28px;
+              }
+              .goods_tag {
+                display: flex;
+              }
+            }
+          }
+          .operations {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+            width: 60px;
+            padding: 8px 5px;
+            .delete_icon {
+              width: 30px;
+              height: 30px;
+            }
+            .input_number {
+              display: flex;
+              align-items: center;
+              span {
+                width: 15px;
+                height: 15px;
+                text-align: center;
+                img {
+                  width: 100%;
+                }
+              }
+              .num {
+                padding: 0 10px;
+                font-size: 16px;
+                font-weight: 700;
+                text-align: center;
+              }
+            }
+            // background: #ccc;
+          }
+        }
+      }
+      .desc {
+        margin-top: 20px;
+        margin-bottom: 50px;
+        border-radius: 5px;
+        .desc_title {
+          height: 42px;
+          font-size: 30px;
+          font-weight: 600;
+          color: #061527;
+          line-height: 42px;
+        }
+        ::v-deep textarea.ant-input {
+          border-radius: 10px;
+        }
+      }
+      // operate
+      .operate {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 30px;
+        .operate_item {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100px;
+          height: 100px;
+          font-size: 20px;
+          font-weight: 700;
+          border-radius: 50%;
+          border: 3px solid #193557;
+        }
+        .operate_item:active {
+          color: #fff;
+          background: #505b67;
+        }
+      }
+      // submit_order
+      .submit_order {
+        display: flex;
+        align-items: center;
+        height: 100px;
+        background: #193557;
+        border-radius: 54px;
+        overflow: hidden;
+        .total_price {
+          display: flex;
+          align-items: flex-end;
+          width: 70%;
+          .total_icon {
+            margin-left: 30px;
+            width: 80px;
+            height: 80px;
+          }
+          .total_text {
+            color: #fff;
+            margin-left: 10px;
+            span {
+              font-size: 40px;
+              font-weight: 400;
+            }
+            s {
+              color: #ccc;
+            }
+          }
+        }
+        .submit_order_btn {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 30%;
+          height: 100%;
+          font-size: 26px;
+          font-weight: 700;
+
+          background: #ffc165;
+        }
+      }
     }
     .goods_list {
-      height: 1000px;
+      height: 100vh;
       overflow-y: auto;
+      background: #ffc165;
     }
+  }
+  // .ant-card-bordered:active{
+
+  // }
+  ::v-deep .ant-card-body {
+    padding: 15px;
+    // height: 389px;
+  }
+  ::v-deep .ant-card-body:active {
+    border: 8px solid #000;
+    border-radius: 20px;
+    background: #000;
+  }
+  ::v-deep .ant-card-bordered {
+    border-radius: 7px;
   }
 </style>

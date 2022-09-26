@@ -25,7 +25,7 @@
     },
   });
   const emit = defineEmits(['changeTable']);
-  const handelClickOrder = (id) => {
+  const handelClickOrder = (id: number) => {
     emit('changeTable', id);
   };
 </script>
