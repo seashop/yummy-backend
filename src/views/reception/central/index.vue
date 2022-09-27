@@ -1,6 +1,6 @@
 <template>
   <Row type="flex" :class="prefixCls">
-    <Col :span="9" class="cart_list">
+    <Col :span="7" class="cart_list">
       <!-- <Col :xs="24" :sm="24" :md="24" :lg="24" :xl="9" class="cart_list"> -->
       <PageWrapper :class="prefixCls" title="下单" v-if="false">
         <div :class="`${prefixCls}__top`" v-if="false">
@@ -75,6 +75,7 @@
         <div class="header_title"> 下单 </div>
         <div class=""> 桌号</div>
         <div class=""> 人数 </div>
+        <button @click="goTablePage">回到桌台</button>
       </div>
       <!-- 购物车列表 -->
       <div class="cart_list_box">
@@ -134,10 +135,7 @@
       <div class="submit_order">
         <div class="total_price">
           <div class="total_icon">
-            <img
-              src="https://img1.baidu.com/it/u=3006115626,1399856917&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500"
-              alt=""
-            />
+            <img src="/@/assets/icons/Group664@2x.png" alt="" />
           </div>
           <div class="total_text">
             <span>$99.00</span>
@@ -148,7 +146,7 @@
       </div>
     </Col>
     <!-- 商品分类 -->
-    <Col :span="3" style="height: 100vh; overflow: auto">
+    <Col :span="3" style="height: calc(100vh - 32px); overflow: auto">
       <ScrollContainer>
         <!-- <BasicButton @click="submitOrder">下单</BasicButton>
         <BasicButton @click="settlementOrder">去结算</BasicButton>
@@ -221,7 +219,7 @@
       </ScrollContainer>
     </Col>
     <!-- 商品展示区域 -->
-    <Col :span="12" class="goods_list">
+    <Col :span="14" class="goods_list">
       <ScrollContainer>
         <template v-if="false">
           <BasicButton @click="() => handleCategoryClick(0)">全部</BasicButton>
@@ -238,9 +236,9 @@
             <Row :gutter="16" v-if="goodsItems && goodsItems.length">
               <template v-for="goods in goodsItems" :key="goods.goods_id">
                 <Col :span="8">
-                  <ListItem>
-                    <ProductCard :goods="goods" @selected="handleProdcutSelected" />
-                  </ListItem>
+                  <!-- <ListItem> -->
+                  <ProductCard :goods="goods" @selected="handleProdcutSelected" />
+                  <!-- </ListItem> -->
                 </Col>
               </template>
             </Row>
@@ -253,7 +251,7 @@
   </Row>
 </template>
 <script lang="ts">
-  import { defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
+  import { defineComponent, onMounted, reactive, ref, toRefs, watch, nextTick } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { Row, Col, List, Input, InputNumber, Image } from 'ant-design-vue';
   import { listCategory } from '/@/api/stores/category';
@@ -329,16 +327,25 @@
         items: [] as Array<Partial<DiningGoodsItem>>,
         goodsStack: [] as Array<GoodsItem>,
       });
-
+      const goTablePage = () => {
+        router.push({ path: '/reception/management' });
+      };
       onMounted(async () => {
         // 获取页面元素 默认全屏
-        document.querySelector('.vben-layout-header-action__item').click();
-        document.querySelector('.vben-multiple-tabs-content__extra-fold').click();
-        document.querySelector('.vben-setting-drawer-feature').style.display = 'none'; //隐藏设置图标
+        if (document.querySelector('.vben-layout-header-action__item')) {
+          if (document.querySelector('.vben-multiple-tabs-content__extra-fold'))
+            document.querySelector('.vben-multiple-tabs-content__extra-fold').click();
+        }
         openLoading(true);
         state.categoryItems = (await listCategory()).items;
+        console.log('state.categoryItems ', state.categoryItems);
         state.goodsItems = (await listGoods()).items;
         compState.loading = false;
+        nextTick(() => {
+          if (document.querySelector('.vben-setting-drawer-feature')) {
+            document.querySelector('.vben-setting-drawer-feature').style.display = 'none'; //隐藏设置图标
+          }
+        });
       });
       const getListDiningTables = async () => {
         const res = await listDiningTables();
@@ -478,6 +485,7 @@
         settlementOrder,
         managementOrder,
         submitOrder,
+        goTablePage,
         // cartPlace: async () => {
         //   openLoading(true);
         //   await createCart({
@@ -569,7 +577,7 @@
     }
     .category_style {
       // margin-top: 10px;
-      // background: #0960bd;
+      background: #fff;
     }
     .category_item {
       display: flex;
@@ -611,10 +619,13 @@
       background-color: #ffc165;
     }
     .cart_list {
-      height: 100vh;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      height: calc(100vh - 32px);
+      // padding-right: 25px;
+      padding: 0 2%;
       background: #fff;
-      // order_header
       .order_header {
         display: flex;
         height: 60px;
@@ -625,13 +636,13 @@
           margin-left: 30px;
           font-size: 30px;
           font-weight: 700;
-          border-left: 3px solid #ffc165;
+          // border-left: 3px solid #ffc165;
         }
       }
       .cart_list_box {
         height: 478px;
         overflow: auto;
-        padding: 12px;
+        // padding: 12px;
         .cart_list_item {
           display: flex;
           height: 90px;
@@ -643,6 +654,9 @@
           -moz-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //Firefix
           -o-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //opera
           -ms-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //IE
+          overflow: hidden;
+          border-radius: 8px;
+
           .godds_img_box {
             width: 120px;
             display: flex;
@@ -665,7 +679,7 @@
             .goods_details_title {
               .title {
                 height: 31px;
-                font-size: 14px;
+                font-size: 12px;
                 font-weight: 400;
                 color: #000000;
                 // line-height: 28px;
@@ -710,8 +724,8 @@
       }
       .desc {
         margin-top: 20px;
-        margin-bottom: 50px;
-        border-radius: 5px;
+        // margin-bottom: 50px;
+        // border-radius: 5px;
         .desc_title {
           height: 42px;
           font-size: 30px;
@@ -727,7 +741,7 @@
       .operate {
         display: flex;
         justify-content: space-around;
-        margin-bottom: 30px;
+        // margin-bottom: 30px;
         .operate_item {
           display: flex;
           justify-content: center;
@@ -757,18 +771,22 @@
           align-items: flex-end;
           width: 70%;
           .total_icon {
+            display: flex;
+            align-items: center;
             margin-left: 30px;
-            width: 80px;
-            height: 80px;
+            width: 66px;
+            height: 75px;
           }
           .total_text {
             color: #fff;
             margin-left: 10px;
+            margin-bottom: 7px;
             span {
-              font-size: 40px;
+              font-size: 25px;
               font-weight: 400;
             }
             s {
+              font-size: 12px;
               color: #ccc;
             }
           }
@@ -787,7 +805,7 @@
       }
     }
     .goods_list {
-      height: 100vh;
+      height: calc(100vh - 32px);
       overflow-y: auto;
       background: #ffc165;
     }

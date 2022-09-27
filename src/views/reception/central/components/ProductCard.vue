@@ -1,19 +1,24 @@
 <template>
-  <Card :hoverable="true" :class="`${prefixCls}__card`">
+  <div
+    :class="`${prefixCls}__card`"
+    style="background: #fff; padding: 7px; margin-bottom: 10px; border-radius: 8px"
+  >
     <div :class="`${prefixCls}__card-title`">
       <!-- <Image class="icon" :src="goods.img.full_url" /> -->
       <Image class="icon" :src="goods.img.full_url && defaultIma" />
 
       <div
         style="
+          overflow: hidden;
           height: 58px;
-          width: 200px;
+          width: 170px;
+          font-size: 14px;
+          font-weight: 500;
           word-break: break-all;
           text-overflow: ellipsis;
           display: -webkit-box;
           -webkit-box-orient: vertical;
           -webkit-line-clamp: 2; /* 这里是超出几行省略 */
-          overflow: hidden;
         "
       >
         <!-- Lucienne Bechtelar Nettie RaynorLucienne Bechtelar Nettie Raynor -->
@@ -22,10 +27,13 @@
     </div>
     <div @click="handleAdd">
       <div :class="`${prefixCls}__card-detail`">
-        <div style="display: flex; margin-bottom: 10px">
-          <Tag text="9折" color="#ff0000" />
-          <Tag text="新品" color="#42CFBE"
-        /></div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px">
+          <div style="display: flex">
+            <Tag text="9折" color="#ff0000" size="mini" />
+            <Tag text="新品" color="#42CFBE" size="mini"
+          /></div>
+          <div class="operations"> </div>
+        </div>
         <!-- {{ goods.description }} -->
       </div>
       <div
@@ -33,9 +41,9 @@
         style="display: flex; justify-content: space-between; align-items: center;margin"
       >
         <div class="detai_icon">
-          <ShoppingCartOutlined />
+          <ShoppingCartOutlined :style="{ fontSize: '8px' }" />
           {{ 100 }}
-          <LikeOutlined />
+          <LikeOutlined :style="{ fontSize: '8px' }" />
           {{ 1500 }}
         </div>
         <div class="detai_price">
@@ -46,7 +54,7 @@
       </div>
     </div>
     <!-- <BasicButton @click="handleAdd">Add</BasicButton> -->
-  </Card>
+  </div>
 </template>
 
 <script lang="ts">
@@ -90,39 +98,47 @@
 </script>
 
 <style lang="less" scoped>
-  .product {
-    &__card {
-      width: 100%;
-      margin-bottom: -8px;
+  &__card {
+    width: 100%;
+    margin-bottom: -8px;
 
-      &-title {
-        margin-bottom: 5px;
-        font-size: 16px;
-        font-weight: 500;
-        color: @text-color;
+    &-title {
+      margin-bottom: 5px;
+      font-size: 16px;
+      font-weight: 500;
+      color: @text-color;
 
-        .icon {
-          margin-top: -5px;
-          margin-right: 10px;
-          font-size: 38px !important;
-        }
+      .icon {
+        margin-top: -5px;
+        margin-right: 10px;
+        font-size: 38px !important;
       }
+    }
 
-      &-detail {
-        padding-top: 10px;
-        padding-left: 30px;
+    &-detail {
+      // padding-top: 10px;
+      // padding-left: 30px;
+      font-size: 14px;
+      color: @text-color-secondary;
+    }
+    .card-detail {
+      display: flex;
+      justify-content: space-between;
+
+      .detai_price {
         font-size: 14px;
-        color: @text-color-secondary;
-      }
-      .card-detail {
-        display: flex;
-        justify-content: space-between;
       }
     }
   }
+  .detai_icon {
+    font-size: 12px;
+  }
+  s {
+    font-size: 8px;
+  }
   .goods_price {
-    font-size: 18px;
-    font-weight: 400;
+    font-size: 12px;
+    font-weight: 600;
     color: #ff4258;
     margin-right: 5px;
   }
