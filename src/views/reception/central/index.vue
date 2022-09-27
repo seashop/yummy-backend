@@ -170,6 +170,7 @@
               </template>
               <!-- ------------------------------- -->
               <div
+                style="margin-top: 0"
                 class="category_item"
                 :class="{ active_class: 0 == currentId }"
                 @click="handleCategoryClick(0)"
@@ -273,7 +274,7 @@
     deleteGoods,
     getCart,
     updateGoods,
-    PlaceDining,
+    // PlaceDining,
   } from '/@/api/reception/dining';
   import { PlaceOrder } from '/@/api/orders/order';
   import { DiningCartItem, DiningGoodsItem } from '/@/api/reception/model/diningModel';
@@ -330,6 +331,10 @@
       });
 
       onMounted(async () => {
+        // 获取页面元素 默认全屏
+        document.querySelector('.vben-layout-header-action__item').click();
+        document.querySelector('.vben-multiple-tabs-content__extra-fold').click();
+        document.querySelector('.vben-setting-drawer-feature').style.display = 'none'; //隐藏设置图标
         openLoading(true);
         state.categoryItems = (await listCategory()).items;
         state.goodsItems = (await listGoods()).items;
@@ -624,7 +629,7 @@
         }
       }
       .cart_list_box {
-        height: 600px;
+        height: 478px;
         overflow: auto;
         padding: 12px;
         .cart_list_item {
