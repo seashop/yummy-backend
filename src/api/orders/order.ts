@@ -9,7 +9,8 @@ enum Api {
   EditOrderReceive = '/order/admin/{id}/receive',
   DeleteOrder = '/order/admin/{id}/destroy',
   PrintOrder = '/cms/print_order',
-  PlaceOrder = '/order/admin/place',
+  // PlaceOrder = '/order/admin/place',
+  PlaceOrder = '/dining/admin/table/{id}/place',
 }
 
 /**
@@ -48,7 +49,9 @@ export const printOrder = (order_num: string) => {
     },
   });
 };
-export const PlaceOrder = (data) => {
-  return defHttp.post<OrderListResultModel>({ url: Api.PlaceOrder, data });
+export const PlaceOrder = (id: number) => {
+  return defHttp.get<OrderListResultModel>({ url: bindParams(Api.PlaceOrder, { id }) });
+
+  // return defHttp.post<OrderListResultModel>({ url: Api.PlaceOrder, data });
   // return defHttp.post<OrderListResultModel>({ url: bindParams(Api.PlaceOrder, { id }), data });
 };

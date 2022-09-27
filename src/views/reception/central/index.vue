@@ -390,6 +390,15 @@
         },
       );
 
+      watch(
+        () => state.items,
+        (val) => {
+          if (val && val.length) {
+            // const result = val.reduce((all,item)=>{})
+          }
+        },
+      );
+
       async function reloadCart(cart) {
         openLoading(true);
         state.cart = cart;
@@ -400,7 +409,8 @@
         ).items.forEach((item) => {
           state.goodsStack[item.goods_id] = item;
         });
-
+        console.log('state.cart', state.cart);
+        console.log('[...cart.goods]', [...cart.goods]);
         state.items = [...cart.goods];
         compState.loading = false;
       }
@@ -418,9 +428,11 @@
           if (item.id == id) {
             item.quantity = goods.quantity;
             item.served_num = goods.served_num;
+            item.price = goods.price;
           }
           return item;
         });
+        console.log('state.items', state.items);
         compState.loading = false;
       }
 
@@ -464,14 +476,14 @@
       // 下单
       async function submitOrder() {
         console.log('下单');
-        const data = {
-          dintbl_id: 1,
-          // pick_code: 0,
-          // user_id: 0,
-          message: '我是备注信息',
-          // invite_code: '',
-        };
-        const res = await PlaceOrder(data);
+        // const data = {
+        //   dintbl_id: 1,
+        //   // pick_code: 0,
+        //   // user_id: 0,
+        //   message: '我是备注信息',
+        //   // invite_code: '',
+        // };
+        const res = await PlaceOrder(1);
         // const res = await PlaceOrder(1);
         console.log(res);
       }
