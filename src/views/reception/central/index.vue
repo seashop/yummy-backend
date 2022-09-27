@@ -94,11 +94,21 @@
                 {{ goodsStack[item.goods_id].title }}
               </div>
               <div class="goods_tag">
-                <Tag text="9折" color="#FF0000" size="mini" />
-                <Tag text="新品" color="#42CFBE" size="mini" />
+                <Tag
+                  text="热门"
+                  color="#ff0000"
+                  size="mini"
+                  v-if="goodsStack[item.goods_id].is_hot"
+                />
+                <Tag
+                  text="新品"
+                  color="#42CFBE"
+                  size="mini"
+                  v-if="goodsStack[item.goods_id].is_new"
+                />
               </div>
             </div>
-            <div>2022.09.25</div>
+            <!-- <div>2022.09.25</div> -->
           </div>
           <!-- 操作 -->
           <div class="operations">
@@ -258,7 +268,7 @@
   import { getGoods, listGoods } from '/@/api/stores/goods';
   import { CategoryItem } from '/@/api/stores/model/categoryModel';
   import { GoodsItem } from '/@/api/stores/model/goodsModel';
-  import { listDiningTables } from '/@/api/plugins/diningTable';
+  // import { listDiningTables } from '/@/api/plugins/diningTable';
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
   import { ScrollContainer } from '/@/components/Container';
   import { PageWrapper } from '/@/components/Page';
@@ -306,6 +316,7 @@
         loading: false,
         tip: '加载中...',
       });
+      const cartId: any = ref(undefined);
       const currentId = ref(0);
       const order_desc = ref('');
       const defaultIma =
@@ -347,21 +358,24 @@
           }
         });
       });
-      const getListDiningTables = async () => {
-        const res = await listDiningTables();
-        console.log('getListDiningTables', res);
-      };
-      getListDiningTables();
+      // 获取所有桌台
+      // const getListDiningTables = async () => {
+      //   const res = await listDiningTables();
+      //   console.log('getListDiningTables', res);
+      // };
+      // getListDiningTables();
+      // 创建购物车
       const getCreateCart = async () => {
         if (!dintbl_id) return;
         const res = await createCart({
-          dintbl_id: 1,
+          dintbl_id: dintbl_id,
         });
-        console.log('getCreateCart', res);
+        cartId.value = res.id;
+        console.log('getCreateCart', cartId.value);
       };
       getCreateCart();
       watch(
-        [() => props.cartId],
+        [() => cartId.value],
         async ([id]) => {
           openLoading(true);
           if (!id) {
@@ -437,7 +451,7 @@
           quantity: 1,
           served_num: 0,
         };
-        await appendCart(props.cartId, item)
+        await appendCart(cartId.value, item)
           .then((cart) => {
             return reloadCart(cart);
           })
@@ -450,14 +464,15 @@
       // 下单
       async function submitOrder() {
         console.log('下单');
-        // const data = {
-        // dintbl_id: 1,
-        // pick_code: 0,
-        // user_id: 0,
-        // message: '',
-        // invite_code: '',
-        // };
-        const res = await PlaceOrder(1);
+        const data = {
+          dintbl_id: 1,
+          // pick_code: 0,
+          // user_id: 0,
+          message: '我是备注信息',
+          // invite_code: '',
+        };
+        const res = await PlaceOrder(data);
+        // const res = await PlaceOrder(1);
         console.log(res);
       }
       // // 订单结算
@@ -686,6 +701,7 @@
               }
               .goods_tag {
                 display: flex;
+                margin-top: 3px;
               }
             }
           }

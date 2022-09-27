@@ -3,15 +3,15 @@
     class="table-item"
     v-for="(item, index) in props.data"
     :key="index"
-    @click="handelClickOrder(item)"
+    @click="handelClickOrder(item.id)"
   >
     <div class="table-title">
-      <span>A00{{ item }}</span>
+      <span>{{ item.title }}</span>
       <span>X</span>
     </div>
     <div class="table-content">
-      <div class="table-status">空闲</div>
-      <div>（{{ item }}人）</div>
+      <div>{{ item.title }}</div>
+      <div class="table-status">空闲（{{ 8 }}人）</div>
     </div>
   </div>
 </template>
@@ -28,6 +28,7 @@
   const handelClickOrder = (id: number) => {
     emit('changeTable', id);
   };
+  // console.log(props.data);
 </script>
 
 <style lang="less" scoped>

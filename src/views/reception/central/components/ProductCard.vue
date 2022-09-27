@@ -27,10 +27,12 @@
     </div>
     <div @click="handleAdd">
       <div :class="`${prefixCls}__card-detail`">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px">
+        <div
+          style="display: flex; justify-content: space-between; margin-bottom: 10px; height: 23px"
+        >
           <div style="display: flex">
-            <Tag text="9折" color="#ff0000" size="mini" />
-            <Tag text="新品" color="#42CFBE" size="mini"
+            <Tag text="热门" color="#ff0000" size="mini" v-if="goods.is_hot" />
+            <Tag text="新品" color="#42CFBE" size="mini" v-if="goods.is_new"
           /></div>
           <div class="operations"> </div>
         </div>
@@ -137,8 +139,8 @@
     font-size: 8px;
   }
   .goods_price {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 700;
     color: #ff4258;
     margin-right: 5px;
   }
