@@ -145,7 +145,10 @@
       <div class="submit_order">
         <div class="total_price">
           <div class="total_icon">
-            <img src="/@/assets/icons/Group664@2x.png" alt="" />
+            <div class="total_icon_img">
+              <span class="icon_num"> {{ totalNum }} </span>
+              <img src="/@/assets/icons/Group664@2x.png" alt=""
+            /></div>
           </div>
           <div class="total_text">
             <span>$99.00</span>
@@ -318,7 +321,7 @@
       const router = useRouter();
       const route = useRoute();
       const times: any = ref(null);
-
+      const totalNum = ref(0);
       const dintbl_id = route.query.id ?? undefined;
       if (!dintbl_id) router.push({ path: '/reception/management' });
       // console.log('dintbl_id', dintbl_id);
@@ -391,7 +394,9 @@
         () => state.items,
         (val) => {
           if (val && val.length) {
-            // const result = val.reduce((all,item)=>{})
+            const result = val.reduce((all, item) => all + item.quantity, 0);
+            console.log(result);
+            totalNum.value = result;
           }
         },
       );
@@ -491,6 +496,7 @@
         currentId,
         order_desc,
         pageWidth,
+        totalNum,
         prefixCls: 'central',
         handelChangeQuantity,
         ChangeQuantity,
@@ -796,6 +802,24 @@
             margin-left: 30px;
             width: 66px;
             height: 75px;
+            .total_icon_img {
+              position: relative;
+              .icon_num {
+                position: absolute;
+                top: -1px;
+                right: -1px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                // padding: 2px;
+                width: 20px;
+                height: 20px;
+                color: #fff;
+                text-align: center;
+                background: #e95851;
+                border-radius: 50%;
+              }
+            }
           }
           .total_text {
             color: #fff;
