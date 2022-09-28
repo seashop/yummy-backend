@@ -11,7 +11,7 @@
         style="
           overflow: hidden;
           height: 58px;
-          width: 170px;
+          width: 158px;
           font-size: 14px;
           font-weight: 500;
           word-break: break-all;
@@ -40,7 +40,7 @@
       </div>
       <div
         :class="`${prefixCls}__card-detail`"
-        style="display: flex; justify-content: space-between; align-items: center;margin"
+        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap"
       >
         <div class="detai_icon">
           <ShoppingCartOutlined :style="{ fontSize: '8px' }" />

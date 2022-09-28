@@ -1,6 +1,6 @@
 <template>
   <Row type="flex" :class="prefixCls">
-    <Col :span="7" class="cart_list">
+    <Col :span="pageWidth > 1024 ? 7 : 9" class="cart_list">
       <!-- <Col :xs="24" :sm="24" :md="24" :lg="24" :xl="9" class="cart_list"> -->
       <PageWrapper :class="prefixCls" title="下单" v-if="false">
         <div :class="`${prefixCls}__top`" v-if="false">
@@ -73,7 +73,7 @@
       <!-- order Header -->
       <div class="order_header">
         <div class="header_title"> 下单 </div>
-        <div class=""> 桌号</div>
+        <div class=""> 桌号:{{ dintbl_id }}</div>
         <div class=""> 人数 </div>
         <button @click="goTablePage">回到桌台</button>
       </div>
@@ -229,7 +229,7 @@
       </ScrollContainer>
     </Col>
     <!-- 商品展示区域 -->
-    <Col :span="14" class="goods_list">
+    <Col :span="pageWidth > 1024 ? 14 : 12" class="goods_list">
       <ScrollContainer>
         <template v-if="false">
           <BasicButton @click="() => handleCategoryClick(0)">全部</BasicButton>
@@ -245,7 +245,7 @@
           <List>
             <Row :gutter="16" v-if="goodsItems && goodsItems.length">
               <template v-for="goods in goodsItems" :key="goods.goods_id">
-                <Col :span="8">
+                <Col :span="pageWidth > 1024 ? 8 : 12">
                   <!-- <ListItem> -->
                   <ProductCard :goods="goods" @selected="handleProdcutSelected" />
                   <!-- </ListItem> -->
@@ -257,7 +257,6 @@
         </div>
       </ScrollContainer>
     </Col>
-    <Loading :loading="loading" :absolute="absolute" tip="加载中" />
   </Row>
 </template>
 <script lang="ts">
@@ -272,6 +271,7 @@
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
   import { ScrollContainer } from '/@/components/Container';
   import { PageWrapper } from '/@/components/Page';
+  import { getBrowser } from '/@/utils/getBrowser';
 
   import ProductCard from './components/ProductCard.vue';
   import Tag from './components/tag.vue';
@@ -286,7 +286,6 @@
   } from '/@/api/reception/dining';
   import { PlaceOrder } from '/@/api/orders/order';
   import { DiningCartItem, DiningGoodsItem } from '/@/api/reception/model/diningModel';
-  import { Loading } from '/@/components/Loading';
   export default defineComponent({
     components: {
       Row,
@@ -300,7 +299,6 @@
       ScrollContainer,
       PageWrapper,
       ProductCard,
-      Loading,
       Tag,
       InputTextArea: Input.TextArea,
     },
@@ -311,26 +309,19 @@
       },
     },
     setup(props) {
-      const compState = reactive({
-        absolute: false,
-        loading: false,
-        tip: '加载中...',
-      });
       const cartId: any = ref(undefined);
       const currentId = ref(0);
       const order_desc = ref('');
+      const pageWidth: any = ref(undefined);
       const defaultIma =
         'https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc';
       const router = useRouter();
       const route = useRoute();
       const times: any = ref(null);
-      function openLoading(absolute: boolean) {
-        compState.absolute = absolute;
-        compState.loading = true;
-      }
+
       const dintbl_id = route.query.id ?? undefined;
       if (!dintbl_id) router.push({ path: '/reception/management' });
-      console.log('dintbl_id', dintbl_id);
+      // console.log('dintbl_id', dintbl_id);
       const state = reactive({
         categoryItems: [] as Array<CategoryItem>,
         goodsItems: [] as Array<GoodsItem>,
@@ -342,22 +333,30 @@
         router.push({ path: '/reception/management' });
       };
       onMounted(async () => {
+        const { width } = getBrowser();
+        pageWidth.value = width;
+        window.addEventListener('resize', () => {
+          Browser();
+        });
         // 获取页面元素 默认全屏
         if (document.querySelector('.vben-layout-header-action__item')) {
           if (document.querySelector('.vben-multiple-tabs-content__extra-fold'))
-            document.querySelector('.vben-multiple-tabs-content__extra-fold').click();
+            document.querySelector('.vben-multiple-tabs-content__extra-fold')!.click();
         }
-        openLoading(true);
         state.categoryItems = (await listCategory()).items;
-        console.log('state.categoryItems ', state.categoryItems);
+        // console.log('state.categoryItems ', state.categoryItems);
         state.goodsItems = (await listGoods()).items;
-        compState.loading = false;
         nextTick(() => {
           if (document.querySelector('.vben-setting-drawer-feature')) {
-            document.querySelector('.vben-setting-drawer-feature').style.display = 'none'; //隐藏设置图标
+            document.querySelector('.vben-setting-drawer-feature')!.style.display = 'none'; //隐藏设置图标
           }
         });
       });
+      function Browser() {
+        // 执行了
+        const { width } = getBrowser();
+        pageWidth.value = width;
+      }
       // 获取所有桌台
       // const getListDiningTables = async () => {
       //   const res = await listDiningTables();
@@ -377,13 +376,11 @@
       watch(
         [() => cartId.value],
         async ([id]) => {
-          openLoading(true);
           if (!id) {
             return;
           }
           const cart = await getCart(id);
           await reloadCart(cart);
-          compState.loading = false;
         },
         {
           immediate: true,
@@ -400,7 +397,6 @@
       );
 
       async function reloadCart(cart) {
-        openLoading(true);
         state.cart = cart;
         (
           await listGoods({
@@ -412,7 +408,6 @@
         console.log('state.cart', state.cart);
         console.log('[...cart.goods]', [...cart.goods]);
         state.items = [...cart.goods];
-        compState.loading = false;
       }
       // 购物车防抖
       const ChangeQuantity = (id, quantity) => {
@@ -422,7 +417,6 @@
         }, 300);
       };
       async function handelChangeQuantity(id, quantity) {
-        openLoading(true);
         const goods = await updateGoods(id, { quantity });
         state.items = state.items.map((item) => {
           if (item.id == id) {
@@ -433,30 +427,24 @@
           return item;
         });
         console.log('state.items', state.items);
-        compState.loading = false;
       }
 
       async function handleDeleteGoods({ id }) {
-        openLoading(true);
         await deleteGoods(id).then(() => {
           state.items = state.items.filter((item) => item.id != id);
         });
-        compState.loading = false;
       }
 
       async function handleCategoryClick(id) {
         currentId.value = id;
-        openLoading(true);
         state.goodsItems = (
           await listGoods({
             category_id: id,
           })
         ).items;
-        compState.loading = false;
       }
 
       async function handleProdcutSelected({ goods_id, sku }) {
-        openLoading(true);
         const item = {
           goods_id: goods_id,
           sku_id: sku,
@@ -471,11 +459,10 @@
             const goods = await getGoods(goods_id);
             state.goodsStack[goods.goods_id] = goods;
           });
-        compState.loading = false;
       }
       // 下单
       async function submitOrder() {
-        console.log('下单');
+        // console.log('下单');
         // const data = {
         //   dintbl_id: 1,
         //   // pick_code: 0,
@@ -498,11 +485,12 @@
       }
       return {
         ...toRefs(state),
-        ...toRefs(compState),
+        // ...toRefs(compState),
         defaultIma,
         dintbl_id,
         currentId,
         order_desc,
+        pageWidth,
         prefixCls: 'central',
         handelChangeQuantity,
         ChangeQuantity,
@@ -637,7 +625,9 @@
         }
       }
       .category_item_title {
+        text-align: center;
         margin-top: 10px;
+        padding: 0 5px;
         color: #fff;
       }
     }
@@ -655,13 +645,15 @@
       background: #fff;
       .order_header {
         display: flex;
+        justify-content: space-around;
+        align-items: center;
         height: 60px;
         margin: 10px 50px;
         border: 1px solid #ffc165;
         border-radius: 30px;
         .header_title {
-          margin-left: 30px;
-          font-size: 30px;
+          // margin-left: 30px;
+          font-size: 20px;
           font-weight: 700;
           // border-left: 3px solid #ffc165;
         }
