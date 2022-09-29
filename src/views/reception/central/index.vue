@@ -141,7 +141,7 @@
                     :goods="goods"
                     :checkedGoods="items.find((item) => item.id == goods.goods_id)"
                     @selected="handleProdcutSelected"
-                    @ChangeQuantity="ChangeQuantity"
+                    @changeProduct="ChangeQuantity"
                   />
                   <!-- </ListItem> -->
                 </Col>
@@ -280,7 +280,7 @@
         (val) => {
           if (val && val.length) {
             const result = val.reduce((all, item) => all + item.quantity, 0);
-            console.log(result);
+            // console.log(result);
             totalNum.value = result;
           }
           CentralStore.changeCartList(val);
@@ -300,8 +300,8 @@
           // console.log('ListGoods', item);
           state.goodsStack[item.goods_id] = item;
         });
-        console.log('state.cart', state.cart);
-        console.log('[...cart.goods]', [...cart.goods]);
+        // console.log('state.cart', state.cart);
+        // console.log('[...cart.goods]', [...cart.goods]);
         state.items = [...cart.goods];
       }
       // 购物车防抖
@@ -313,7 +313,7 @@
       };
       async function handelChangeQuantity(id, quantity) {
         const goods = await updateGoods(id, { quantity });
-        console.log('goods', goods);
+        // console.log('goods', goods);
         state.items = state.items.map((item) => {
           if (item.id == id) {
             item.quantity = goods.quantity;
@@ -321,7 +321,7 @@
           }
           return item;
         });
-        console.log('state.items', state.items);
+        // console.log('state.items', state.items);
       }
 
       async function handleDeleteGoods({ id }) {

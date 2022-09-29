@@ -26,12 +26,12 @@ export const listCart = (params?: selectParams) => {
 };
 
 export const createCart = (data: Partial<DiningCartItem>) => {
-  console.log(data);
+  // console.log(data);
   return defHttp.post<DiningCartItem>({ url: Api.CreateCart, data });
 };
 
 export const placeCart = (data: Partial<DiningCartItem>) => {
-  console.log(data);
+  // console.log(data);
   return defHttp.post<DiningCartItem>({ url: Api.CreateCart, data });
 };
 

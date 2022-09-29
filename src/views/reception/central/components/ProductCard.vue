@@ -1,6 +1,9 @@
 <template>
   <div
-    :class="{ product__card__card: true, acitve: true }"
+    :class="{
+      product__card__card: true,
+      acitve: !!CartList.find((item) => item.goods_id === goods.goods_id),
+    }"
     style="
       background: #fff;
       padding: 7px;
@@ -12,7 +15,7 @@
     <div class="mark" v-if="!goods.state"> </div>
     <div :class="`${prefixCls}__card-title`">
       <!-- <Image class="icon" :src="goods.img.full_url" /> -->
-      <Image class="icon" :src="goods.img.full_url && defaultIma" />
+      <img @click="handleAdd" class="icon" :src="goods.img.full_url && defaultIma" />
 
       <div
         style="
@@ -32,7 +35,7 @@
         {{ goods.title }} {{ goods.description }}
       </div>
     </div>
-    <div @click="handleAdd">
+    <div>
       <div :class="`${prefixCls}__card-detail`">
         <div
           style="display: flex; justify-content: space-between; margin-bottom: 10px; height: 23px"
@@ -42,14 +45,22 @@
             <Tag text="新品" color="#42CFBE" size="mini" v-if="goods.is_new"
           /></div>
           <div class="operations" v-if="!goods.state"> 已售罄 </div>
-          <div class="operations" v-if="false">
-            <span v-for="item in CartList" :key="item.id">{{ item.id }}</span>
+
+          <div class="operations" v-if="current.id">
             <div class="input_number">
-              <span @click="ChangeQuantity(goods.id, --goods.quantity)">
+              <span @click="changeProduct(current.id, --current.quantity)">
                 <img src="/@/assets/icons/Group620.png" alt="" />
               </span>
-              <div class="num">{{ goods.quantity }}</div>
-              <span @click="ChangeQuantity(goods.id, ++goods.quantity)">
+              <div class="num">
+                <!-- {{
+                  CartList.find((item) => item.goods_id === goods.goods_id) &&
+                  CartList.find((item) => item.goods_id === goods.goods_id).quantity
+                }} -->
+
+                {{ current.quantity || '' }}
+                <!-- {{ goods.quantity }} -->
+              </div>
+              <span @click="changeProduct(current.id, ++current.quantity)">
                 <img src="/@/assets/icons/Group621.png" alt="" />
               </span>
             </div>
@@ -79,7 +90,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, watch, computed } from 'vue';
+  import { defineComponent, watch, ref, computed } from 'vue';
   import { storeToRefs } from 'pinia';
   import { useCentralStore } from '/@/store/modules/central';
   import { Image } from 'ant-design-vue';
@@ -101,38 +112,32 @@
         type: Object as PropType<GoodsItem>,
         default: () => null,
       },
-      checkedGoods: {
-        type: Object,
-        default: () => {},
-      },
     },
-    emits: ['selected', 'ChangeQuantity'],
+    emits: ['selected', 'changeProduct'],
     setup(props, { emit }) {
       const CentralStore = useCentralStore();
       const { CartList } = storeToRefs(CentralStore);
-
-      // const active = CentralStore.;
+      const current = ref<object>({});
+      watch(CartList, () => {
+        if (CartList.value && CartList.value.length) {
+          const result = CartList.value.find((item) => item.goods_id === props.goods.goods_id);
+          if (result) current.value = result;
+        }
+      });
       const defaultIma =
         'https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc';
       function handleAdd() {
         emit('selected', { goods_id: props.goods.goods_id });
       }
-      const ChangeQuantity = (item) => {
-        console.log(item.id, item.quantity);
-        emit('ChangeQuantity', item.id, item.quantity);
+      const changeProduct = (id: number, quantity?: number) => {
+        emit('changeProduct', id, quantity);
       };
-      // console.log('checkedGoods', props.checkedGoods);
-      watch(
-        () => props.checkedGoods,
-        (val) => {
-          console.log('props.checkedGoods', val);
-        },
-      );
       return {
         prefixCls: 'product__card',
         handleAdd,
-        ChangeQuantity,
+        changeProduct,
         defaultIma,
+        current,
         CartList,
       };
     },
@@ -173,8 +178,8 @@
     }
   }
   .acitve {
-    // box-shadow: 0px 0px 13px 0px rgba(0, 0, 0, 0.05);
-    // border: 5px solid #ff3d00;
+    box-shadow: 0px 0px 13px 0px rgba(0, 0, 0, 0.05);
+    border: 5px solid #ff3d00;
   }
   .mark {
     width: 100%;
