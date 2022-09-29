@@ -1,5 +1,5 @@
 import { defHttp } from '/@/utils/http/axios';
-import { OrderListResultModel, selectParams, PlaceOrderType } from './model/ordersModel';
+import { OrderListResultModel, selectParams } from './model/ordersModel';
 import { bindParams } from '../util';
 
 enum Api {

@@ -1,8 +1,15 @@
 <template>
   <div
-    :class="`${prefixCls}__card`"
-    style="background: #fff; padding: 7px; margin-bottom: 10px; border-radius: 8px"
+    :class="{ product__card__card: true, acitve: true }"
+    style="
+      background: #fff;
+      padding: 7px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      position: relative;
+    "
   >
+    <div class="mark" v-if="!goods.state"> </div>
     <div :class="`${prefixCls}__card-title`">
       <!-- <Image class="icon" :src="goods.img.full_url" /> -->
       <Image class="icon" :src="goods.img.full_url && defaultIma" />
@@ -34,7 +41,19 @@
             <Tag text="热门" color="#ff0000" size="mini" v-if="goods.is_hot" />
             <Tag text="新品" color="#42CFBE" size="mini" v-if="goods.is_new"
           /></div>
-          <div class="operations"> </div>
+          <div class="operations" v-if="!goods.state"> 已售罄 </div>
+          <div class="operations" v-if="false">
+            <span v-for="item in CartList" :key="item.id">{{ item.id }}</span>
+            <div class="input_number">
+              <span @click="ChangeQuantity(goods.id, --goods.quantity)">
+                <img src="/@/assets/icons/Group620.png" alt="" />
+              </span>
+              <div class="num">{{ goods.quantity }}</div>
+              <span @click="ChangeQuantity(goods.id, ++goods.quantity)">
+                <img src="/@/assets/icons/Group621.png" alt="" />
+              </span>
+            </div>
+          </div>
         </div>
         <!-- {{ goods.description }} -->
       </div>
@@ -44,9 +63,9 @@
       >
         <div class="detai_icon">
           <ShoppingCartOutlined :style="{ fontSize: '8px' }" />
-          {{ 100 }}
+          {{ goods.sales }}
           <LikeOutlined :style="{ fontSize: '8px' }" />
-          {{ 1500 }}
+          {{ goods.stock }}
         </div>
         <div class="detai_price">
           <s>${{ goods.market_price }}</s>
@@ -60,8 +79,10 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
-  import { Card, Image } from 'ant-design-vue';
+  import { defineComponent, watch, computed } from 'vue';
+  import { storeToRefs } from 'pinia';
+  import { useCentralStore } from '/@/store/modules/central';
+  import { Image } from 'ant-design-vue';
   import { ShoppingCartOutlined, LikeOutlined } from '@ant-design/icons-vue';
   import { GoodsItem } from '/@/api/stores/model/goodsModel';
   import Tag from './tag.vue';
@@ -69,7 +90,6 @@
 
   export default defineComponent({
     components: {
-      Card,
       Image,
       Tag,
       ShoppingCartOutlined,
@@ -81,19 +101,39 @@
         type: Object as PropType<GoodsItem>,
         default: () => null,
       },
+      checkedGoods: {
+        type: Object,
+        default: () => {},
+      },
     },
-    emits: ['selected'],
+    emits: ['selected', 'ChangeQuantity'],
     setup(props, { emit }) {
+      const CentralStore = useCentralStore();
+      const { CartList } = storeToRefs(CentralStore);
+
+      // const active = CentralStore.;
       const defaultIma =
         'https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc';
       function handleAdd() {
         emit('selected', { goods_id: props.goods.goods_id });
       }
-
+      const ChangeQuantity = (item) => {
+        console.log(item.id, item.quantity);
+        emit('ChangeQuantity', item.id, item.quantity);
+      };
+      // console.log('checkedGoods', props.checkedGoods);
+      watch(
+        () => props.checkedGoods,
+        (val) => {
+          console.log('props.checkedGoods', val);
+        },
+      );
       return {
-        prefixCls: 'product_card',
+        prefixCls: 'product__card',
         handleAdd,
+        ChangeQuantity,
         defaultIma,
+        CartList,
       };
     },
   });
@@ -132,11 +172,56 @@
       }
     }
   }
+  .acitve {
+    // box-shadow: 0px 0px 13px 0px rgba(0, 0, 0, 0.05);
+    // border: 5px solid #ff3d00;
+  }
+  .mark {
+    width: 100%;
+    height: 100%;
+    background: rgb(255 255 255 / 60%);
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    border-radius: 8px;
+  }
   .detai_icon {
     font-size: 12px;
   }
   s {
     font-size: 8px;
+  }
+  .operations {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 60px;
+    // padding: 8px 5px;
+    .delete_icon {
+      width: 16px;
+      height: 16px;
+    }
+    .input_number {
+      display: flex;
+      align-items: center;
+      span {
+        width: 15px;
+        height: 15px;
+        text-align: center;
+        img {
+          width: 100%;
+        }
+      }
+      .num {
+        padding: 0 10px;
+        font-size: 16px;
+        font-weight: 700;
+        text-align: center;
+      }
+    }
+    // background: #ccc;
   }
   .goods_price {
     font-size: 15px;

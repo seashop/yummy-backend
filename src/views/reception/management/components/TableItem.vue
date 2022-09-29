@@ -105,7 +105,7 @@
           font-size: 10px;
           font-family: Inter-Regular, Inter;
           font-weight: 400;
-          color: rgba(0, 0, 0, 0.5);
+          color: rgba(255, 255, 255, 0.5);
           line-height: 12px;
         }
       }
@@ -117,20 +117,24 @@
         font-size: 14px;
         font-family: Inter-Semi Bold, Inter;
         font-weight: normal;
-        color: #ff0000;
+        color: #fff;
         line-height: 16px;
+      }
+      strong {
+        color: #fff;
       }
       s {
         font-size: 10px;
         font-family: Inter-Regular, Inter;
         font-weight: 400;
-        color: #ffffff;
         line-height: 12px;
+        height: 12px;
+        color: rgba(255, 255, 255, 0.8);
       }
     }
   }
   .item_active {
-    background: linear-gradient(156deg, #ff4921 0%, rgba(255, 180, 156, 0.33) 100%);
+    background: linear-gradient(156deg, #ff9674 0%, #fb6900 100%);
     .table_content {
       .table_num {
         color: #fff;
@@ -141,6 +145,14 @@
     }
   }
   .item_success {
-    background: linear-gradient(153deg, #cdeec1 0%, rgba(205, 238, 193, 0.6) 100%);
+    background: linear-gradient(135deg, #00d4c8 0%, #00af85 100%);
+    .table_content {
+      .table_num {
+        color: #fff;
+      }
+      .table_status {
+        color: #fff;
+      }
+    }
   }
 </style>

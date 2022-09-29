@@ -1,145 +1,69 @@
 <template>
   <Row type="flex" :class="prefixCls">
     <Col :span="pageWidth > 1024 ? 7 : 9" class="cart_list">
-      <!-- <Col :xs="24" :sm="24" :md="24" :lg="24" :xl="9" class="cart_list"> -->
-      <PageWrapper :class="prefixCls" title="下单" v-if="false">
-        <div :class="`${prefixCls}__top`" v-if="false">
-          <Row :gutter="10">
-            <Col :span="6" :class="`${prefixCls}__top-col`">
-              <div>下单时间</div>
-              <p>{{ cart.created_at }}</p>
-            </Col>
-            <Col :span="6" :class="`${prefixCls}__top-col`">
-              <div>桌号</div>
-              <p>{{ dintbl_id }}</p>
-            </Col>
-            <Col :span="6" :class="`${prefixCls}__top-col`">
-              <div>未上菜数</div>
-              <p>2个</p>
-            </Col>
-            <Col :span="6" :class="`${prefixCls}__top-col`">
-              <div>总价格</div>
-              <p>¥99.00</p>
-            </Col>
-          </Row>
-        </div>
-        <div :class="`${prefixCls}__content`" v-if="false">
-          <List>
-            <template v-for="item in items" :key="item.id">
-              <ListItem class="list">
-                <ListItemMeta>
-                  <template #avatar>
-                    <Image
-                      class="icon"
-                      v-if="goodsStack[item.goods_id].img"
-                      :src="goodsStack[item.goods_id].img.full_url && defaultIma"
-                      :width="60"
-                    />
-                  </template>
-                  <template #title>
-                    <span>{{ goodsStack[item.goods_id].title }}</span>
-                    <div class="extra">
-                      <BasicButton type="link" danger @click="handleDeleteGoods(item)">
-                        删除
-                      </BasicButton>
-                      <BasicButton type="link">待上餐</BasicButton>
-                    </div>
-                  </template>
-                  <template #description>
-                    <div class="description">
-                      {{ goodsStack[item.goods_id].description }}
-                    </div>
-                    <div class="info">
-                      <div><span>Owner</span>{{ item.author }}</div>
-                      <div><span>点餐时间</span>2022/09/22 18:00{{ item.datetime }}</div>
-                      <div><span>价格</span>$99.99{{ item.price }}</div>
-                    </div>
-                    <div class="progress">
-                      <span>{{ item.served_num }}</span> /
-                      <InputNumber
-                        v-model:value="item.quantity"
-                        :min="1"
-                        @change="(quantity) => ChangeQuantity(item.id, quantity)"
-                      />
-                      <!-- @change="(quantity) => handelChangeQuantity(item.id, quantity)" -->
-                    </div>
-                  </template>
-                </ListItemMeta>
-              </ListItem>
-            </template>
-          </List>
-        </div>
-      </PageWrapper>
       <!-- order Header -->
-      <div class="order_header">
-        <div class="header_title"> 下单 </div>
-        <div class=""> 桌号:{{ dintbl_id }}</div>
-        <div class=""> 人数 </div>
-        <button @click="goTablePage">回到桌台</button>
+      <div class="order_header" @click="goTablePage"><LeftOutlined /> 返回 </div>
+      <div class="operate">
+        <OrderOperateVue />
       </div>
       <!-- 购物车列表 -->
       <div class="cart_list_box">
-        <div class="cart_list_item" v-for="item in items" :key="item.id">
-          <div class="godds_img_box">
-            <div class="godds_img">
-              <img
-                src="https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc"
-                alt=""
-              />
-            </div>
-          </div>
-          <div class="goods_details">
-            <div class="goods_details_title">
-              <div class="title">
-                {{ goodsStack[item.goods_id].title }}
-              </div>
-              <div class="goods_tag">
-                <Tag
-                  text="热门"
-                  color="#ff0000"
-                  size="mini"
-                  v-if="goodsStack[item.goods_id].is_hot"
-                />
-                <Tag
-                  text="新品"
-                  color="#42CFBE"
-                  size="mini"
-                  v-if="goodsStack[item.goods_id].is_new"
+        <template v-if="items && items.length">
+          <!-- <template v-if="true"> -->
+          <div class="cart_list_item" v-for="item in items" :key="item.id">
+            <div class="godds_img_box">
+              <div class="godds_img">
+                <img
+                  src="https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc"
+                  alt=""
                 />
               </div>
             </div>
-            <!-- <div>2022.09.25</div> -->
-          </div>
-          <!-- 操作 -->
-          <div class="operations">
-            <div class="delete_icon" @click="handleDeleteGoods(item)">
-              <img src="/@/assets/icons/Group645.png" alt="" />
+            <div class="goods_details">
+              <div class="goods_details_title">
+                <div class="title">
+                  {{ goodsStack[item.goods_id].title }}
+                </div>
+                <div class="goods_tag">
+                  <Tag text="热门" color="#ff0000" v-if="goodsStack[item.goods_id].is_hot" />
+                  <Tag text="新品" color="#42CFBE" v-if="goodsStack[item.goods_id].is_new" />
+                </div>
+              </div>
+              <div class="goods_price">$99.00</div>
             </div>
-            <div class="input_number">
-              <span @click="ChangeQuantity(item.id, --item.quantity)">
-                <img src="/@/assets/icons/Group620.png" alt="" />
-              </span>
-              <div class="num">{{ item.quantity }}</div>
-              <span @click="ChangeQuantity(item.id, ++item.quantity)">
-                <img src="/@/assets/icons/Group621.png" alt="" />
-              </span>
+            <!-- 操作 -->
+            <div class="operations">
+              <div class="delete_icon" @click="handleDeleteGoods(item)">
+                <img src="/@/assets/icons/Group645.png" alt="" />
+              </div>
+              <div class="input_number">
+                <span @click="ChangeQuantity(item.id, --item.quantity)">
+                  <img src="/@/assets/icons/Group620.png" alt="" />
+                </span>
+                <div class="num">{{ item.quantity }}</div>
+                <span @click="ChangeQuantity(item.id, ++item.quantity)">
+                  <img src="/@/assets/icons/Group621.png" alt="" />
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        </template>
+        <template v-else>
+          <div class="order_null">
+            <img src="/@/assets/images/Group721.png" alt="" />
+            <div class="order_title">Welcome to order</div>
+          </div>
+        </template>
       </div>
       <!-- desc -->
-      <div class="desc">
+      <div class="desc" v-if="items && items.length">
         <InputTextArea
+          style="height: 46px"
           v-model:value="order_desc"
           placeholder="请输入备注信息"
           :showCount="false"
-          :rows="3"
+          :rows="1"
         />
-      </div>
-      <div class="operate">
-        <div class="operate_item">催菜</div>
-        <div class="operate_item">换桌</div>
-        <div class="operate_item">结账</div>
       </div>
       <!-- submitOrder -->
       <div class="submit_order">
@@ -157,6 +81,8 @@
         </div>
         <div class="submit_order_btn" @click="submitOrder">下单</div>
       </div>
+      <!-- 结账 -->
+      <div class="bill_please" v-if="true"> 结账 </div>
     </Col>
     <!-- 商品分类 -->
     <Col :span="3" style="height: calc(100vh - 32px); overflow: auto">
@@ -168,17 +94,6 @@
           <ScrollContainer>
             <div class="category_style">
               <!-- <BasicButton type="primary" @click="() => handleCategoryClick(0)">全部</BasicButton> -->
-              <template v-if="false">
-                <div v-for="(category, index) in categoryItems" :key="index">
-                  <BasicButton
-                    style="margin: 5px 0"
-                    type="primary"
-                    @click="() => handleCategoryClick(category.category_id)"
-                  >
-                    {{ category.title }}
-                  </BasicButton>
-                </div>
-              </template>
               <!-- ------------------------------- -->
               <div
                 style="margin-top: 0"
@@ -208,49 +123,26 @@
                 <div class="category_item_title"> {{ category.title }}</div>
               </div>
             </div>
-            <div :class="`${prefixCls}__content`" v-if="false">
-              <List>
-                <Row :gutter="16">
-                  <template v-for="goods in goodsItems" :key="goods.goods_id">
-                    <Col :span="6">
-                      <ListItem>
-                        <ProductCard :goods="goods" @selected="handleProdcutSelected" />
-                      </ListItem>
-                    </Col>
-                  </template>
-                </Row>
-              </List>
-            </div>
           </ScrollContainer>
         </Col>
-        <div v-if="false">
-          <template v-for="index in 8" :key="index">
-            <BasicButton>Action{{ index }}</BasicButton>
-            <br />
-          </template>
-        </div>
       </ScrollContainer>
     </Col>
     <!-- 商品展示区域 -->
     <Col :span="pageWidth > 1024 ? 14 : 12" class="goods_list">
       <ScrollContainer>
-        <template v-if="false">
-          <BasicButton @click="() => handleCategoryClick(0)">全部</BasicButton>
-          <BasicButton
-            v-for="(category, index) in categoryItems"
-            :key="index"
-            @click="() => handleCategoryClick(category.category_id)"
-          >
-            {{ category.title }}
-          </BasicButton>
-        </template>
         <div :class="`${prefixCls}__content`">
           <List>
             <Row :gutter="16" v-if="goodsItems && goodsItems.length">
               <template v-for="goods in goodsItems" :key="goods.goods_id">
+                {{ items.find((item) => item.id == goods.goods_id) }}
                 <Col :span="pageWidth > 1024 ? 8 : 12">
                   <!-- <ListItem> -->
-                  <ProductCard :goods="goods" @selected="handleProdcutSelected" />
+                  <ProductCard
+                    :goods="goods"
+                    :checkedGoods="items.find((item) => item.id == goods.goods_id)"
+                    @selected="handleProdcutSelected"
+                    @ChangeQuantity="ChangeQuantity"
+                  />
                   <!-- </ListItem> -->
                 </Col>
               </template>
@@ -263,19 +155,18 @@
   </Row>
 </template>
 <script lang="ts">
-  import { defineComponent, onMounted, reactive, ref, toRefs, watch, nextTick } from 'vue';
+  import { defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
-  import { Row, Col, List, Input, InputNumber, Image } from 'ant-design-vue';
+  import { Row, Col, List, Input } from 'ant-design-vue';
+  import { LeftOutlined } from '@ant-design/icons-vue';
+  import { useCentralStore } from '/@/store/modules/central';
   import { listCategory } from '/@/api/stores/category';
   import { getGoods, listGoods } from '/@/api/stores/goods';
   import { CategoryItem } from '/@/api/stores/model/categoryModel';
   import { GoodsItem } from '/@/api/stores/model/goodsModel';
-  // import { listDiningTables } from '/@/api/plugins/diningTable';
-  import BasicButton from '/@/components/Button/src/BasicButton.vue';
   import { ScrollContainer } from '/@/components/Container';
-  import { PageWrapper } from '/@/components/Page';
   import { getBrowser } from '/@/utils/getBrowser';
-
+  import OrderOperateVue from './components/OrderOperate.vue';
   import ProductCard from './components/ProductCard.vue';
   import Tag from './components/tag.vue';
   import {
@@ -294,14 +185,10 @@
       Row,
       Col,
       List,
-      ListItem: List.Item,
-      ListItemMeta: List.Item.Meta,
-      InputNumber,
-      Image,
-      BasicButton,
       ScrollContainer,
-      PageWrapper,
+      OrderOperateVue,
       ProductCard,
+      LeftOutlined,
       Tag,
       InputTextArea: Input.TextArea,
     },
@@ -311,7 +198,8 @@
         default: 1,
       },
     },
-    setup(props) {
+    setup() {
+      const CentralStore = useCentralStore();
       const cartId: any = ref(undefined);
       const currentId = ref(0);
       const order_desc = ref('');
@@ -346,14 +234,12 @@
           if (document.querySelector('.vben-multiple-tabs-content__extra-fold'))
             document.querySelector('.vben-multiple-tabs-content__extra-fold')!.click();
         }
+        if (document.querySelector('.vben-setting-drawer-feature')) {
+          document.querySelector('.vben-setting-drawer-feature')!.style.display = 'none'; //隐藏设置图标
+        }
         state.categoryItems = (await listCategory()).items;
         // console.log('state.categoryItems ', state.categoryItems);
         state.goodsItems = (await listGoods()).items;
-        nextTick(() => {
-          if (document.querySelector('.vben-setting-drawer-feature')) {
-            document.querySelector('.vben-setting-drawer-feature')!.style.display = 'none'; //隐藏设置图标
-          }
-        });
       });
       function Browser() {
         // 执行了
@@ -373,16 +259,15 @@
           dintbl_id: dintbl_id,
         });
         cartId.value = res.id;
-        console.log('getCreateCart', cartId.value);
+        // console.log('getCreateCart', cartId.value);
       };
       getCreateCart();
       watch(
         [() => cartId.value],
         async ([id]) => {
-          if (!id) {
-            return;
-          }
+          if (!id) return;
           const cart = await getCart(id);
+          // console.log('cartId', cart);
           await reloadCart(cart);
         },
         {
@@ -398,16 +283,21 @@
             console.log(result);
             totalNum.value = result;
           }
+          CentralStore.changeCartList(val);
+          // console.log('watch---state.items', val);
         },
       );
 
       async function reloadCart(cart) {
+        const res = await listGoods(cart.id);
+        // console.log('res_listGoods', res);
         state.cart = cart;
         (
           await listGoods({
             goods_ids: cart.goods.map((item) => item.goods_id),
           })
         ).items.forEach((item) => {
+          // console.log('ListGoods', item);
           state.goodsStack[item.goods_id] = item;
         });
         console.log('state.cart', state.cart);
@@ -423,11 +313,11 @@
       };
       async function handelChangeQuantity(id, quantity) {
         const goods = await updateGoods(id, { quantity });
+        console.log('goods', goods);
         state.items = state.items.map((item) => {
           if (item.id == id) {
             item.quantity = goods.quantity;
             item.served_num = goods.served_num;
-            item.price = goods.price;
           }
           return item;
         });
@@ -644,51 +534,71 @@
     .cart_list {
       display: flex;
       flex-direction: column;
-      justify-content: space-evenly;
+      //
+      justify-content: space-around;
       height: calc(100vh - 32px);
       // padding-right: 25px;
       padding: 0 2%;
+      // padding: 0 67px;
       background: #fff;
       .order_header {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        height: 60px;
-        margin: 10px 50px;
-        border: 1px solid #ffc165;
-        border-radius: 30px;
-        .header_title {
-          // margin-left: 30px;
-          font-size: 20px;
-          font-weight: 700;
-          // border-left: 3px solid #ffc165;
-        }
+        margin: 20px 0;
       }
       .cart_list_box {
+        margin-top: 16px;
         height: 478px;
         overflow: auto;
+        .order_null {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          img {
+            width: 160px;
+            height: 92px;
+          }
+          .order_title {
+            margin-top: 22px;
+            font-size: 20px;
+            font-weight: 400;
+            color: rgba(6, 21, 39, 0.5);
+            line-height: 28px;
+          }
+        }
         // padding: 12px;
         .cart_list_item {
           display: flex;
-          height: 90px;
-          margin: 10px;
-          // padding: 12px;
-          border: 1px solid #ccc;
-          box-shadow: 0 0px 3px 4px rgb(236, 236, 236);
-          -webkit-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //Google Chrome
-          -moz-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //Firefix
-          -o-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //opera
-          -ms-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //IE
-          overflow: hidden;
-          border-radius: 8px;
+          width: 343px;
+          height: 72px;
+          padding: 8px 0;
+          margin: 10px 0;
+          background: #ffffff;
+          // box-shadow: 0px 0px 12px 3px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 0px 3px 4px rgba(0, 0, 0, 0.05);
+          border-radius: 7px 7px 7px 7px;
+          opacity: 1;
+          // display: flex;
+          // height: 90px;
+          // margin: 10px;
+          // // padding: 12px;
+          // border: 1px solid #ccc;
+          // box-shadow: 0 0px 3px 4px rgb(236, 236, 236);
+          // -webkit-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //Google Chrome
+          // -moz-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //Firefix
+          // -o-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //opera
+          // -ms-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //IE
+          // overflow: hidden;
+          // border-radius: 8px;
 
           .godds_img_box {
-            width: 120px;
+            // width: 120px;
             display: flex;
             align-items: center;
             // padding: 12px;
             .godds_img {
-              width: 120px;
+              width: 79px;
+              height: 54px;
               img {
                 width: 100%;
               }
@@ -698,21 +608,34 @@
           .goods_details {
             flex: 1;
             display: flex;
-            padding: 8px 5px;
+            // padding: 8px 5px;
+            padding-left: 11px;
             flex-direction: column;
             justify-content: space-between;
             .goods_details_title {
               .title {
-                height: 31px;
-                font-size: 12px;
+                height: 11px;
+                font-size: 9px;
                 font-weight: 400;
                 color: #000000;
+                line-height: 11px;
+                // height: 31px;
+                // font-size: 12px;
+                // font-weight: 400;
+                // color: #000000;
                 // line-height: 28px;
               }
               .goods_tag {
                 display: flex;
                 margin-top: 3px;
               }
+            }
+            .goods_price {
+              height: 12px;
+              font-size: 10px;
+              font-weight: normal;
+              color: #000000;
+              line-height: 12px;
             }
           }
           .operations {
@@ -721,10 +644,10 @@
             justify-content: space-between;
             align-items: flex-end;
             width: 60px;
-            padding: 8px 5px;
+            // padding: 8px 5px;
             .delete_icon {
-              width: 30px;
-              height: 30px;
+              width: 16px;
+              height: 16px;
             }
             .input_number {
               display: flex;
@@ -763,35 +686,15 @@
           border-radius: 10px;
         }
       }
-      // operate
-      .operate {
-        display: flex;
-        justify-content: space-around;
-        // margin-bottom: 30px;
-        .operate_item {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          width: 100px;
-          height: 100px;
-          font-size: 20px;
-          font-weight: 700;
-          border-radius: 50%;
-          border: 3px solid #193557;
-        }
-        .operate_item:active {
-          color: #fff;
-          background: #505b67;
-        }
-      }
       // submit_order
       .submit_order {
         display: flex;
         align-items: center;
-        height: 100px;
+        height: 77px;
         background: #193557;
-        border-radius: 54px;
+        border-radius: 108px;
         overflow: hidden;
+
         .total_price {
           display: flex;
           align-items: flex-end;
@@ -800,8 +703,8 @@
             display: flex;
             align-items: center;
             margin-left: 30px;
-            width: 66px;
-            height: 75px;
+            width: 42px;
+            height: 39px;
             .total_icon_img {
               position: relative;
               .icon_num {
@@ -812,8 +715,8 @@
                 align-items: center;
                 justify-content: center;
                 // padding: 2px;
-                width: 20px;
-                height: 20px;
+                width: 18px;
+                height: 18px;
                 color: #fff;
                 text-align: center;
                 background: #e95851;
@@ -822,16 +725,24 @@
             }
           }
           .total_text {
-            color: #fff;
-            margin-left: 10px;
-            margin-bottom: 7px;
+            // color: #fff;
+            margin-left: 16px;
+            // margin-bottom: 7px;
+            // width: 74px;
+            font-size: 20px;
+            font-weight: normal;
+            color: #ffffff;
+            line-height: 23px;
             span {
               font-size: 25px;
               font-weight: 400;
             }
             s {
-              font-size: 12px;
-              color: #ccc;
+              font-size: 15px;
+              font-family: Inter-Regular, Inter;
+              font-weight: 400;
+              color: #999797;
+              line-height: 18px;
             }
           }
         }
@@ -841,11 +752,25 @@
           align-items: center;
           width: 30%;
           height: 100%;
-          font-size: 26px;
-          font-weight: 700;
-
           background: #ffc165;
+          font-size: 20px;
+          font-family: PingFang SC-Medium, PingFang SC;
+          font-weight: 500;
+          color: #061527;
         }
+      }
+      // bill_please
+      .bill_please {
+        height: 60px;
+        line-height: 60px;
+        text-align: center;
+        font-size: 28px;
+        font-weight: bold;
+        color: #ffffff;
+        // background: rgba(255, 107, 0, 0.5);
+        background: #ff6b00;
+        border-radius: 35px;
+        opacity: 1;
       }
     }
     .goods_list {
@@ -861,11 +786,7 @@
     padding: 15px;
     // height: 389px;
   }
-  ::v-deep .ant-card-body:active {
-    // border: 8px solid #000;
-    // border-radius: 20px;
-    // background: #000;
-  }
+
   ::v-deep .ant-card-bordered {
     border-radius: 7px;
   }

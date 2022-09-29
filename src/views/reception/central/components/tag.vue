@@ -31,15 +31,23 @@
 
 <style lang="less" scoped>
   .tag {
-    width: 43px;
-    height: 28px;
-    line-height: 25px;
-    margin: 0 2px;
-    border-radius: 5px 5px 5px 5px;
-    opacity: 1;
-    text-align: center;
+    font-size: 8px;
+    font-weight: normal;
+    color: #ff0000;
+    line-height: 9px;
+    padding: 2px;
+    // width: 43px;
+    // height: 28px;
+    // line-height: 25px;
+    // margin: 0 2px;
+    border-radius: 3px;
+    // opacity: 1;
+    // text-align: center;
   }
   .tag_size {
+    // width: 43px;
+    // height: 28px;
+    // line-height: 25px;
     // padding: 5px 2px;
     // height: 21px;
     // line-height: 10px;
