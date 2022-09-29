@@ -155,7 +155,7 @@
   </Row>
 </template>
 <script lang="ts">
-  import { defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
+  import { defineComponent, onMounted, nextTick, reactive, ref, toRefs, watch } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { Row, Col, List, Input } from 'ant-design-vue';
   import { LeftOutlined } from '@ant-design/icons-vue';
@@ -332,6 +332,7 @@
 
       async function handleCategoryClick(id) {
         currentId.value = id;
+        console.log('点击了分类');
         state.goodsItems = (
           await listGoods({
             category_id: id,

@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted } from 'vue';
+  import { ref, onMounted, nextTick } from 'vue';
   import { useRouter } from 'vue-router';
   import { SyncOutlined } from '@ant-design/icons-vue';
   import { listDiningTables } from '/@/api/plugins/diningTable';
@@ -41,7 +41,17 @@
     tableItem.value = res.items;
   };
   onMounted(() => {
-    console.log('onMounted');
+    // 获取页面元素 默认全屏
+    if (document.querySelector('.vben-layout-header-action__item')) {
+      if (document.querySelector('.vben-multiple-tabs-content__extra-fold'))
+        document.querySelector('.vben-multiple-tabs-content__extra-fold')!.click();
+    }
+    nextTick(() => {
+      if (document.querySelector('.vben-setting-drawer-feature')) {
+        document.querySelector('.vben-setting-drawer-feature')!.style.display = 'none'; //隐藏设置图标
+      }
+    });
+
     getListDiningTables();
   });
   const handelClickOrder = (id: number) => {
