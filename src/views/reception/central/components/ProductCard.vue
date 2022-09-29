@@ -129,7 +129,9 @@
       });
       const updateNum = () => {
         const result = CartList.value.find((item) => item.goods_id === props.goods.goods_id);
-        if (result) current.value = result;
+        if (result) {
+          current.value = result;
+        }
       };
 
       const defaultIma =

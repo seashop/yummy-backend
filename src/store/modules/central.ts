@@ -24,7 +24,6 @@ export const useCentralStore = defineStore('app-central', {
   getters: {},
   actions: {
     changeCartList(List: any) {
-      // console.log('执行了');
       this.CartList = List;
     },
   },

@@ -221,6 +221,7 @@
         goodsStack: [] as Array<GoodsItem>,
       });
       const goTablePage = () => {
+        CentralStore.$reset();
         router.push({ path: '/reception/management' });
       };
       onMounted(async () => {
@@ -332,7 +333,7 @@
 
       async function handleCategoryClick(id) {
         currentId.value = id;
-        console.log('点击了分类');
+        // console.log('点击了分类');
         state.goodsItems = (
           await listGoods({
             category_id: id,
