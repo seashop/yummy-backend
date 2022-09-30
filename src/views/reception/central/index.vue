@@ -79,7 +79,7 @@
             <s>$199.00</s>
           </div>
         </div>
-        <div class="submit_order_btn" @click="submitOrder">下单</div>
+        <div class="submit_order_btn" @click="visible = true">下单</div>
       </div>
       <!-- 结账 -->
       <div class="bill_please" :class="NoOrder ? '' : 'order_status'"> 结账 </div>
@@ -134,7 +134,6 @@
           <List>
             <Row :gutter="16" v-if="goodsItems && goodsItems.length">
               <template v-for="goods in goodsItems" :key="goods.goods_id">
-                {{ items.find((item) => item.id == goods.goods_id) }}
                 <Col :span="pageWidth > 1024 ? 8 : 12">
                   <!-- <ListItem> -->
                   <ProductCard
@@ -168,10 +167,10 @@
         </div>
         <div class="modal_btn">
           <div class="btn">
-            <div class="btn_text" @click=""> 我再看看 </div>
+            <div class="btn_text" @click="visible = false"> 我再看看 </div>
           </div>
           <div class="confirm">
-            <div class="btn_text"> 立即下单 </div>
+            <div class="btn_text" @click="submitOrder"> 立即下单 </div>
           </div>
         </div>
       </div>
@@ -317,17 +316,22 @@
       );
 
       async function reloadCart(cart) {
-        const res = await listGoods(cart.id);
-        // console.log('res_listGoods', res);
         state.cart = cart;
-        (
-          await listGoods({
-            goods_ids: cart.goods.map((item) => item.goods_id),
-          })
-        ).items.forEach((item) => {
-          // console.log('ListGoods', item);
+        // (
+        //   await listGoods({
+        //     goods_ids: cart.goods.map((item) => item.goods_id),
+        //   })
+        // ).items.forEach((item) => {
+        //   // console.log('ListGoods', item);
+        //   state.goodsStack[item.goods_id] = item;
+        // });
+        const result = await listGoods({
+          goods_ids: cart.goods.map((item) => item.goods_id),
+        });
+        result.items.forEach((item) => {
           state.goodsStack[item.goods_id] = item;
         });
+        console.log('goods_ids: cart.goods.map(', result);
         // console.log('state.cart', state.cart);
         // console.log('[...cart.goods]', [...cart.goods]);
         state.items = [...cart.goods];
@@ -390,8 +394,7 @@
       }
       // 下单
       async function submitOrder() {
-        visible.value = true;
-        return;
+        // return;
         // console.log('下单');
         // const data = {
         //   dintbl_id: 1,
@@ -400,7 +403,8 @@
         //   message: '我是备注信息',
         //   // invite_code: '',
         // };
-        const res = await PlaceOrder(1);
+        console.log('dintbl_id', dintbl_id);
+        const res = await PlaceOrder(dintbl_id);
         // const res = await PlaceOrder(1);
         console.log(res);
       }
@@ -800,7 +804,7 @@
         // background: rgba(255, 107, 0, 0.5);
         background: #ff6b00;
         border-radius: 35px;
-        opacity: 1;
+        // opacity: 1;
       }
     }
     .goods_list {
