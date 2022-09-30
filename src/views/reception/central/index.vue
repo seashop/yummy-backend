@@ -4,7 +4,7 @@
       <!-- order Header -->
       <div class="order_header" @click="goTablePage"><LeftOutlined /> 返回 </div>
       <div class="operate">
-        <OrderOperateVue />
+        <OrderOperate :status="false" :isChange="!!items && !!items.length" />
       </div>
       <!-- 购物车列表 -->
       <div class="cart_list_box">
@@ -66,7 +66,7 @@
         />
       </div>
       <!-- submitOrder -->
-      <div class="submit_order">
+      <div class="submit_order" :class="NoOrder || (items && items.length) ? '' : 'order_status'">
         <div class="total_price">
           <div class="total_icon">
             <div class="total_icon_img">
@@ -82,7 +82,7 @@
         <div class="submit_order_btn" @click="submitOrder">下单</div>
       </div>
       <!-- 结账 -->
-      <div class="bill_please" v-if="true"> 结账 </div>
+      <div class="bill_please" :class="NoOrder ? '' : 'order_status'"> 结账 </div>
     </Col>
     <!-- 商品分类 -->
     <Col :span="3" style="height: calc(100vh - 32px); overflow: auto">
@@ -152,12 +152,36 @@
         </div>
       </ScrollContainer>
     </Col>
+    <!-- 对话框 -->
+    <Modal
+      v-model:visible="visible"
+      centered
+      width="600"
+      :closable="false"
+      :footer="null"
+      @ok="handleMode"
+    >
+      <div class="modal_box">
+        <div class="modal_title">
+          <div class="tips">下单提示</div>
+          <p>是否现在下单</p>
+        </div>
+        <div class="modal_btn">
+          <div class="btn">
+            <div class="btn_text" @click=""> 我再看看 </div>
+          </div>
+          <div class="confirm">
+            <div class="btn_text"> 立即下单 </div>
+          </div>
+        </div>
+      </div>
+    </Modal>
   </Row>
 </template>
 <script lang="ts">
-  import { defineComponent, onMounted, nextTick, reactive, ref, toRefs, watch } from 'vue';
+  import { defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
-  import { Row, Col, List, Input } from 'ant-design-vue';
+  import { Row, Col, List, Input, Modal } from 'ant-design-vue';
   import { LeftOutlined } from '@ant-design/icons-vue';
   import { useCentralStore } from '/@/store/modules/central';
   import { listCategory } from '/@/api/stores/category';
@@ -166,7 +190,7 @@
   import { GoodsItem } from '/@/api/stores/model/goodsModel';
   import { ScrollContainer } from '/@/components/Container';
   import { getBrowser } from '/@/utils/getBrowser';
-  import OrderOperateVue from './components/OrderOperate.vue';
+  import OrderOperate from './components/OrderOperate.vue';
   import ProductCard from './components/ProductCard.vue';
   import Tag from './components/tag.vue';
   import {
@@ -185,8 +209,9 @@
       Row,
       Col,
       List,
+      Modal,
       ScrollContainer,
-      OrderOperateVue,
+      OrderOperate,
       ProductCard,
       LeftOutlined,
       Tag,
@@ -199,6 +224,8 @@
       },
     },
     setup() {
+      const visible = ref(false);
+      const NoOrder = ref(false);
       const CentralStore = useCentralStore();
       const cartId: any = ref(undefined);
       const currentId = ref(0);
@@ -307,6 +334,10 @@
       }
       // 购物车防抖
       const ChangeQuantity = (id, quantity) => {
+        if (quantity <= 0) {
+          handleDeleteGoods({ id });
+          return;
+        }
         if (times.value) clearTimeout(times.value);
         times.value = setTimeout(() => {
           handelChangeQuantity(id, quantity);
@@ -359,6 +390,8 @@
       }
       // 下单
       async function submitOrder() {
+        visible.value = true;
+        return;
         // console.log('下单');
         // const data = {
         //   dintbl_id: 1,
@@ -371,6 +404,10 @@
         // const res = await PlaceOrder(1);
         console.log(res);
       }
+      // modal事件
+      const handleMode = () => {
+        console.log('点击了确认');
+      };
       // // 订单结算
       function settlementOrder() {
         router.push({ path: '/orders/order' });
@@ -383,6 +420,8 @@
       return {
         ...toRefs(state),
         // ...toRefs(compState),
+        visible,
+        NoOrder,
         defaultIma,
         dintbl_id,
         currentId,
@@ -399,6 +438,7 @@
         managementOrder,
         submitOrder,
         goTablePage,
+        handleMode,
         // cartPlace: async () => {
         //   openLoading(true);
         //   await createCart({
@@ -571,28 +611,16 @@
         // padding: 12px;
         .cart_list_item {
           display: flex;
-          width: 343px;
+          // width: 343px;
+          width: 333px;
           height: 72px;
-          padding: 8px 0;
+          padding: 8px 5px;
           margin: 10px 0;
           background: #ffffff;
           // box-shadow: 0px 0px 12px 3px rgba(0, 0, 0, 0.05);
           box-shadow: 0 0px 3px 4px rgba(0, 0, 0, 0.05);
           border-radius: 7px 7px 7px 7px;
           opacity: 1;
-          // display: flex;
-          // height: 90px;
-          // margin: 10px;
-          // // padding: 12px;
-          // border: 1px solid #ccc;
-          // box-shadow: 0 0px 3px 4px rgb(236, 236, 236);
-          // -webkit-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //Google Chrome
-          // -moz-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //Firefix
-          // -o-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //opera
-          // -ms-box-shadow: 0 0px 3px 4px rgba(236, 236, 236); //IE
-          // overflow: hidden;
-          // border-radius: 8px;
-
           .godds_img_box {
             // width: 120px;
             display: flex;
@@ -781,6 +809,68 @@
       background: #ffc165;
     }
   }
+  .order_status {
+    opacity: 0.5;
+  }
+  // modal_box style
+  .modal_box {
+    width: 600px;
+    height: 320px;
+    padding: 54px 95px 58px 95px;
+    background: #ffffff;
+    border-radius: 12px 12px 12px 12px;
+    opacity: 1;
+
+    .modal_title {
+      text-align: center;
+      .tips {
+        font-size: 32px;
+        font-weight: bold;
+        color: #000000;
+        line-height: 45px;
+      }
+      p {
+        margin-top: 29px;
+        height: 36px;
+        font-size: 26px;
+        // font-weight: 500;
+        color: #000000;
+        line-height: 36px;
+      }
+    }
+    .modal_btn {
+      display: flex;
+      justify-content: center;
+      text-align: center;
+      margin-top: 45px;
+
+      .btn {
+        margin-right: 30px;
+        width: 190px;
+        height: 53px;
+        line-height: 53px;
+        background: #ffffff;
+        border-radius: 12px 12px 12px 12px;
+        opacity: 1;
+        border: 1px solid #ffc165;
+      }
+      .confirm {
+        width: 190px;
+        height: 53px;
+        line-height: 53px;
+        background: #ffc165;
+        border-radius: 12px 12px 12px 12px;
+        opacity: 1;
+      }
+      .btn_text {
+        font-size: 26px;
+        // font-family: PingFang SC-Medium, PingFang SC;
+        // font-weight: 500;
+        color: #000000;
+        line-height: 53px;
+      }
+    }
+  }
   // .ant-card-bordered:active{
 
   // }
@@ -791,5 +881,12 @@
 
   ::v-deep .ant-card-bordered {
     border-radius: 7px;
+  }
+  .ant-modal-root ::v-deep .ant-modal-body {
+    padding: 0;
+  }
+  .ant-modal-root :deep(.ant-modal) {
+    border-radius: 12px;
+    overflow: hidden;
   }
 </style>

@@ -12,16 +12,27 @@
     </div>
     <!-- button -->
     <div class="operate_item_box">
-      <div class="operate_item" @click="reminder">催菜</div>
-      <div class="operate_item item1" @click="changeTable">换桌</div>
-      <div class="operate_item item2" @click="print">打印小票</div>
-      <div class="operate_item item3" @click="clearTable">清台</div>
+      <div :class="props.status ? '' : 'order_status'" class="operate_item" @click="reminder"
+        >催菜</div
+      >
+      <div :class="{ order_status: !isChange }" class="operate_item item1" @click="changeTable"
+        >换桌</div
+      >
+      <div :class="props.status ? '' : 'order_status'" class="operate_item item2" @click="print"
+        >打印小票</div
+      >
+      <div
+        :class="props.status ? '' : 'order_status'"
+        class="operate_item item3"
+        @click="clearTable"
+        >清台</div
+      >
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { defineProps, defineEmits, ref } from 'vue';
+  import { defineProps, defineEmits, ref, watch } from 'vue';
   import { Select } from 'ant-design-vue';
   const props = defineProps({
     tableNum: {
@@ -32,7 +43,22 @@
       type: String,
       default: () => '09:30',
     },
+    status: {
+      type: Boolean,
+      default: () => true,
+    },
+    isChange: {
+      type: Boolean,
+      default: () => true,
+    },
   });
+  watch(
+    () => props.isChange,
+    (val) => {
+      isChange.value = val;
+    },
+  );
+  const isChange = ref(false);
   const emit = defineEmits(['reminder', 'changeTable', 'print', 'clearTable']);
   const options = [
     { label: '人数1/8', value: '1' },
@@ -104,6 +130,9 @@
       .item3 {
         background: linear-gradient(133deg, #24c796 0%, #07ae9a 100%);
         // background: linear-gradient(133deg, #24c796 0%, #07ae9a 100%);
+      }
+      .order_status {
+        opacity: 0.5;
       }
     }
   }

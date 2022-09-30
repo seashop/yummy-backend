@@ -46,7 +46,7 @@
           /></div>
           <div class="operations" v-if="!goods.state"> 已售罄 </div>
 
-          <div class="operations" v-if="current.id">
+          <div class="operations" v-if="current && current.id">
             <div class="input_number">
               <span @click="changeProduct(current.id, --current.quantity)">
                 <img src="/@/assets/icons/Group620.png" alt="" />
@@ -121,7 +121,13 @@
       watch(CartList, () => {
         if (CartList.value && CartList.value.length) {
           const result = CartList.value.find((item) => item.goods_id === props.goods.goods_id);
-          if (result) current.value = result;
+          if (result) {
+            current.value = result;
+          } else {
+            current.value = {};
+          }
+        } else {
+          current.value = {};
         }
       });
       onMounted(() => {
@@ -131,6 +137,8 @@
         const result = CartList.value.find((item) => item.goods_id === props.goods.goods_id);
         if (result) {
           current.value = result;
+        } else {
+          current.value = {};
         }
       };
 

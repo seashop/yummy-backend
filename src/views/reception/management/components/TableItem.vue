@@ -13,8 +13,10 @@
     </div>
     <div class="table_content">
       <div class="table_num">{{ item.title }}</div>
-      <div class="table_status"
-        >空闲
+      <div class="table_status">
+        <template v-if="item.status === 0">空闲</template>
+        <template v-else-if="item.status === 1">已下单</template>
+        <template v-else-if="item.status === 2">已结算</template>
         <span class="number_people">（{{ 8 }}）</span>
       </div>
     </div>
