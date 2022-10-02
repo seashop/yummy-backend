@@ -238,6 +238,7 @@
       const totalNum = ref(0);
       const dintbl_id = route.query.id ?? undefined;
       const tableNum = route.query.title ?? undefined;
+      console.log(tableNum);
       if (!dintbl_id) router.push({ path: '/reception/management' });
       // console.log('dintbl_id', dintbl_id);
       const state = reactive({

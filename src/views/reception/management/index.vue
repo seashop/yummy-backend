@@ -34,7 +34,7 @@
   import { listDiningTables } from '/@/api/plugins/diningTable';
   import TableItem from './components/TableItem.vue';
   const router = useRouter();
-  const tableItem: any = ref([]);
+  // const tableItem: any = ref([]);
   const current = ref(2);
   const tableObject: any = reactive({
     2: [],
@@ -52,7 +52,6 @@
     tableObject[4] = res.items
       .map((item) => (item.title[0] === '4' ? item : null))
       .filter((item) => item?.title);
-    console.log(tableObject);
     // tableItem.value
     // tableItem.value = res.items;
   };
@@ -84,7 +83,6 @@
     getListDiningTables();
   };
   const handleClick = (id) => {
-    console.log(id);
     current.value = id;
   };
 </script>
