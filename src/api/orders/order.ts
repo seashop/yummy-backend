@@ -49,9 +49,11 @@ export const printOrder = (order_num: string) => {
     },
   });
 };
-export const PlaceOrder = (id: number) => {
-  return defHttp.post<OrderListResultModel>({ url: bindParams(Api.PlaceOrder, { id }) });
+export const PlaceOrder = (id: number, data) => {
+  // export const PlaceOrder = (data) => {
+  return defHttp.post<OrderListResultModel>({ url: bindParams(Api.PlaceOrder, { id }), data });
 
   // return defHttp.post<OrderListResultModel>({ url: Api.PlaceOrder, data });
+
   // return defHttp.post<OrderListResultModel>({ url: bindParams(Api.PlaceOrder, { id }), data });
 };

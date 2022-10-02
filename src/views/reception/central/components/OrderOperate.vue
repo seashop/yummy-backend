@@ -37,7 +37,7 @@
   const props = defineProps({
     tableNum: {
       type: String,
-      default: () => '2-101',
+      default: () => '',
     },
     orderTime: {
       type: String,
@@ -58,6 +58,7 @@
       isChange.value = val;
     },
   );
+
   const isChange = ref(false);
   const emit = defineEmits(['reminder', 'changeTable', 'print', 'clearTable']);
   const options = [

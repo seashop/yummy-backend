@@ -4,7 +4,11 @@
       <!-- order Header -->
       <div class="order_header" @click="goTablePage"><LeftOutlined /> 返回 </div>
       <div class="operate">
-        <OrderOperate :tableNum="tableNum" :status="false" :isChange="!!items && !!items.length" />
+        <OrderOperate
+          :tableNum="tableTitle"
+          :status="false"
+          :isChange="!!items && !!items.length"
+        />
       </div>
       <!-- 购物车列表 -->
       <div class="cart_list_box">
@@ -21,8 +25,49 @@
             </div>
             <div class="goods_details">
               <div class="goods_details_title">
-                <div class="title">
+                <div
+                  class="title"
+                  v-if="goodsStack[item.goods_id] && goodsStack[item.goods_id].title"
+                >
                   {{ goodsStack[item.goods_id].title }}
+                </div>
+                <div class="goods_tag">
+                  <Tag text="热门" color="#ff0000" v-if="goodsStack[item.goods_id].is_hot" />
+                  <Tag text="新品" color="#42CFBE" v-if="goodsStack[item.goods_id].is_new" />
+                </div>
+              </div>
+              <div class="goods_price">$99.00</div>
+            </div>
+            <!-- 操作 -->
+            <div class="operations">
+              <div class="delete_icon" @click="handleDeleteGoods(item)">
+                <img src="/@/assets/icons/Group645.png" alt="" />
+              </div>
+              <div class="input_number">
+                <span @click="ChangeQuantity(item.id, --item.quantity)">
+                  <img src="/@/assets/icons/Group620.png" alt="" />
+                </span>
+                <div class="num">{{ item.quantity }}</div>
+                <span @click="ChangeQuantity(item.id, ++item.quantity)">
+                  <img src="/@/assets/icons/Group621.png" alt="" />
+                </span>
+              </div>
+            </div>
+          </div>
+          <!-- div orderGoods -->
+          <div class="cart_list_item" v-for="item in items" :key="item.id">
+            <div class="godds_img_box">
+              <div class="godds_img">
+                <img
+                  src="https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc"
+                  alt=""
+                />
+              </div>
+            </div>
+            <div class="goods_details">
+              <div class="goods_details_title">
+                <div class="title">
+                  {{ item.title }}
                 </div>
                 <div class="goods_tag">
                   <Tag text="热门" color="#ff0000" v-if="goodsStack[item.goods_id].is_hot" />
@@ -79,10 +124,10 @@
             <s>$199.00</s>
           </div>
         </div>
-        <div class="submit_order_btn" @click="visible = true">下单</div>
+        <div class="submit_order_btn" @click="handleOpenModal">下单</div>
       </div>
       <!-- 结账 -->
-      <div class="bill_please" :class="NoOrder ? '' : 'order_status'"> 结账 </div>
+      <div class="bill_please" :class="NoOrder ? '' : 'order_status'" @click="goPay"> 结账 </div>
     </Col>
     <!-- 商品分类 -->
     <Col :span="3" style="height: calc(100vh - 32px); overflow: auto">
@@ -193,7 +238,7 @@
   import ProductCard from './components/ProductCard.vue';
   import Tag from './components/tag.vue';
   import {
-    // ListCart,
+    // listCart,
     appendCart,
     createCart,
     deleteGoods,
@@ -201,8 +246,9 @@
     updateGoods,
     // PlaceDining,
   } from '/@/api/reception/dining';
-  import { PlaceOrder } from '/@/api/orders/order';
+  import { PlaceOrder, listOrders } from '/@/api/orders/order';
   import { DiningCartItem, DiningGoodsItem } from '/@/api/reception/model/diningModel';
+  import { editOrderPay } from '/@/api/orders/order';
   export default defineComponent({
     components: {
       Row,
@@ -225,6 +271,8 @@
     setup() {
       const visible = ref(false);
       const NoOrder = ref(false);
+      const order_id = ref(0);
+      const tableTitle: any = ref('');
       const CentralStore = useCentralStore();
       const cartId: any = ref(undefined);
       const currentId = ref(0);
@@ -237,8 +285,7 @@
       const times: any = ref(null);
       const totalNum = ref(0);
       const dintbl_id = route.query.id ?? undefined;
-      const tableNum = route.query.title ?? undefined;
-      console.log(tableNum);
+      tableTitle.value = route.query.title ?? undefined;
       if (!dintbl_id) router.push({ path: '/reception/management' });
       // console.log('dintbl_id', dintbl_id);
       const state = reactive({
@@ -282,15 +329,27 @@
       // };
       // getListDiningTables();
       // 创建购物车
-      const getCreateCart = async () => {
-        if (!dintbl_id) return;
-        const res = await createCart({
-          dintbl_id: dintbl_id,
+
+      // const getCreateCart = async () => {
+      //   if (!dintbl_id) return;
+      //   const res = await createCart({
+      //     dintbl_id: dintbl_id,
+      //   });
+      //   cartId.value = res.id;
+      //   // console.log('getCreateCart', cartId.value);
+      // };
+      // getCreateCart();
+
+      const getOrderList = async () => {
+        const cartList = await listOrders({
+          dintbl_id,
         });
-        cartId.value = res.id;
-        // console.log('getCreateCart', cartId.value);
+        console.log('OrderList', cartList.items[0].ordergoods);
+        state.items = cartList.items[0].ordergoods;
+        console.log('state.items', state.items);
       };
-      getCreateCart();
+      //ListCart
+      getOrderList();
       watch(
         [() => cartId.value],
         async ([id]) => {
@@ -333,7 +392,7 @@
         result.items.forEach((item) => {
           state.goodsStack[item.goods_id] = item;
         });
-        console.log('goods_ids: cart.goods.map(', result);
+        // console.log('goods_ids: cart.goods.map(', result);
         // console.log('state.cart', state.cart);
         // console.log('[...cart.goods]', [...cart.goods]);
         state.items = [...cart.goods];
@@ -391,6 +450,7 @@
           })
           .then(async () => {
             const goods = await getGoods(goods_id);
+            console.log('appendCart', goods);
             state.goodsStack[goods.goods_id] = goods;
           });
       }
@@ -399,21 +459,32 @@
         // return;
         // console.log('下单');
         // const data = {
-        //   dintbl_id: 1,
-        //   // pick_code: 0,
-        //   // user_id: 0,
-        //   message: '我是备注信息',
-        //   // invite_code: '',
+        // dintbl_id: 1,
+        // pick_code: 0,
+        // user_id: 0,
+        // message: '我是备注信息',
+        // invite_code: '',
         // };
-        console.log('dintbl_id', dintbl_id);
-        const res = await PlaceOrder(dintbl_id);
+        // console.log('dintbl_id', dintbl_id);
+        const data = {
+          message: '我是备注',
+        };
+        const res = await PlaceOrder(dintbl_id, data);
+        console.log('placeOrder', res);
         if (res.id) {
+          order_id.value = res.id;
           message.success('下单成功');
           visible.value = false;
         }
         // const res = await PlaceOrder(1);
         console.log(res);
       }
+      // 下单弹窗
+      const handleOpenModal = () => {
+        if (state.items && state.items.length) {
+          visible.value = true;
+        }
+      };
       // modal事件
       const handleMode = () => {
         console.log('点击了确认');
@@ -427,10 +498,18 @@
           path: '/reception/management',
         });
       }
+      // 结账
+      const goPay = async () => {
+        order_id.value;
+        const res = await editOrderPay(order_id.value);
+        console.log('pay', res);
+      };
       return {
         ...toRefs(state),
         // ...toRefs(compState),
         visible,
+        goPay,
+        tableTitle,
         NoOrder,
         defaultIma,
         dintbl_id,
@@ -449,6 +528,7 @@
         submitOrder,
         goTablePage,
         handleMode,
+        handleOpenModal,
         // cartPlace: async () => {
         //   openLoading(true);
         //   await createCart({

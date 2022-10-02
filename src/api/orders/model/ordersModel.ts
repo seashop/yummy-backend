@@ -76,10 +76,11 @@ export interface OrderUser {
 }
 
 export interface selectParams {
-  playstate: number;
+  playstate?: number;
   since_at?: Date;
   until_at?: Date;
   wordkey?: string;
+  order_num?: string;
 }
 export interface PlaceOrderType {
   dintbl_id?: number;
