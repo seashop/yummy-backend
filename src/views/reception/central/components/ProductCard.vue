@@ -74,9 +74,9 @@
       >
         <div class="detai_icon">
           <ShoppingCartOutlined :style="{ fontSize: '8px' }" />
-          {{ goods.sales }}
-          <LikeOutlined :style="{ fontSize: '8px' }" />
           {{ goods.stock }}
+          <LikeOutlined :style="{ fontSize: '8px' }" />
+          {{ goods.sales }}
         </div>
         <div class="detai_price">
           <s>${{ goods.market_price }}</s>

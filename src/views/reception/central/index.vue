@@ -13,7 +13,7 @@
       <!-- 购物车列表 -->
       <div class="cart_list_box">
         <template v-if="items && items.length">
-          <!-- <template v-if="true"> -->
+          <!-- <template v-if="true">  -->
           <div class="cart_list_item" v-for="item in items" :key="item.id">
             <div class="godds_img_box">
               <div class="godds_img">
@@ -54,8 +54,9 @@
               </div>
             </div>
           </div>
+          <!-- end -->
           <!-- div orderGoods -->
-          <div class="cart_list_item" v-for="item in items" :key="item.id">
+          <!-- <div class="cart_list_item" v-for="item in items" :key="item.id">
             <div class="godds_img_box">
               <div class="godds_img">
                 <img
@@ -69,14 +70,13 @@
                 <div class="title">
                   {{ item.title }}
                 </div>
-                <div class="goods_tag">
-                  <Tag text="热门" color="#ff0000" v-if="goodsStack[item.goods_id].is_hot" />
-                  <Tag text="新品" color="#42CFBE" v-if="goodsStack[item.goods_id].is_new" />
-                </div>
+                <div class="goods_tag"> </div>
               </div>
-              <div class="goods_price">$99.00</div>
+              <div class="goods_price">{{ '$' + item.price || '$99.00' }}</div>
             </div>
-            <!-- 操作 -->
+            <div class="order_status_img">
+              <img src="/@/assets/icons/Group710.png" alt="" />
+            </div>
             <div class="operations">
               <div class="delete_icon" @click="handleDeleteGoods(item)">
                 <img src="/@/assets/icons/Group645.png" alt="" />
@@ -85,13 +85,13 @@
                 <span @click="ChangeQuantity(item.id, --item.quantity)">
                   <img src="/@/assets/icons/Group620.png" alt="" />
                 </span>
-                <div class="num">{{ item.quantity }}</div>
+                <div class="num">{{ item.quantity || item.number }}</div>
                 <span @click="ChangeQuantity(item.id, ++item.quantity)">
                   <img src="/@/assets/icons/Group621.png" alt="" />
                 </span>
               </div>
             </div>
-          </div>
+          </div> -->
         </template>
         <template v-else>
           <div class="order_null">
@@ -115,19 +115,21 @@
         <div class="total_price">
           <div class="total_icon">
             <div class="total_icon_img">
-              <span class="icon_num"> {{ totalNum }} </span>
+              <!-- <span class="icon_num"> {{ totalNum }} </span> -->
+              <span class="icon_num"> {{ items.length }} </span>
               <img src="/@/assets/icons/Group664@2x.png" alt=""
             /></div>
           </div>
           <div class="total_text">
-            <span>$99.00</span>
+            <!-- <span>$99.00</span> -->
+            <span>${{ items.reduce((all, item) => all + Number(item.price), 0) }}</span>
             <s>$199.00</s>
           </div>
         </div>
         <div class="submit_order_btn" @click="handleOpenModal">下单</div>
       </div>
       <!-- 结账 -->
-      <div class="bill_please" :class="NoOrder ? '' : 'order_status'" @click="goPay"> 结账 </div>
+      <div class="bill_please" :class="order_id ? '' : 'order_status'" @click="goPay"> 结账 </div>
     </Col>
     <!-- 商品分类 -->
     <Col :span="3" style="height: calc(100vh - 32px); overflow: auto">
@@ -328,25 +330,34 @@
       //   console.log('getListDiningTables', res);
       // };
       // getListDiningTables();
-      // 创建购物车
 
-      // const getCreateCart = async () => {
-      //   if (!dintbl_id) return;
-      //   const res = await createCart({
-      //     dintbl_id: dintbl_id,
-      //   });
-      //   cartId.value = res.id;
-      //   // console.log('getCreateCart', cartId.value);
-      // };
-      // getCreateCart();
+      // 创建购物车
+      const getCreateCart = async () => {
+        if (!dintbl_id) return;
+        const res = await createCart({
+          dintbl_id: dintbl_id,
+        });
+        cartId.value = res.id;
+        // console.log('getCreateCart', cartId.value);
+      };
 
       const getOrderList = async () => {
-        const cartList = await listOrders({
+        const OrderList = await listOrders({
           dintbl_id,
         });
-        console.log('OrderList', cartList.items[0].ordergoods);
-        state.items = cartList.items[0].ordergoods;
-        console.log('state.items', state.items);
+        console.log('OrderList', OrderList);
+        if (OrderList && OrderList.items.length) {
+          if (OrderList.items[0].payment_state) {
+            getCreateCart();
+            return;
+          }
+          state.items = OrderList.items[0].ordergoods.concat(OrderList.items[1].ordergoods);
+          // const list = []
+          // state.items = []
+          console.log('state.items', state.items);
+        } else {
+          getCreateCart(); //创建购物车
+        }
       };
       //ListCart
       getOrderList();
@@ -500,14 +511,15 @@
       }
       // 结账
       const goPay = async () => {
-        order_id.value;
         const res = await editOrderPay(order_id.value);
-        console.log('pay', res);
+        console.log('goPay', res);
+        message.success('结账成功');
       };
       return {
         ...toRefs(state),
         // ...toRefs(compState),
         visible,
+        order_id,
         goPay,
         tableTitle,
         NoOrder,
@@ -756,6 +768,16 @@
               font-weight: normal;
               color: #000000;
               line-height: 12px;
+            }
+          }
+          // order_status
+          .order_status_img {
+            display: flex;
+            align-items: center;
+            width: 33px;
+
+            img {
+              width: 100%;
             }
           }
           .operations {

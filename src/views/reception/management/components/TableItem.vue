@@ -1,28 +1,37 @@
 <template>
   <div
     class="table_item"
-    :class="{ item_active: item.status === 1, item_success: item.status === 2 }"
+    :class="{ item_active: item.is_cleaned === 1, item_success: item.is_cleaned === 2 }"
     v-for="(item, index) in props.data"
     :key="index"
     @click="handelClickOrder(item)"
   >
     <div class="table_title">
       <span class="title_img">
-        <img :src="imags[item.status]" alt="" />
+        <!-- <img :src="imags[item.is_cleaned]" alt="" /> -->
+        <template v-if="item.is_cleaned === 0">
+          <img src="/@/assets/images/fi-sr-room-service.png" alt="" />
+        </template>
+        <template v-if="item.is_cleaned === 1">
+          <img src="/@/assets/images/fi-sr-utensils.png" alt="" />
+        </template>
+        <template v-if="item.is_cleaned === 2">
+          <img src="/@/assets/images/Group704.png" alt="" />
+        </template>
       </span>
     </div>
     <div class="table_content">
       <div class="table_num">{{ item.title }}</div>
       <div class="table_status">
-        <template v-if="item.status === 0">空闲</template>
-        <template v-else-if="item.status === 1">已下单</template>
-        <template v-else-if="item.status === 2">已结算</template>
+        <template v-if="item.is_cleaned === 0">空闲</template>
+        <template v-else-if="item.is_cleaned === 1">已下单</template>
+        <template v-else-if="item.is_cleaned === 2">已结算</template>
         <span class="number_people">（{{ 8 }}）</span>
       </div>
     </div>
-    <div class="table_price" v-if="item.status === 1 || item.status === 2">
-      <strong :class="{ price: item.status === 1 }">$99.00</strong>
-      <s v-if="item.status === 1">$199.00</s>
+    <div class="table_price" v-if="item.is_cleaned === 1 || item.is_cleaned === 2">
+      <strong :class="{ price: item.is_cleaned === 1 }">$99.00</strong>
+      <s v-if="item.is_cleaned === 1">$199.00</s>
     </div>
   </div>
 </template>
