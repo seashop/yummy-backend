@@ -5,10 +5,10 @@
       <div class="header-item-box">
         <div
           class="table-header-item"
-          :class="{ active: current === index }"
-          v-for="(item, index) in 4"
+          :class="{ active: current === item }"
+          v-for="item in [2, 3, 4]"
           :key="item"
-          @click="handleClick(index)"
+          @click="handleClick(item)"
         >
           <div class="item-content">{{ item }}楼大厅</div>
         </div>
@@ -20,7 +20,7 @@
     </div>
     <!-- 内容 -->
     <div class="content">
-      <TableItem :data="tableItem" @changeTable="handelClickOrder" />
+      <TableItem :data="tableObject[current]" @changeTable="handelClickOrder" />
     </div>
     <!-- 右下角图片 -->
     <div class="background_img"> </div>
@@ -28,17 +28,33 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, nextTick } from 'vue';
+  import { ref, onMounted, nextTick, reactive } from 'vue';
   import { useRouter } from 'vue-router';
   import { SyncOutlined } from '@ant-design/icons-vue';
   import { listDiningTables } from '/@/api/plugins/diningTable';
   import TableItem from './components/TableItem.vue';
   const router = useRouter();
   const tableItem: any = ref([]);
-  const current = ref(0);
+  const current = ref(2);
+  const tableObject: any = reactive({
+    2: [],
+    3: [],
+    4: [],
+  });
   const getListDiningTables = async () => {
     const res = await listDiningTables();
-    tableItem.value = res.items;
+    tableObject[2] = res.items
+      .map((item) => (item.title[0] === '2' ? item : null))
+      .filter((item) => item?.title);
+    tableObject[3] = res.items
+      .map((item) => (item.title[0] === '3' ? item : null))
+      .filter((item) => item?.title);
+    tableObject[4] = res.items
+      .map((item) => (item.title[0] === '4' ? item : null))
+      .filter((item) => item?.title);
+    console.log(tableObject);
+    // tableItem.value
+    // tableItem.value = res.items;
   };
   onMounted(() => {
     // 获取页面元素 默认全屏
@@ -54,11 +70,12 @@
 
     getListDiningTables();
   });
-  const handelClickOrder = (id: number) => {
+  const handelClickOrder = (item) => {
     router.push({
       path: '/reception/central',
       query: {
-        id,
+        id: item.id,
+        title: item.title,
       },
     });
   };
@@ -67,6 +84,7 @@
     getListDiningTables();
   };
   const handleClick = (id) => {
+    console.log(id);
     current.value = id;
   };
 </script>

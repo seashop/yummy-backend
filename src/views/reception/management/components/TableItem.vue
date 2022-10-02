@@ -4,7 +4,7 @@
     :class="{ item_active: item.status === 1, item_success: item.status === 2 }"
     v-for="(item, index) in props.data"
     :key="index"
-    @click="handelClickOrder(item.id)"
+    @click="handelClickOrder(item)"
   >
     <div class="table_title">
       <span class="title_img">

@@ -4,7 +4,7 @@
       <!-- order Header -->
       <div class="order_header" @click="goTablePage"><LeftOutlined /> 返回 </div>
       <div class="operate">
-        <OrderOperate :status="false" :isChange="!!items && !!items.length" />
+        <OrderOperate :tableNum="tableNum" :status="false" :isChange="!!items && !!items.length" />
       </div>
       <!-- 购物车列表 -->
       <div class="cart_list_box">
@@ -180,7 +180,7 @@
 <script lang="ts">
   import { defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
-  import { Row, Col, List, Input, Modal } from 'ant-design-vue';
+  import { Row, Col, List, Input, Modal, message } from 'ant-design-vue';
   import { LeftOutlined } from '@ant-design/icons-vue';
   import { useCentralStore } from '/@/store/modules/central';
   import { listCategory } from '/@/api/stores/category';
@@ -237,6 +237,7 @@
       const times: any = ref(null);
       const totalNum = ref(0);
       const dintbl_id = route.query.id ?? undefined;
+      const tableNum = route.query.title ?? undefined;
       if (!dintbl_id) router.push({ path: '/reception/management' });
       // console.log('dintbl_id', dintbl_id);
       const state = reactive({
@@ -405,6 +406,10 @@
         // };
         console.log('dintbl_id', dintbl_id);
         const res = await PlaceOrder(dintbl_id);
+        if (res.id) {
+          message.success('下单成功');
+          visible.value = false;
+        }
         // const res = await PlaceOrder(1);
         console.log(res);
       }
