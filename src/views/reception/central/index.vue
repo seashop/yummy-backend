@@ -8,6 +8,7 @@
           :tableNum="tableTitle"
           :status="false"
           :isChange="!!items && !!items.length"
+          @changeTable="changeTable"
         />
       </div>
       <!-- 购物车列表 -->
@@ -25,10 +26,7 @@
             </div>
             <div class="goods_details">
               <div class="goods_details_title">
-                <div
-                  class="title"
-                  v-if="goodsStack[item.goods_id] && goodsStack[item.goods_id].title"
-                >
+                <div class="title" v-if="true">
                   {{ goodsStack[item.goods_id].title }}
                 </div>
                 <div class="goods_tag">
@@ -36,7 +34,7 @@
                   <Tag text="新品" color="#42CFBE" v-if="goodsStack[item.goods_id].is_new" />
                 </div>
               </div>
-              <div class="goods_price">$99.00</div>
+              <div class="goods_price">${{ goodsStack[item.goods_id].price }}</div>
             </div>
             <!-- 操作 -->
             <div class="operations">
@@ -47,7 +45,7 @@
                 <span @click="ChangeQuantity(item.id, --item.quantity)">
                   <img src="/@/assets/icons/Group620.png" alt="" />
                 </span>
-                <div class="num">{{ item.quantity }}</div>
+                <div class="num">{{ item.quantity || item.number }}</div>
                 <span @click="ChangeQuantity(item.id, ++item.quantity)">
                   <img src="/@/assets/icons/Group621.png" alt="" />
                 </span>
@@ -116,14 +114,27 @@
           <div class="total_icon">
             <div class="total_icon_img">
               <!-- <span class="icon_num"> {{ totalNum }} </span> -->
-              <span class="icon_num"> {{ items.length }} </span>
+              <span class="icon_num">
+                {{ items.reduce((all, item) => all + item.quantity, 0) || 0 }}
+              </span>
               <img src="/@/assets/icons/Group664@2x.png" alt=""
             /></div>
           </div>
           <div class="total_text">
-            <!-- <span>$99.00</span> -->
-            <span>${{ items.reduce((all, item) => all + Number(item.price), 0) }}</span>
-            <s>$199.00</s>
+            <!-- <span>{{ goodsStack[item.goods_id].price }}</span> -->
+            <!-- market_price -->
+            <span>
+              {{
+                items
+                  .reduce(
+                    (all, item) =>
+                      all + Number(goodsStack[item.goods_id].price).toFixed(2) * item.quantity,
+                    0,
+                  )
+                  .toFixed(2)
+              }}
+            </span>
+            <s>$199.99 </s>
           </div>
         </div>
         <div class="submit_order_btn" @click="handleOpenModal">下单</div>
@@ -340,7 +351,15 @@
         cartId.value = res.id;
         // console.log('getCreateCart', cartId.value);
       };
-
+      // 获取所有产品信息
+      const getGoodsList = async () => {
+        const res = await listGoods();
+        res.items.forEach((item) => {
+          state.goodsStack[item.goods_id] = item;
+        });
+      };
+      getGoodsList();
+      // 根据桌台查询订单列表
       const getOrderList = async () => {
         const OrderList = await listOrders({
           dintbl_id,
@@ -351,9 +370,12 @@
             getCreateCart();
             return;
           }
-          state.items = OrderList.items[0].ordergoods.concat(OrderList.items[1].ordergoods);
-          // const list = []
-          // state.items = []
+          const result = [...OrderList.items[0].ordergoods];
+          //  添加quantity属性
+          OrderList.items[0].ordergoods.forEach((item, index) => {
+            result[index].quantity = item.number;
+          });
+          state.items = result;
           console.log('state.items', state.items);
         } else {
           getCreateCart(); //创建购物车
@@ -366,7 +388,7 @@
         async ([id]) => {
           if (!id) return;
           const cart = await getCart(id);
-          // console.log('cartId', cart);
+          console.log('getCart', cart);
           await reloadCart(cart);
         },
         {
@@ -388,6 +410,7 @@
       );
 
       async function reloadCart(cart) {
+        console.log('reloadCart', cart);
         state.cart = cart;
         // (
         //   await listGoods({
@@ -403,6 +426,7 @@
         result.items.forEach((item) => {
           state.goodsStack[item.goods_id] = item;
         });
+        console.log(' result.items.forEach', state.goodsStack);
         // console.log('goods_ids: cart.goods.map(', result);
         // console.log('state.cart', state.cart);
         // console.log('[...cart.goods]', [...cart.goods]);
@@ -478,18 +502,24 @@
         // };
         // console.log('dintbl_id', dintbl_id);
         const data = {
-          message: '我是备注',
+          message: order_desc.value,
         };
+        visible.value = false;
         const res = await PlaceOrder(dintbl_id, data);
         console.log('placeOrder', res);
         if (res.id) {
           order_id.value = res.id;
           message.success('下单成功');
-          visible.value = false;
         }
         // const res = await PlaceOrder(1);
         console.log(res);
       }
+      const changeTable = () => {
+        console.log('state---item', state.items);
+      };
+      const computedTotal = () => {
+        return state.items.reduce((all, item) => all + Number(goodsStack[item.goods_id].price), 0);
+      };
       // 下单弹窗
       const handleOpenModal = () => {
         if (state.items && state.items.length) {
@@ -541,6 +571,8 @@
         goTablePage,
         handleMode,
         handleOpenModal,
+        changeTable,
+        computedTotal,
         // cartPlace: async () => {
         //   openLoading(true);
         //   await createCart({
