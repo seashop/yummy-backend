@@ -677,7 +677,7 @@
       // 下单弹窗
       const handleOpenModal = () => {
         if (state.items && state.items.length) {
-          if (order_id.value == false) {
+          if (order_id.value == null) {
             visible.value = true;
           }
         }
