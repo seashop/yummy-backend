@@ -674,7 +674,9 @@
       // 下单弹窗
       const handleOpenModal = () => {
         if (state.items && state.items.length) {
-          visible.value = true;
+          if (order_id.value == false) {
+            visible.value = true;
+          }
         }
       };
       // modal事件
