@@ -38,7 +38,7 @@
               <div class="goods_price">${{ goodsStack[item.goods_id].price }}</div>
             </div>
             <!-- 操作 -->
-            <div class="operations">
+            <div class="operations" v-if="!order_id">
               <div class="delete_icon" @click="handleDeleteGoods(item)">
                 <img src="/@/assets/icons/Group645.png" alt="" />
               </div>
@@ -54,43 +54,6 @@
             </div>
           </div>
           <!-- end -->
-          <!-- div orderGoods -->
-          <!-- <div class="cart_list_item" v-for="item in items" :key="item.id">
-            <div class="godds_img_box">
-              <div class="godds_img">
-                <img
-                  src="https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc"
-                  alt=""
-                />
-              </div>
-            </div>
-            <div class="goods_details">
-              <div class="goods_details_title">
-                <div class="title">
-                  {{ item.title }}
-                </div>
-                <div class="goods_tag"> </div>
-              </div>
-              <div class="goods_price">{{ '$' + item.price || '$99.00' }}</div>
-            </div>
-            <div class="order_status_img">
-              <img src="/@/assets/icons/Group710.png" alt="" />
-            </div>
-            <div class="operations">
-              <div class="delete_icon" @click="handleDeleteGoods(item)">
-                <img src="/@/assets/icons/Group645.png" alt="" />
-              </div>
-              <div class="input_number">
-                <span @click="ChangeQuantity(item.id, --item.quantity)">
-                  <img src="/@/assets/icons/Group620.png" alt="" />
-                </span>
-                <div class="num">{{ item.quantity || item.number }}</div>
-                <span @click="ChangeQuantity(item.id, ++item.quantity)">
-                  <img src="/@/assets/icons/Group621.png" alt="" />
-                </span>
-              </div>
-            </div>
-          </div> -->
         </template>
         <template v-else>
           <div class="order_null">
@@ -110,7 +73,8 @@
         />
       </div>
       <!-- submitOrder -->
-      <div class="submit_order" :class="NoOrder || (items && items.length) ? '' : 'order_status'">
+      <div class="submit_order">
+        <!-- <div class="submit_order" :class="items && items.length && !order_id ? '' : 'order_status'"> -->
         <!-- order_details -->
         <!-- <div class="order_details" :span="pageWidth > 1024 ? 7 : 9">
           <div class="order_details_title">121222222222</div>
@@ -215,10 +179,17 @@
             <s>$199.99 </s>
           </div>
         </div>
-        <div class="submit_order_btn" @click="handleOpenModal">下单</div>
+        <div
+          class="submit_order_btn"
+          :class="items && items.length && !order_id ? '' : 'order_status'"
+          @click="handleOpenModal"
+          >下单</div
+        >
       </div>
       <!-- 结账 -->
-      <div class="bill_please" :class="order_id ? '' : 'order_status'" @click="goPay"> 结账 </div>
+      <div class="bill_please" :class="order_id ? '' : 'order_status'" @click="openClosingModal">
+        结账
+      </div>
     </Col>
     <!-- 商品分类 -->
     <Col :span="3" style="height: calc(100vh - 32px); overflow: auto">
@@ -267,6 +238,7 @@
     <Col :span="pageWidth > 1024 ? 14 : 12" class="goods_list">
       <ScrollContainer>
         <div :class="`${prefixCls}__content`">
+          <div class="goods_mask" v-if="order_id"></div>
           <List>
             <Row :gutter="16" v-if="goodsItems && goodsItems.length">
               <template v-for="goods in goodsItems" :key="goods.goods_id">
@@ -307,6 +279,29 @@
           </div>
           <div class="confirm">
             <div class="btn_text" @click="submitOrder"> 立即下单 </div>
+          </div>
+        </div>
+      </div>
+    </Modal>
+    <Modal
+      v-model:visible="ClosingVisible"
+      centered
+      width="600"
+      :closable="false"
+      :footer="null"
+      @ok="handleMode"
+    >
+      <div class="modal_box">
+        <div class="modal_title">
+          <div class="tips">结账提示</div>
+          <p>是否已经结账</p>
+        </div>
+        <div class="modal_btn">
+          <div class="btn">
+            <div class="btn_text" @click="ClosingVisible = false"> 我再看看 </div>
+          </div>
+          <div class="confirm">
+            <div class="btn_text" @click="goPay"> 立即结账 </div>
           </div>
         </div>
       </div>
@@ -392,6 +387,8 @@
       const NoOrder = ref(false);
       const isShowOrder = ref(false);
       const clearTablevisible = ref(false);
+      const ClosingVisible = ref(false);
+      const isClearTable = ref(false);
       const order_id = ref(0);
       const tableTitle: any = ref('');
       const CentralStore = useCentralStore();
@@ -693,11 +690,18 @@
           path: '/reception/management',
         });
       }
+
+      const openClosingModal = () => {
+        if (!order_id.value) return;
+        ClosingVisible.value = true;
+      };
+
       // 结账
       const goPay = async () => {
+        ClosingVisible.value = false;
         const res = await editOrderPay(order_id.value);
         console.log('goPay', res);
-        message.success('结账成功');
+        isClearTable.value = res;
       };
       // 清台
       const openClearTableModal = () => {
@@ -732,6 +736,8 @@
         totalNum,
         isShowOrder,
         clearTablevisible,
+        ClosingVisible,
+        isClearTable,
         prefixCls: 'central',
         handelChangeQuantity,
         ChangeQuantity,
@@ -749,6 +755,7 @@
         handleCleanDiningTable,
         openClearTableModal,
         openOrderDetails,
+        openClosingModal,
         // cartPlace: async () => {
         //   openLoading(true);
         //   await createCart({
@@ -790,9 +797,19 @@
     }
 
     &__content {
+      position: relative;
       padding: 24px;
       margin-top: 12px;
       // background-color: @component-background;
+      .goods_mask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgb(7 7 7 / 46%);
+        z-index: 999;
+      }
 
       .list {
         position: relative;
