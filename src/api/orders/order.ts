@@ -55,5 +55,5 @@ export const PlaceOrder = (id: number, data) => {
 };
 
 export const CalculateDiningTable = (id: number) => {
-  return defHttp.get<OrderListResultModel>({ url: bindParams(Api.PlaceOrder, { id }) });
+  return defHttp.post<OrderListResultModel>({ url: bindParams(Api.CalculateDiningTable, { id }) });
 };

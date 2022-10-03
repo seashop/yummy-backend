@@ -22,7 +22,7 @@
         >打印小票</div
       >
       <div
-        :class="props.status ? '' : 'order_status'"
+        :class="props.clearStatus ? '' : 'order_status'"
         class="operate_item item3"
         @click="clearTable"
         >清台</div
@@ -48,6 +48,10 @@
       default: () => true,
     },
     isChange: {
+      type: Boolean,
+      default: () => true,
+    },
+    clearStatus: {
       type: Boolean,
       default: () => true,
     },

@@ -7,6 +7,7 @@
         <OrderOperate
           :tableNum="tableTitle"
           :status="false"
+          :clearStatus="isClearTable"
           :isChange="!!items && !!items.length"
           @changeTable="changeTable"
           @clearTable="openClearTableModal"
@@ -360,7 +361,7 @@
     // PlaceDining,
   } from '/@/api/reception/dining';
   import { CleanDiningTable, getDiningTable } from '/@/api/plugins/diningTable';
-  import { PlaceOrder, listOrders } from '/@/api/orders/order';
+  import { PlaceOrder, listOrders, CalculateDiningTable } from '/@/api/orders/order';
   import { DiningCartItem, DiningGoodsItem } from '/@/api/reception/model/diningModel';
   import { editOrderPay } from '/@/api/orders/order';
   export default defineComponent({
@@ -668,7 +669,9 @@
       const computedTotal = () => {
         return state.items.reduce((all, item) => all + Number(goodsStack[item.goods_id].price), 0);
       };
-      const openOrderDetails = () => {
+      const openOrderDetails = async () => {
+        const res = await CalculateDiningTable(dintbl_id);
+        console.log(res);
         isShowOrder.value = !isShowOrder.value;
       };
       // 下单弹窗
