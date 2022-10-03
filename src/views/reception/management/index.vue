@@ -31,7 +31,7 @@
   import { ref, onMounted, nextTick, reactive } from 'vue';
   import { useRouter } from 'vue-router';
   import { SyncOutlined } from '@ant-design/icons-vue';
-  import { listDiningTables } from '/@/api/plugins/diningTable';
+  import { listDiningTables, getDiningTable } from '/@/api/plugins/diningTable';
   import TableItem from './components/TableItem.vue';
   const router = useRouter();
   // const tableItem: any = ref([]);
@@ -41,8 +41,21 @@
     3: [],
     4: [],
   });
+
+  // const getDiningTableList = async () => {
+  //   const data = {
+  //     with_status: 1,
+  //   };
+  //   try {
+  //     const res = await getDiningTable({ data });
+  //     console.log(res);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+  // getDiningTableList();
   const getListDiningTables = async () => {
-    const res = await listDiningTables();
+    const res = await listDiningTables({ with_status: 1 });
     tableObject[2] = res.items
       .map((item) => (item.title[0] === '2' ? item : null))
       .filter((item) => item?.title);
@@ -75,6 +88,7 @@
       query: {
         id: item.id,
         title: item.title,
+        status: item.is_cleaned,
       },
     });
   };

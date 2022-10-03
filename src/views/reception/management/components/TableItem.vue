@@ -1,7 +1,7 @@
 <template>
   <div
     class="table_item"
-    :class="{ item_active: item.is_cleaned === 1, item_success: item.is_cleaned === 2 }"
+    :class="{ item_active: item.is_cleaned === 0, item_success: item.is_cleaned === 2 }"
     v-for="(item, index) in props.data"
     :key="index"
     @click="handelClickOrder(item)"
@@ -9,10 +9,10 @@
     <div class="table_title">
       <span class="title_img">
         <!-- <img :src="imags[item.is_cleaned]" alt="" /> -->
-        <template v-if="item.is_cleaned === 0">
+        <template v-if="item.is_cleaned === 1">
           <img src="/@/assets/images/fi-sr-room-service.png" alt="" />
         </template>
-        <template v-if="item.is_cleaned === 1">
+        <template v-if="item.is_cleaned === 0">
           <img src="/@/assets/images/fi-sr-utensils.png" alt="" />
         </template>
         <template v-if="item.is_cleaned === 2">
@@ -23,15 +23,15 @@
     <div class="table_content">
       <div class="table_num">{{ item.title }}</div>
       <div class="table_status">
-        <template v-if="item.is_cleaned === 0">空闲</template>
-        <template v-else-if="item.is_cleaned === 1">已下单</template>
+        <template v-if="item.is_cleaned === 1">空闲</template>
+        <template v-else-if="item.is_cleaned === 0">已下单</template>
         <template v-else-if="item.is_cleaned === 2">已结算</template>
-        <span class="number_people">（{{ 8 }}）</span>
+        <span class="number_people">（{{ item.diners }}）</span>
       </div>
     </div>
-    <div class="table_price" v-if="item.is_cleaned === 1 || item.is_cleaned === 2">
-      <strong :class="{ price: item.is_cleaned === 1 }">$99.00</strong>
-      <s v-if="item.is_cleaned === 1">$199.00</s>
+    <div class="table_price" v-if="item.is_cleaned === 0 || item.is_cleaned === 2">
+      <strong :class="{ price: item.is_cleaned === 0 }">$99.00</strong>
+      <s v-if="item.is_cleaned === 0">$199.00</s>
     </div>
   </div>
 </template>
@@ -116,7 +116,7 @@
           font-size: 10px;
           font-family: Inter-Regular, Inter;
           font-weight: 400;
-          color: rgba(255, 255, 255, 0.5);
+          color: rgba(0, 0, 0, 0.5);
           line-height: 12px;
         }
       }

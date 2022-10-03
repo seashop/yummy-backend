@@ -14,6 +14,8 @@ export enum Api {
   UpdateDiningTable = '/diningTable/admin/{id}/update',
   DeleteDiningTable = '/diningTable/admin/{id}/destroy',
   GetDiningTableCode = '/diningTable/admin/{id}/codes',
+  CleanDiningTable = '/dining/admin/table/{id}/clean',
+  getDiningTable = '/dining/admin/table',
 }
 
 /**
@@ -47,5 +49,15 @@ export const deleteDiningTable = (id: number) => {
 export const getDiningTableCode = (id: number) => {
   return defHttp.get<DiningTableCodeItem>({
     url: bindParams(Api.GetDiningTableCode, { id }),
+  });
+};
+
+export const CleanDiningTable = (id) => {
+  return defHttp.post({ url: bindParams(Api.CleanDiningTable, { id }) });
+};
+
+export const getDiningTable = (params) => {
+  return defHttp.get<DiningTableCodeItem>({
+    url: bindParams(Api.getDiningTable, params),
   });
 };

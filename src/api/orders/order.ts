@@ -11,6 +11,7 @@ enum Api {
   PrintOrder = '/cms/print_order',
   // PlaceOrder = '/order/admin/place',
   PlaceOrder = '/dining/admin/table/{id}/place',
+  CalculateDiningTable = '/dining/admin/table/{id}/calculate',
 }
 
 /**
@@ -50,10 +51,9 @@ export const printOrder = (order_num: string) => {
   });
 };
 export const PlaceOrder = (id: number, data) => {
-  // export const PlaceOrder = (data) => {
   return defHttp.post<OrderListResultModel>({ url: bindParams(Api.PlaceOrder, { id }), data });
+};
 
-  // return defHttp.post<OrderListResultModel>({ url: Api.PlaceOrder, data });
-
-  // return defHttp.post<OrderListResultModel>({ url: bindParams(Api.PlaceOrder, { id }), data });
+export const CalculateDiningTable = (id: number) => {
+  return defHttp.get<OrderListResultModel>({ url: bindParams(Api.PlaceOrder, { id }) });
 };
