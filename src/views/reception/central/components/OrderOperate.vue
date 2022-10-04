@@ -7,7 +7,13 @@
         <div class="order_time">Order Time {{ props.orderTime }}</div>
       </div>
       <div>
-        <Select style="width: 180px" ref="select" :options="options" v-model:value="value1" />
+        <Select
+          style="width: 180px"
+          ref="select"
+          @change="changeValue"
+          :options="options"
+          v-model:value="value1"
+        />
       </div>
     </div>
     <!-- button -->
@@ -64,7 +70,7 @@
   );
 
   const isChange = ref(false);
-  const emit = defineEmits(['reminder', 'changeTable', 'print', 'clearTable']);
+  const emit = defineEmits(['reminder', 'changeTable', 'print', 'clearTable', 'changeDiners']);
   const options = [
     { label: '人数1/8', value: '1' },
     { label: '人数2/8', value: '2' },
@@ -75,7 +81,7 @@
     { label: '人数7/8', value: '7' },
     { label: '人数8/8', value: '8' },
   ];
-  const value1 = ref<string>('5');
+  const value1 = ref<string>('1');
   const reminder = () => {
     emit('reminder');
   };
@@ -87,6 +93,9 @@
   };
   const clearTable = () => {
     emit('clearTable');
+  };
+  const changeValue = (val) => {
+    emit('changeDiners', val);
   };
 </script>
 

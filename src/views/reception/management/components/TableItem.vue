@@ -9,6 +9,7 @@
     <div class="table_title">
       <span class="title_img">
         <!-- <img :src="imags[item.is_cleaned]" alt="" /> -->
+        <!-- 1表示空闲 0表示已下单  -->
         <template v-if="item.is_cleaned === 1">
           <img src="/@/assets/images/fi-sr-room-service.png" alt="" />
         </template>
@@ -26,7 +27,7 @@
         <template v-if="item.is_cleaned === 1">空闲</template>
         <template v-else-if="item.is_cleaned === 0">已下单</template>
         <template v-else-if="item.is_cleaned === 2">已结算</template>
-        <span class="number_people">（{{ item.diners }}）</span>
+        <span class="number_people">（{{ item.diners }}人）</span>
       </div>
     </div>
     <div class="table_price" v-if="item.is_cleaned === 0 || item.is_cleaned === 2">

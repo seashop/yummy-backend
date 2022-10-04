@@ -9,6 +9,7 @@
           :status="false"
           :clearStatus="isClearTable"
           :isChange="!!items && !!items.length"
+          @changeDiners="changeDiners"
           @changeTable="changeTable"
           @clearTable="openClearTableModal"
         />
@@ -82,7 +83,10 @@
         </div> -->
         <!-- :span="pageWidth > 1024 ? 7 : 9" -->
         <Col :span="24" class="order_details" v-show="isShowOrder">
-          <div class="order_details_title">已下单菜品</div>
+          <div class="order_details_title">
+            <div style="flex: 1">已下单菜品</div>
+            <div @click="isShowOrder = false"><DownOutlined /></div>
+          </div>
           <div class="order_content">
             <div class="order_details_desc">
               <InputTextArea
@@ -135,19 +139,19 @@
             <div class="order_details_total">
               <div class="total_details">
                 <span>小 计(subTotal):</span>
-                <span>660.00</span>
+                <span>{{ order_details.sub_money }}</span>
               </div>
               <div class="total_details">
                 <span> 税 费(SVC)10%:</span>
-                <span>660.00</span>
+                <span>{{ order_details.svc_fee }}</span>
               </div>
               <div class="total_details">
                 <span>服务费(GTS)7%:</span>
-                <span>660.00</span>
+                <span>{{ order_details.gts_fee }}</span>
               </div>
               <div class="total_details">
                 <span> 总 计(Total):</span>
-                <span>660.00</span>
+                <span>{{ order_details.total_money }}</span>
               </div>
             </div>
           </div>
@@ -340,7 +344,7 @@
   import { defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { Row, Col, List, Input, Modal, message } from 'ant-design-vue';
-  import { LeftOutlined } from '@ant-design/icons-vue';
+  import { LeftOutlined, DownOutlined } from '@ant-design/icons-vue';
   import { useCentralStore } from '/@/store/modules/central';
   import { listCategory } from '/@/api/stores/category';
   import { getGoods, listGoods } from '/@/api/stores/goods';
@@ -373,6 +377,7 @@
       OrderOperate,
       ProductCard,
       LeftOutlined,
+      DownOutlined,
       Tag,
       InputTextArea: Input.TextArea,
     },
@@ -394,6 +399,7 @@
       const CentralStore = useCentralStore();
       const cartId: any = ref(undefined);
       const currentId = ref(0);
+      const diners = ref('1');
       const order_desc = ref('');
       const pageWidth: any = ref(undefined);
       const defaultIma =
@@ -401,6 +407,7 @@
       const router = useRouter();
       const route = useRoute();
       const times: any = ref(null);
+      const order_details = ref({});
       const totalNum = ref(0);
       const dintbl_id = route.query.id ?? undefined;
       tableTitle.value = route.query.title ?? undefined;
@@ -436,17 +443,11 @@
         // console.log('state.categoryItems ', state.categoryItems);
         state.goodsItems = (await listGoods()).items;
       });
+      // 获取屏幕宽度
       function Browser() {
-        // 执行了
         const { width } = getBrowser();
         pageWidth.value = width;
       }
-      // 获取所有桌台
-      // const getListDiningTables = async () => {
-      //   const res = await listDiningTables();
-      //   console.log('getListDiningTables', res);
-      // };
-      // getListDiningTables();
       // 获取购物车列表  查找 order_id为null的 证明没下单 然后拿到购物车id 往里面push商品
       // 接下来 下单  调取查询订单接口  展示总数总价格 结账后 清台 操作
       const getCartList = async () => {
@@ -459,20 +460,12 @@
         console.log('getCartList', res);
         if (res.items && res.items.length) {
           const result: any = res.items;
-          // const result = res.items
-          //   .filter((item) => item.order_id === null)
-          //   .filter((item) => item.dintbl_id == dintbl_id);
-          // const newresult = result.filter((item) => item.dintbl_id == dintbl_id);
-          console.log('result', result.at(-1));
           if (result.at(-1)) {
             cartId.value = result.at(-1).id;
             if (result.at(-1).goods && result.at(-1).goods.length)
               state.items = result.at(-1).goods;
             order_id.value = result.at(-1).order_id;
           }
-          console.log('items', state.items);
-          console.log('order_id.valu', order_id.value);
-          // console.log('newresult', newresult);
         }
       };
       getCartList();
@@ -481,11 +474,11 @@
         if (!dintbl_id) return;
         const res = await createCart({
           dintbl_id: dintbl_id,
+          diners: diners.value,
         });
         cartId.value = res.id;
-        console.log('cartId.value ', cartId.value);
+        // console.log('cartId.value ', cartId.value);
         return cartId.value;
-        // console.log('getCreateCart', cartId.value);
       };
       // 获取所有产品信息
       const getGoodsList = async () => {
@@ -496,48 +489,6 @@
       };
       getGoodsList();
       // 根据桌台查询订单列表  获取订单
-      // const getOrderList = async () => {
-      //   const OrderList = await listOrders({
-      //     dintbl_id,
-      //   });
-      //   // console.log('OrderList', OrderList);
-      //   if (OrderList && OrderList.items.length) {
-      //     // 如果是1表示都是已支付状态 执行获取购物车编号
-      //     if (OrderList.items[0].payment_state) {
-      //       getCreateCart();
-      //       return;
-      //     }
-
-      //     const resultArray = OrderList.items.filter((item) => item.payment_state === 0);
-      //     console.log('resultArray', resultArray);
-      //     const result = [...OrderList.items[0].ordergoods];
-      //     const ordergoodsList = result.map((item) => item.ordergoods);
-      //     console.log('ordergoodsList', ordergoodsList);
-      //     //  添加quantity属性
-      //     OrderList.items[0].ordergoods.forEach((item, index) => {
-      //       result[index].quantity = item.number;
-      //     });
-      //     state.items = result;
-      //     console.log('state.items', state.items);
-      //   } else {
-      //     getCreateCart(); //创建购物车
-      //   }
-      // };
-      //ListCart
-      // getOrderList();
-
-      // watch(
-      //   [() => cartId.value],
-      //   async ([id]) => {
-      //     if (!id) return;
-      //     const cart = await getCart(id);
-      //     console.log('getCart', cart);
-      //     await reloadCart(cart);
-      //   },
-      //   {
-      //     immediate: true,
-      //   },
-      // );
 
       watch(
         () => state.items,
@@ -555,24 +506,12 @@
       async function reloadCart(cart) {
         console.log('reloadCart', cart);
         state.cart = cart;
-        // (
-        //   await listGoods({
-        //     goods_ids: cart.goods.map((item) => item.goods_id),
-        //   })
-        // ).items.forEach((item) => {
-        //   // console.log('ListGoods', item);
-        //   state.goodsStack[item.goods_id] = item;
-        // });
         const result = await listGoods({
           goods_ids: cart.goods.map((item) => item.goods_id),
         });
         result.items.forEach((item) => {
           state.goodsStack[item.goods_id] = item;
         });
-        // console.log(' result.items.forEach', state.goodsStack);
-        // console.log('goods_ids: cart.goods.map(', result);
-        // console.log('state.cart', state.cart);
-        // console.log('[...cart.goods]', [...cart.goods]);
         state.items = [...cart.goods];
       }
       // 购物车防抖
@@ -638,16 +577,6 @@
       }
       // 下单
       async function submitOrder() {
-        // return;
-        // console.log('下单');
-        // const data = {
-        // dintbl_id: 1,
-        // pick_code: 0,
-        // user_id: 0,
-        // message: '我是备注信息',
-        // invite_code: '',
-        // };
-        // console.log('dintbl_id', dintbl_id);
         const data = {
           message: order_desc.value,
         };
@@ -665,13 +594,21 @@
       const changeTable = () => {
         console.log('state---item', state.items);
       };
+      const changeDiners = (val) => {
+        diners.value = val;
+        console.log('diners', diners.value);
+      };
       const computedTotal = () => {
         return state.items.reduce((all, item) => all + Number(goodsStack[item.goods_id].price), 0);
       };
+      // 打开订单详情框
       const openOrderDetails = async () => {
+        console.log('open');
         const res = await CalculateDiningTable(dintbl_id);
         console.log(res);
+        order_details.value = res;
         isShowOrder.value = !isShowOrder.value;
+        console.log('isShowOrder.value', order_details.value);
       };
       // 下单弹窗
       const handleOpenModal = () => {
@@ -705,6 +642,7 @@
         ClosingVisible.value = false;
         const res = await editOrderPay(order_id.value);
         console.log('goPay', res);
+        message.success('结账成功');
         isClearTable.value = res;
       };
       // 清台
@@ -742,6 +680,7 @@
         clearTablevisible,
         ClosingVisible,
         isClearTable,
+        order_details,
         prefixCls: 'central',
         handelChangeQuantity,
         ChangeQuantity,
@@ -755,19 +694,12 @@
         handleMode,
         handleOpenModal,
         changeTable,
+        changeDiners,
         computedTotal,
         handleCleanDiningTable,
         openClearTableModal,
         openOrderDetails,
         openClosingModal,
-        // cartPlace: async () => {
-        //   openLoading(true);
-        //   await createCart({
-        //     dintbl_id: props.cartId,
-        //     goods: state.items as Array<DiningGoodsItem>,
-        //   });
-        //   compState.loading = false;
-        // },
       };
     },
   });
@@ -1060,7 +992,7 @@
         height: 77px;
         background: #193557;
         border-radius: 108px;
-        overflow: hidden;
+        // overflow: hidden;
 
         .total_price {
           display: flex;
@@ -1119,6 +1051,7 @@
           align-items: center;
           width: 30%;
           height: 100%;
+          border-radius: 0 108px 108px 0;
           background: #ffc165;
           font-size: 20px;
           font-family: PingFang SC-Medium, PingFang SC;
@@ -1127,9 +1060,10 @@
         }
         // position
         .order_details {
-          position: fixed;
+          position: absolute;
+          z-index: 999;
           left: 0;
-          bottom: 154px;
+          top: -442px;
           width: 399px;
           height: 442px;
           background: #fff;
@@ -1137,11 +1071,13 @@
           // padding: 0 2%;
           // background: #666;
           .order_details_title {
+            display: flex;
             height: 36px;
             line-height: 36px;
             background: #ffd597;
             border-radius: 15px 15px 0px 0px;
             margin-bottom: 14px;
+            padding-right: 18px;
             text-align: center;
             font-size: 15px;
             font-weight: 500;
