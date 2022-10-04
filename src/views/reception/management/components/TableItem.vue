@@ -1,7 +1,10 @@
 <template>
   <div
     class="table_item"
-    :class="{ item_active: item.is_cleaned === 0, item_success: item.is_cleaned === 2 }"
+    :class="{
+      item_active: item.status_label === '已下单',
+      item_success: item.status_label === '待清台',
+    }"
     v-for="(item, index) in props.data"
     :key="index"
     @click="handelClickOrder(item)"
@@ -10,13 +13,13 @@
       <span class="title_img">
         <!-- <img :src="imags[item.is_cleaned]" alt="" /> -->
         <!-- 1表示空闲 0表示已下单  -->
-        <template v-if="item.is_cleaned === 1">
+        <template v-if="item.status_label === '空闲'">
           <img src="/@/assets/images/fi-sr-room-service.png" alt="" />
         </template>
-        <template v-if="item.is_cleaned === 0">
+        <template v-if="item.status_label === '已下单'">
           <img src="/@/assets/images/fi-sr-utensils.png" alt="" />
         </template>
-        <template v-if="item.is_cleaned === 2">
+        <template v-if="item.status_label === '待清台'">
           <img src="/@/assets/images/Group704.png" alt="" />
         </template>
       </span>
@@ -24,15 +27,15 @@
     <div class="table_content">
       <div class="table_num">{{ item.title }}</div>
       <div class="table_status">
-        <template v-if="item.is_cleaned === 1">空闲</template>
-        <template v-else-if="item.is_cleaned === 0">已下单</template>
-        <template v-else-if="item.is_cleaned === 2">已结算</template>
+        <template v-if="item.status_label === '空闲'">空闲</template>
+        <template v-else-if="item.status_label === '已下单'">已下单</template>
+        <template v-else-if="item.status_label === '待清台'">已结算</template>
         <span class="number_people">（{{ item.diners }}人）</span>
       </div>
     </div>
-    <div class="table_price" v-if="item.is_cleaned === 0 || item.is_cleaned === 2">
-      <strong :class="{ price: item.is_cleaned === 0 }">$99.00</strong>
-      <s v-if="item.is_cleaned === 0">$199.00</s>
+    <div class="table_price" v-if="item.calc_info">
+      <strong :class="{ price: true }">$ {{ item.calc_info && item.calc_info.total_money }}</strong>
+      <!-- <s v-if="item.is_cleaned === 0">$199.00</s> -->
     </div>
   </div>
 </template>
@@ -45,20 +48,6 @@
       default: () => [],
     },
   });
-  const data = [
-    { id: 1, title: 101, status: 0 },
-    { id: 2, title: 102, status: 1 },
-    { id: 3, title: 103, status: 2 },
-    { id: 3, title: 103, status: 0 },
-    { id: 3, title: 103, status: 0 },
-    { id: 3, title: 103, status: 0 },
-    { id: 3, title: 103, status: 0 },
-  ];
-  const imags = {
-    0: '/@/assets/images/fi-sr-room-service.png',
-    1: '/@/assets/images/fi-sr-utensils.png',
-    2: '/@/assets/images/Group704.png',
-  };
   const emit = defineEmits(['changeTable']);
   const handelClickOrder = (id: number) => {
     emit('changeTable', id);

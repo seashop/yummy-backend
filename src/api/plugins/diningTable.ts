@@ -58,6 +58,7 @@ export const CleanDiningTable = (id) => {
 
 export const getDiningTable = (params) => {
   return defHttp.get<DiningTableCodeItem>({
-    url: bindParams(Api.getDiningTable, params),
+    url: Api.getDiningTable,
+    params,
   });
 };

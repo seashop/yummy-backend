@@ -33,6 +33,8 @@
   import { SyncOutlined } from '@ant-design/icons-vue';
   import { listDiningTables, getDiningTable } from '/@/api/plugins/diningTable';
   import TableItem from './components/TableItem.vue';
+  import LocalCache from '/@/api/LocalCache/index';
+
   const router = useRouter();
   // const tableItem: any = ref([]);
   const current = ref(2);
@@ -42,20 +44,26 @@
     4: [],
   });
 
-  // const getDiningTableList = async () => {
-  //   const data = {
-  //     with_status: 1,
-  //   };
-  //   try {
-  //     const res = await getDiningTable({ data });
-  //     console.log(res);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
-  // getDiningTableList();
+  const placeList = LocalCache.getCache('placeList') ?? [];
+  console.log(placeList);
   const getListDiningTables = async () => {
-    const res = await listDiningTables({ with_status: 1 });
+    const data = {
+      with_status: 1,
+    };
+    const res = await getDiningTable(data);
+    console.log(res);
+    const result = res.items;
+    res.items.forEach((item, index) => {
+      // console.log();
+      if (item.calc_info) {
+        result[index].status_label = '空闲';
+        // 本地缓存读取是否下单
+        if (placeList.includes(item.id + '')) {
+          result[index].status_label = '已下单';
+        }
+      }
+    });
+    console.log('res.items', result);
     tableObject[2] = res.items
       .map((item) => (item.title[0] === '2' ? item : null))
       .filter((item) => item?.title);
@@ -65,8 +73,6 @@
     tableObject[4] = res.items
       .map((item) => (item.title[0] === '4' ? item : null))
       .filter((item) => item?.title);
-    // tableItem.value
-    // tableItem.value = res.items;
   };
   onMounted(() => {
     // 获取页面元素 默认全屏
@@ -88,7 +94,8 @@
       query: {
         id: item.id,
         title: item.title,
-        status: item.is_cleaned,
+        status: placeList.includes(item.id + '') ? 0 : 1,
+        settlement: item.status_label == '待清台',
       },
     });
   };

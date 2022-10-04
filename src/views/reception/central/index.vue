@@ -84,7 +84,8 @@
         <!-- :span="pageWidth > 1024 ? 7 : 9" -->
         <Col :span="24" class="order_details" v-show="isShowOrder">
           <div class="order_details_title">
-            <div style="flex: 1">已下单菜品</div>
+            <!-- 已下单菜品 -->
+            <div style="flex: 1">已选择菜品</div>
             <div @click="isShowOrder = false"><DownOutlined /></div>
           </div>
           <div class="order_content">
@@ -139,7 +140,8 @@
             <div class="order_details_total">
               <div class="total_details">
                 <span>小 计(subTotal):</span>
-                <span>{{ order_details.sub_money }}</span>
+
+                <span>{{ order_details.sub_money || order_details.goods_money }}</span>
               </div>
               <div class="total_details">
                 <span> 税 费(SVC)10%:</span>
@@ -151,7 +153,7 @@
               </div>
               <div class="total_details">
                 <span> 总 计(Total):</span>
-                <span>{{ order_details.total_money }}</span>
+                <span>{{ order_details.total_money || order_details.order_money }}</span>
               </div>
             </div>
           </div>
@@ -171,7 +173,8 @@
             <!-- <span>{{ goodsStack[item.goods_id].price }}</span> -->
             <!-- market_price -->
             <span>
-              {{
+              {{ order_details.total_money }}
+              <!-- {{
                 items
                   .reduce(
                     (all, item) =>
@@ -179,7 +182,7 @@
                     0,
                   )
                   .toFixed(2)
-              }}
+              }} -->
             </span>
             <s>$199.99 </s>
           </div>
@@ -192,7 +195,11 @@
         >
       </div>
       <!-- 结账 -->
-      <div class="bill_please" :class="order_id ? '' : 'order_status'" @click="openClosingModal">
+      <div
+        class="bill_please"
+        :class="order_status == 0 && !isClearTable ? '' : 'order_status'"
+        @click="openClosingModal"
+      >
         结账
       </div>
     </Col>
@@ -364,9 +371,9 @@
     // PlaceDining,
   } from '/@/api/reception/dining';
   import { CleanDiningTable } from '/@/api/plugins/diningTable';
-  import { PlaceOrder, CalculateDiningTable } from '/@/api/orders/order';
+  import { PlaceOrder, CalculateDiningTable, listOrders } from '/@/api/orders/order';
   import { DiningCartItem, DiningGoodsItem } from '/@/api/reception/model/diningModel';
-  import { editOrderPay } from '/@/api/orders/order';
+  import LocalCache from '/@/api/LocalCache/index';
   export default defineComponent({
     components: {
       Row,
@@ -411,7 +418,13 @@
       const totalNum = ref(0);
       const dintbl_id = route.query.id ?? undefined;
       tableTitle.value = route.query.title ?? undefined;
-      const order_status = route.query.status ?? undefined;
+      const status: any = route.query.status ?? undefined;
+      const settlement = route.query.settlement ?? undefined;
+      console.log('settlement', settlement);
+      if (settlement == 'true') {
+        isClearTable.value = true;
+      }
+      let order_status: any = ref(status);
       if (!dintbl_id) router.push({ path: '/reception/management' });
       // console.log('dintbl_id', dintbl_id);
       const state = reactive({
@@ -451,12 +464,9 @@
       // 获取购物车列表  查找 order_id为null的 证明没下单 然后拿到购物车id 往里面push商品
       // 接下来 下单  调取查询订单接口  展示总数总价格 结账后 清台 操作
       const getCartList = async () => {
-        console.log('getCartList dintbl_id', dintbl_id);
-        console.log('order_status', typeof order_status);
-        console.log('order_status', order_status);
         // const res = await listCart({ dintbl_id });
         // 通过route传参数  0表示 已经有订单 查询已下单的购物车
-        const res = await listCart({ dintbl_id, is_ordered: order_status == 0 ? 1 : 0 });
+        const res = await listCart({ dintbl_id, is_ordered: order_status.value == 0 ? 1 : 0 });
         console.log('getCartList', res);
         if (res.items && res.items.length) {
           const result: any = res.items;
@@ -492,14 +502,33 @@
 
       watch(
         () => state.items,
-        (val) => {
+        async (val) => {
           if (val && val.length) {
             const result = val.reduce((all, item) => all + item.quantity, 0);
             // console.log(result);
             totalNum.value = result;
           }
           CentralStore.changeCartList(val);
+          console.log('watch api');
+          let res;
+          if (isClearTable.value) {
+            console.log(1);
+            res = await listOrders({ dintbl_id, order_num: order_id.value });
+            const result = res.items.filter((item) => item.order_id == order_id.value);
+            console.log('result', result);
+            order_details.value = result[0];
+            order_details.value = res;
+          } else {
+            console.log(2);
+            res = await CalculateDiningTable(dintbl_id);
+            order_details.value = res;
+          }
+          // isShowOrder.value = !isShowOrder.value;
+          console.log('order_details.value', order_details.value);
           // console.log('watch---state.items', val);
+        },
+        {
+          immediate: true, // 这个属性是重点啦
         },
       );
 
@@ -575,22 +604,7 @@
             state.goodsStack[goods.goods_id] = goods;
           });
       }
-      // 下单
-      async function submitOrder() {
-        const data = {
-          message: order_desc.value,
-        };
-        visible.value = false;
-        const res: any = await PlaceOrder(dintbl_id, data);
-        console.log('placeOrder', res);
-        if (res.id) {
-          order_id.value = res.id;
-          NoOrder.value = true;
-          message.success('下单成功');
-        }
-        // const res = await PlaceOrder(1);
-        console.log(res);
-      }
+
       const changeTable = () => {
         console.log('state---item', state.items);
       };
@@ -604,20 +618,50 @@
       // 打开订单详情框
       const openOrderDetails = async () => {
         console.log('open');
-        const res = await CalculateDiningTable(dintbl_id);
-        console.log(res);
-        order_details.value = res;
+        // if (!order_id.value) return;
+        // const res = await CalculateDiningTable(dintbl_id);
+        // const res = await listOrders({ dintbl_id, order_num: order_id.value });
+        // const result = res.items.filter((item) => item.order_id == order_id.value);
+        // console.log(result);
+        // order_details.value = result[0];
+        // order_details.value = res;
         isShowOrder.value = !isShowOrder.value;
-        console.log('isShowOrder.value', order_details.value);
       };
       // 下单弹窗
       const handleOpenModal = () => {
+        if (isClearTable.value) return;
         if (state.items && state.items.length) {
-          if (order_id.value == null) {
-            visible.value = true;
-          }
+          visible.value = true;
         }
       };
+      // 下单
+      async function submitOrder() {
+        message.success('下单成功');
+        order_id.value = 1;
+        visible.value = false;
+        order_status.value = 0;
+        console.log('order_status', order_status);
+        const placeList = LocalCache.getCache('placeList') ?? [];
+        if (placeList.includes(dintbl_id)) return;
+        placeList.push(dintbl_id);
+        LocalCache.setCache('placeList', placeList);
+
+        // console.log('placeList', placeList);
+        // const data = {
+        //   message: order_desc.value,
+        // };
+        // visible.value = false;
+        // const res: any = await PlaceOrder(dintbl_id, data);
+        // console.log('placeOrder', res);
+        // if (res.id) {
+        //   order_id.value = res.id;
+        //   NoOrder.value = true;
+        //   order_details.value.payment_state = 0; // payment
+        //   message.success('下单成功');
+        // }
+        // const res = await PlaceOrder(1);
+        // console.log(res);
+      }
       // modal事件
       const handleMode = () => {
         console.log('点击了确认');
@@ -634,16 +678,40 @@
 
       const openClosingModal = () => {
         if (!order_id.value) return;
+        if (isClearTable.value) return;
         ClosingVisible.value = true;
       };
 
       // 结账
       const goPay = async () => {
         ClosingVisible.value = false;
-        const res = await editOrderPay(order_id.value);
+        //更改结账接口
+        // const res = await editOrderPay(order_id.value);
+        const data = {
+          message: order_desc.value,
+        };
+        visible.value = false;
+        const res: any = await PlaceOrder(dintbl_id, data);
+        console.log('placeOrder', res);
+        if (res.id) {
+          order_id.value = res.id;
+          NoOrder.value = true;
+          // order_details.value.payment_state = 0; // payment
+        }
         console.log('goPay', res);
         message.success('结账成功');
         isClearTable.value = res;
+        const result = LocalCache.getCache('placeList') ?? [];
+        const order_list = result;
+        result.forEach((item, index) => {
+          if (item == dintbl_id) {
+            console.log('符合');
+            console.log('index', index);
+            order_list.splice(index, 1);
+          }
+        });
+        console.log(order_list);
+        LocalCache.setCache('placeList', order_list);
       };
       // 清台
       const openClearTableModal = () => {
@@ -662,11 +730,13 @@
           path: '/reception/management',
         });
       };
+
       return {
         ...toRefs(state),
         // ...toRefs(compState),
         visible,
         order_id,
+        order_status,
         goPay,
         tableTitle,
         NoOrder,
