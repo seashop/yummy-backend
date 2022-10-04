@@ -419,8 +419,9 @@
       const dintbl_id = route.query.id ?? undefined;
       tableTitle.value = route.query.title ?? undefined;
       const status: any = route.query.status ?? undefined;
+      console.log('router.status', status);
       const settlement = route.query.settlement ?? undefined;
-      console.log('settlement', settlement);
+      // console.log('settlement', settlement);
       if (settlement == 'true') {
         isClearTable.value = true;
       }
@@ -467,7 +468,7 @@
         // const res = await listCart({ dintbl_id });
         // 通过route传参数  0表示 已经有订单 查询已下单的购物车
         const res = await listCart({ dintbl_id, is_ordered: order_status.value == 0 ? 1 : 0 });
-        console.log('getCartList', res);
+        // console.log('getCartList', res);
         if (res.items && res.items.length) {
           const result: any = res.items;
           if (result.at(-1)) {
@@ -509,13 +510,11 @@
             totalNum.value = result;
           }
           CentralStore.changeCartList(val);
-          console.log('watch api');
           let res;
           if (isClearTable.value) {
             console.log(1);
             res = await listOrders({ dintbl_id, order_num: order_id.value });
             const result = res.items.filter((item) => item.order_id == order_id.value);
-            console.log('result', result);
             order_details.value = result[0];
             order_details.value = res;
           } else {
@@ -524,16 +523,15 @@
             order_details.value = res;
           }
           // isShowOrder.value = !isShowOrder.value;
-          console.log('order_details.value', order_details.value);
+          // console.log('order_details.value', order_details.value);
           // console.log('watch---state.items', val);
         },
         {
-          immediate: true, // 这个属性是重点啦
+          // immediate: true,
         },
       );
 
       async function reloadCart(cart) {
-        console.log('reloadCart', cart);
         state.cart = cart;
         const result = await listGoods({
           goods_ids: cart.goods.map((item) => item.goods_id),
@@ -590,17 +588,15 @@
           quantity: 1,
           served_num: 0,
         };
-        console.log('item', item);
+        // console.log('item', item);
         // await getCreateCart();
         if (!cartId.value) await getCreateCart(); //创建购物车
         await appendCart(cartId.value, item)
           .then((cart) => {
-            console.log(47394);
             return reloadCart(cart);
           })
           .then(async () => {
             const goods = await getGoods(goods_id);
-            console.log('appendCart', goods);
             state.goodsStack[goods.goods_id] = goods;
           });
       }
@@ -610,14 +606,14 @@
       };
       const changeDiners = (val) => {
         diners.value = val;
-        console.log('diners', diners.value);
+        // console.log('diners', diners.value);
       };
       const computedTotal = () => {
         return state.items.reduce((all, item) => all + Number(goodsStack[item.goods_id].price), 0);
       };
       // 打开订单详情框
       const openOrderDetails = async () => {
-        console.log('open');
+        // console.log('open');
         // if (!order_id.value) return;
         // const res = await CalculateDiningTable(dintbl_id);
         // const res = await listOrders({ dintbl_id, order_num: order_id.value });
@@ -640,7 +636,7 @@
         order_id.value = 1;
         visible.value = false;
         order_status.value = 0;
-        console.log('order_status', order_status);
+        // console.log('order_status', order_status);
         const placeList = LocalCache.getCache('placeList') ?? [];
         if (placeList.includes(dintbl_id)) return;
         placeList.push(dintbl_id);
@@ -664,7 +660,7 @@
       }
       // modal事件
       const handleMode = () => {
-        console.log('点击了确认');
+        // console.log('点击了确认');
       };
       // // 订单结算
       function settlementOrder() {
@@ -692,26 +688,26 @@
         };
         visible.value = false;
         const res: any = await PlaceOrder(dintbl_id, data);
-        console.log('placeOrder', res);
+        // console.log('placeOrder', res);
         if (res.id) {
           order_id.value = res.id;
           NoOrder.value = true;
           // order_details.value.payment_state = 0; // payment
         }
-        console.log('goPay', res);
-        message.success('结账成功');
+        // console.log('goPay', res);
+        // message.success('结账成功');
         isClearTable.value = res;
-        const result = LocalCache.getCache('placeList') ?? [];
-        const order_list = result;
-        result.forEach((item, index) => {
-          if (item == dintbl_id) {
-            console.log('符合');
-            console.log('index', index);
-            order_list.splice(index, 1);
-          }
-        });
-        console.log(order_list);
-        LocalCache.setCache('placeList', order_list);
+        // const result = LocalCache.getCache('placeList') ?? [];
+        // const order_list = result;
+        // result.forEach((item, index) => {
+        //   if (item == dintbl_id) {
+        //     console.log('符合');
+        //     console.log('index', index);
+        //     order_list.splice(index, 1);
+        //   }
+        // });
+        // console.log(order_list);
+        // LocalCache.setCache('placeList', order_list);
       };
       // 清台
       const openClearTableModal = () => {
@@ -722,9 +718,18 @@
         //   id: dintbl_id,
         // };
         clearTablevisible.value = false;
-        console.log('dintbl_id', dintbl_id);
+        // console.log('dintbl_id', dintbl_id);
         const res = await CleanDiningTable(dintbl_id);
         if (res === null) message.success('清台成功');
+        const result = LocalCache.getCache('placeList') ?? [];
+        const order_list = result;
+        result.forEach((item, index) => {
+          if (item == dintbl_id) {
+            order_list.splice(index, 1);
+          }
+        });
+        // console.log(order_list);
+        LocalCache.setCache('placeList', order_list);
         CentralStore.$reset();
         router.push({
           path: '/reception/management',

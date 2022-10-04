@@ -95,6 +95,7 @@
         id: item.id,
         title: item.title,
         status: placeList.includes(item.id + '') ? 0 : 1,
+        // status: 0,
         settlement: item.status_label == '待清台',
       },
     });
