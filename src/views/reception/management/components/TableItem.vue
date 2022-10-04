@@ -125,7 +125,7 @@
       height: 35px;
       text-align: center;
       .price {
-        font-size: 14px;
+        font-size: 19px;
         font-family: Inter-Semi Bold, Inter;
         font-weight: normal;
         color: #fff;

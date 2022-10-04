@@ -295,7 +295,7 @@
       <div class="modal_box">
         <div class="modal_title">
           <div class="tips">结账提示</div>
-          <p>是否已经结账</p>
+          <p>是否立即结账</p>
         </div>
         <div class="modal_btn">
           <div class="btn">
@@ -356,12 +356,11 @@
     appendCart,
     createCart,
     deleteGoods,
-    getCart,
     updateGoods,
     // PlaceDining,
   } from '/@/api/reception/dining';
-  import { CleanDiningTable, getDiningTable } from '/@/api/plugins/diningTable';
-  import { PlaceOrder, listOrders, CalculateDiningTable } from '/@/api/orders/order';
+  import { CleanDiningTable } from '/@/api/plugins/diningTable';
+  import { PlaceOrder, CalculateDiningTable } from '/@/api/orders/order';
   import { DiningCartItem, DiningGoodsItem } from '/@/api/reception/model/diningModel';
   import { editOrderPay } from '/@/api/orders/order';
   export default defineComponent({
@@ -459,7 +458,7 @@
         const res = await listCart({ dintbl_id, is_ordered: order_status == 0 ? 1 : 0 });
         console.log('getCartList', res);
         if (res.items && res.items.length) {
-          const result = res.items;
+          const result: any = res.items;
           // const result = res.items
           //   .filter((item) => item.order_id === null)
           //   .filter((item) => item.dintbl_id == dintbl_id);
@@ -653,7 +652,7 @@
           message: order_desc.value,
         };
         visible.value = false;
-        const res = await PlaceOrder(dintbl_id, data);
+        const res: any = await PlaceOrder(dintbl_id, data);
         console.log('placeOrder', res);
         if (res.id) {
           order_id.value = res.id;
