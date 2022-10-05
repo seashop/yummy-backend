@@ -110,10 +110,10 @@
                 </div>
                 <div class="goods_details">
                   <div class="goods_details_title">
-                    <div class="title" v-if="true">
+                    <div class="title" v-if="goodsStack[item.goods_id].title">
                       {{ goodsStack[item.goods_id].title }}
                     </div>
-                    <div class="goods_tag">
+                    <div class="goods_tag" v-if="goodsStack[item.goods_id].is_hot">
                       <Tag text="热门" color="#ff0000" v-if="goodsStack[item.goods_id].is_hot" />
                       <Tag text="新品" color="#42CFBE" v-if="goodsStack[item.goods_id].is_new" />
                     </div>
@@ -555,7 +555,7 @@
             console.log('isOrder.value', isOrder.value);
           } else {
             // 否则没有下单
-            isOrder.value = true;
+            isOrder.value = false;
           }
           const result: any = res.items;
           if (result.at(-1)) {
@@ -571,10 +571,11 @@
       };
       // 创建购物车
       const getCreateCart = async () => {
+        console.log('diners', +diners.value);
         if (!dintbl_id) return;
         const res = await createCart({
           dintbl_id: dintbl_id,
-          diners: diners.value,
+          diners: +diners.value,
         });
         cartId.value = res.id;
         // console.log('cartId.value ', cartId.value);
@@ -843,7 +844,10 @@
       };
       // 清台
       const openClearTableModal = () => {
+        console.log('清台');
         clearTablevisible.value = true;
+        console.log('clearTablevisible', clearTablevisible.value);
+        // handleCleanDiningTable();
       };
       const handleCleanDiningTable = async () => {
         // const data = {
