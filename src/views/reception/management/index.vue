@@ -45,22 +45,27 @@
   });
 
   const placeList = LocalCache.getCache('placeList') ?? [];
-  console.log(placeList);
+  // console.log(placeList);
   const getListDiningTables = async () => {
     const data = {
       with_status: 1,
     };
     const res = await getDiningTable(data);
-    console.log(res);
+    // console.log(res);
     const result = res.items;
     res.items.forEach((item, index) => {
       // console.log();
       if (item.calc_info) {
         result[index].status_label = '空闲';
         // 本地缓存读取是否下单
-        if (placeList.includes(item.id + '')) {
-          result[index].status_label = '已下单';
-        }
+        // if (placeList.includes(item.id + '')) {
+        //   result[index].status_label = '已下单';
+        // }
+        placeList.forEach((i) => {
+          if (item.id == i.dintbl_id) {
+            result[index].status_label = '已下单';
+          }
+        });
       }
     });
     console.log('res.items', result);
@@ -88,13 +93,30 @@
 
     getListDiningTables();
   });
+  const status = ref(undefined);
   const handelClickOrder = (item) => {
+    const placeList = LocalCache.getCache('placeList') ?? [];
+    // 本地缓存含有的话就是 假下单0 否则没有订单1
+    placeList.forEach((i) => {
+      console.log('item.dintbl_id ', item.id);
+      console.log(i.dintbl_id);
+      if (item.id == i.dintbl_id) {
+        status.value = 0;
+      } else {
+        console.log(status.value);
+        status.value = 1;
+      }
+    });
+    console.log('status.value', status.value);
+    console.log(placeList);
+
     router.push({
       path: '/reception/central',
       query: {
         id: item.id,
         title: item.title,
-        status: placeList.includes(item.id + '') ? 0 : 1,
+        status: status.value,
+        // status: placeList.includes(item.id + '') ? 0 : 1,
         // status: 0,
         settlement: item.status_label == '待清台',
       },

@@ -40,7 +40,7 @@
               <div class="goods_price">${{ goodsStack[item.goods_id].price }}</div>
             </div>
             <!-- 操作 -->
-            <div class="operations" v-if="!order_id">
+            <div class="operations" v-if="!isOrder">
               <div class="delete_icon" @click="handleDeleteGoods(item)">
                 <img src="/@/assets/icons/Group645.png" alt="" />
               </div>
@@ -85,7 +85,7 @@
         <Col :span="24" class="order_details" v-show="isShowOrder">
           <div class="order_details_title">
             <!-- 已下单菜品 -->
-            <div style="flex: 1">已选择菜品</div>
+            <div style="flex: 1">已下单菜品</div>
             <div @click="isShowOrder = false"><DownOutlined /></div>
           </div>
           <div class="order_content">
@@ -140,56 +140,79 @@
             <div class="order_details_total">
               <div class="total_details">
                 <span>小 计(subTotal):</span>
-
-                <span>{{ order_details.sub_money || order_details.goods_money }}</span>
+                <span v-if="order_details && order_details.sub_money">{{
+                  order_details.sub_money
+                }}</span>
+                <span v-if="order_details && order_details.goods_money">{{
+                  order_details.goods_money
+                }}</span>
               </div>
               <div class="total_details">
                 <span> 税 费(SVC)10%:</span>
-                <span>{{ order_details.svc_fee }}</span>
+                <span v-if="order_details && order_details.svc_fee">{{
+                  order_details.svc_fee
+                }}</span>
               </div>
               <div class="total_details">
                 <span>服务费(GTS)7%:</span>
-                <span>{{ order_details.gts_fee }}</span>
+                <span v-if="order_details && order_details.gts_fee">{{
+                  order_details.gts_fee
+                }}</span>
               </div>
               <div class="total_details">
                 <span> 总 计(Total):</span>
-                <span>{{ order_details.total_money || order_details.order_money }}</span>
+                <span v-if="order_details && order_details.total_money">{{
+                  order_details.total_money
+                }}</span>
+                <span v-if="order_details && order_details.order_money">{{
+                  order_details.order_money
+                }}</span>
               </div>
             </div>
           </div>
         </Col>
-
         <div class="total_price" @click="openOrderDetails">
           <div class="total_icon">
             <div class="total_icon_img">
               <!-- <span class="icon_num"> {{ totalNum }} </span> -->
               <span class="icon_num">
-                {{ items.reduce((all, item) => all + item.quantity, 0) || 0 }}
+                <!-- {{ totalQuantity }} -->
+                <template v-if="settlement == 'false'">
+                  {{ items.reduce((all, item) => all + item.quantity, 0) || 0 }}
+                  <!-- {{ totalQuantity }} -->
+                </template>
+
+                <!-- {{ order_details.ordergoods.reduce((all, item) => all + item.number, 0) || 0 }} -->
               </span>
               <img src="/@/assets/icons/Group664@2x.png" alt=""
             /></div>
           </div>
           <div class="total_text">
+            <!-- <template v-if="order_details.ordergoods && order_details.ordergoods.length">
+              {{ order_details.ordergoods.reduce((all, item) => all + item.number, 0) }}
+            </template> -->
             <!-- <span>{{ goodsStack[item.goods_id].price }}</span> -->
             <!-- market_price -->
-            <span>
-              {{ order_details.total_money }}
-              <!-- {{
-                items
-                  .reduce(
-                    (all, item) =>
-                      all + Number(goodsStack[item.goods_id].price).toFixed(2) * item.quantity,
-                    0,
-                  )
-                  .toFixed(2)
-              }} -->
+            <!-- <template v-if="settlement == 'false'">
+              {{ order_details.total_money || order_details.order_money }}
+              {{ totalQuantity }}
+            </template> -->
+            <span v-if="order_details && order_details.total_money">
+              <!-- {{ order_details.total_money }} -->
+              {{ order_details.total_money || order_details.order_money }}
             </span>
-            <s>$199.99 </s>
+            <span v-if="order_details && order_details.order_money">
+              <!-- {{ order_details.total_money }} -->
+              {{ order_details.total_money || order_details.order_money }}
+            </span>
+
+            <!-- <s>$199.99 </s> -->
           </div>
         </div>
+        <!-- //items.length  -->
         <div
           class="submit_order_btn"
-          :class="items && items.length && !order_id ? '' : 'order_status'"
+          :class="items.length && !isOrder ? '' : 'order_status'"
           @click="handleOpenModal"
           >下单</div
         >
@@ -197,10 +220,11 @@
       <!-- 结账 -->
       <div
         class="bill_please"
-        :class="order_status == 0 && !isClearTable ? '' : 'order_status'"
+        :class="isOrder && !isClearTable ? '' : 'order_status'"
         @click="openClosingModal"
       >
         结账
+        <!-- {{ isOrder }} -->
       </div>
     </Col>
     <!-- 商品分类 -->
@@ -250,7 +274,7 @@
     <Col :span="pageWidth > 1024 ? 14 : 12" class="goods_list">
       <ScrollContainer>
         <div :class="`${prefixCls}__content`">
-          <div class="goods_mask" v-if="order_id"></div>
+          <div class="goods_mask" v-if="isOrder"></div>
           <List>
             <Row :gutter="16" v-if="goodsItems && goodsItems.length">
               <template v-for="goods in goodsItems" :key="goods.goods_id">
@@ -401,7 +425,8 @@
       const clearTablevisible = ref(false);
       const ClosingVisible = ref(false);
       const isClearTable = ref(false);
-      const order_id = ref(0);
+      const totalQuantity = ref(0);
+      const order_id: any = ref('');
       const tableTitle: any = ref('');
       const CentralStore = useCentralStore();
       const cartId: any = ref(undefined);
@@ -409,6 +434,7 @@
       const diners = ref('1');
       const order_desc = ref('');
       const pageWidth: any = ref(undefined);
+      const isOrder = ref(false);
       const defaultIma =
         'https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc';
       const router = useRouter();
@@ -419,13 +445,13 @@
       const dintbl_id = route.query.id ?? undefined;
       tableTitle.value = route.query.title ?? undefined;
       const status: any = route.query.status ?? undefined;
-      console.log('router.status', status);
+      // console.log('router.status', status);
+      let order_status: any = ref(status);
       const settlement = route.query.settlement ?? undefined;
-      // console.log('settlement', settlement);
       if (settlement == 'true') {
         isClearTable.value = true;
       }
-      let order_status: any = ref(status);
+      console.log('order_statusorder_status', order_status.value);
       if (!dintbl_id) router.push({ path: '/reception/management' });
       // console.log('dintbl_id', dintbl_id);
       const state = reactive({
@@ -456,6 +482,7 @@
         state.categoryItems = (await listCategory()).items;
         // console.log('state.categoryItems ', state.categoryItems);
         state.goodsItems = (await listGoods()).items;
+        await getCartList();
       });
       // 获取屏幕宽度
       function Browser() {
@@ -466,20 +493,82 @@
       // 接下来 下单  调取查询订单接口  展示总数总价格 结账后 清台 操作
       const getCartList = async () => {
         // const res = await listCart({ dintbl_id });
-        // 通过route传参数  0表示 已经有订单 查询已下单的购物车
-        const res = await listCart({ dintbl_id, is_ordered: order_status.value == 0 ? 1 : 0 });
-        // console.log('getCartList', res);
+        // 通过route传参数  0表示本地下单已经有订单    settlement待清台 查询已下单的购物车
+        console.log('order_status.value', order_status.value);
+        // const res = await listCart({ dintbl_id, is_ordered: order_status.value == 0 ? 1 : 0 });
+        let data: any = {
+          dintbl_id,
+          is_ordered: undefined,
+        };
+        // 0 本地缓存下单  1表示没有下单 settlement:true表示已经下单结账
+        if (order_status.value == 0) {
+          data.is_ordered = 0;
+        } else {
+          data.is_ordered = 0;
+        }
+        // 已经下单的购物车
+        if (settlement == 'true') {
+          data.is_ordered = 1;
+          const placeList = LocalCache.getCache('placeList') ?? [];
+          let stop = false;
+          placeList.forEach((i) => {
+            if (dintbl_id == i.dintbl_id) {
+              //
+              stop = true;
+              console.log('dintbl_id== i.dintbl_id;', dintbl_id == i.dintbl_id);
+              console.log('停止购物车查询');
+              console.log('order_id', i.order_id);
+              console.log(' order_id.value', order_id.value);
+              if (i.order_id) {
+                order_id.value = i.order_id;
+              }
+            }
+          });
+
+          if (stop) {
+            console.log('stop', stop, order_id);
+            isOrder.value = true;
+            const res = await listOrders({ dintbl_id, order_num: order_id.value });
+            console.log('res', res);
+            const result = res.items.filter((item) => item.order_id == order_id.value);
+            console.log('filter', result);
+            state.items = result[0];
+            console.log('state.items', state.items);
+            order_details.value = result[0];
+            totalQuantity.value = order_details.value.ordergoods.reduce(
+              (all, item) => all + item.number,
+              0,
+            );
+            console.log('totalQuantity', totalQuantity.value);
+            return;
+          }
+        }
+        console.log('发送前请求', data);
+        console.log('isOrder', isOrder.value);
+        const res = await listCart(data);
+
+        console.log('getCartList', res);
         if (res.items && res.items.length) {
+          // 0 本地缓存下单  1表示没有下单 settlement:true表示已经下单结账
+          if (order_status.value == 0) {
+            isOrder.value = true;
+            console.log('isOrder.value', isOrder.value);
+          } else {
+            // 否则没有下单
+            isOrder.value = true;
+          }
           const result: any = res.items;
           if (result.at(-1)) {
             cartId.value = result.at(-1).id;
             if (result.at(-1).goods && result.at(-1).goods.length)
               state.items = result.at(-1).goods;
             order_id.value = result.at(-1).order_id;
+            console.log('result.at(-1).order_id', result.at(-1).order_id);
+            // submitOrder(1);
+            // isOrder.value = true;
           }
         }
       };
-      getCartList();
       // 创建购物车
       const getCreateCart = async () => {
         if (!dintbl_id) return;
@@ -511,19 +600,35 @@
           }
           CentralStore.changeCartList(val);
           let res;
-          if (isClearTable.value) {
+          // if (isClearTable.value) {
+          // 假下单isOrder.value  真下单order_id
+          if (false) {
             console.log(1);
+            console.log({ dintbl_id, order_num: order_id.value });
             res = await listOrders({ dintbl_id, order_num: order_id.value });
+            console.log('res', res);
             const result = res.items.filter((item) => item.order_id == order_id.value);
-            order_details.value = result[0];
-            order_details.value = res;
+            console.log('result', result);
+            if (result && result.length) {
+              console.log(' result[0]', result[0]);
+              order_details.value = result[0];
+            } else {
+              console.log('res[0]', res);
+              order_details.value = res.items[0];
+            }
+            // order_details.value = result[0];
+            // order_details.value = res[0];
           } else {
-            console.log(2);
-            res = await CalculateDiningTable(dintbl_id);
-            order_details.value = res;
+            // console.log(2);
+            if (!order_id.value) {
+              res = await CalculateDiningTable(dintbl_id);
+              order_details.value = res;
+            }
+
+            // state.items = res.items;
           }
           // isShowOrder.value = !isShowOrder.value;
-          // console.log('order_details.value', order_details.value);
+          console.log('order_details.value', order_details.value);
           // console.log('watch---state.items', val);
         },
         {
@@ -626,22 +731,47 @@
       // 下单弹窗
       const handleOpenModal = () => {
         if (isClearTable.value) return;
+        if (isOrder.value) return;
         if (state.items && state.items.length) {
           visible.value = true;
         }
       };
       // 下单
-      async function submitOrder() {
-        message.success('下单成功');
-        order_id.value = 1;
+      async function submitOrder(flag) {
+        console.log('执行下单操作');
+        if (flag != 1) {
+          message.success('下单成功');
+          isOrder.value = true;
+        }
+        // isOrder.value = true;
+        // order_id.value = 1;
         visible.value = false;
         order_status.value = 0;
+        if (flag != 1) {
+          isOrder.value = true;
+          const placeList = LocalCache.getCache('placeList') ?? [];
+          console.log('placeList', placeList);
+          console.log('state.items', state.items);
+          const result = placeList.find((item) => item.dintbl_id == dintbl_id);
+          if (!result) {
+            const data = {
+              dintbl_id,
+              items: state.items,
+              order_id: null,
+            };
+            placeList.push(data);
+            console.log('data', data);
+            LocalCache.setCache('placeList', placeList);
+          }
+        }
         // console.log('order_status', order_status);
-        const placeList = LocalCache.getCache('placeList') ?? [];
-        if (placeList.includes(dintbl_id)) return;
-        placeList.push(dintbl_id);
-        LocalCache.setCache('placeList', placeList);
 
+        // placeList.push(data);
+        // console.log('data', data);
+        // if (placeList.includes(dintbl_id)) return;
+        // placeList.push(dintbl_id);
+        // LocalCache.setCache('placeList', placeList);
+        ////----------------------------------------------------------------------------------
         // console.log('placeList', placeList);
         // const data = {
         //   message: order_desc.value,
@@ -673,9 +803,11 @@
       }
 
       const openClosingModal = () => {
-        if (!order_id.value) return;
         if (isClearTable.value) return;
-        ClosingVisible.value = true;
+        // 有订单的情况下才能结账
+        if (isOrder.value) {
+          ClosingVisible.value = true;
+        }
       };
 
       // 结账
@@ -695,19 +827,19 @@
           // order_details.value.payment_state = 0; // payment
         }
         // console.log('goPay', res);
-        // message.success('结账成功');
+        message.success('结账成功');
         isClearTable.value = res;
-        // const result = LocalCache.getCache('placeList') ?? [];
-        // const order_list = result;
-        // result.forEach((item, index) => {
-        //   if (item == dintbl_id) {
-        //     console.log('符合');
-        //     console.log('index', index);
-        //     order_list.splice(index, 1);
-        //   }
-        // });
-        // console.log(order_list);
-        // LocalCache.setCache('placeList', order_list);
+        const result = LocalCache.getCache('placeList') ?? [];
+        const order_list = result;
+        result.forEach((item, index) => {
+          if (item.dintbl_id == dintbl_id) {
+            order_list[index].order_id = res.id;
+            console.log('符合');
+            //     console.log('index', index);
+          }
+        });
+        console.log(order_list);
+        LocalCache.setCache('placeList', order_list);
       };
       // 清台
       const openClearTableModal = () => {
@@ -724,7 +856,7 @@
         const result = LocalCache.getCache('placeList') ?? [];
         const order_list = result;
         result.forEach((item, index) => {
-          if (item == dintbl_id) {
+          if (item.dintbl_id == dintbl_id) {
             order_list.splice(index, 1);
           }
         });
@@ -741,7 +873,10 @@
         // ...toRefs(compState),
         visible,
         order_id,
+        isOrder,
         order_status,
+        totalQuantity,
+        settlement,
         goPay,
         tableTitle,
         NoOrder,
