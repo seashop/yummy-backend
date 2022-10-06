@@ -93,15 +93,13 @@
   import { defineComponent, watch, onMounted, ref } from 'vue';
   import { storeToRefs } from 'pinia';
   import { useCentralStore } from '/@/store/modules/central';
-  import { Image } from 'ant-design-vue';
   import { ShoppingCartOutlined, LikeOutlined } from '@ant-design/icons-vue';
   import { GoodsItem } from '/@/api/stores/model/goodsModel';
-  import Tag from './tag.vue';
+  import Tag from './Tag.vue';
   // import BasicButton from '/@/components/Button/src/BasicButton.vue';
 
   export default defineComponent({
     components: {
-      Image,
       Tag,
       ShoppingCartOutlined,
       LikeOutlined,
@@ -186,6 +184,7 @@
       font-size: 14px;
       color: @text-color-secondary;
     }
+
     .card-detail {
       display: flex;
       justify-content: space-between;
@@ -195,10 +194,12 @@
       }
     }
   }
+
   .acitve {
     box-shadow: 0px 0px 13px 0px rgba(0, 0, 0, 0.05);
     border: 5px solid #ff3d00;
   }
+
   .mark {
     width: 100%;
     height: 100%;
@@ -209,12 +210,15 @@
     left: 0;
     border-radius: 8px;
   }
+
   .detai_icon {
     font-size: 12px;
   }
+
   s {
     font-size: 8px;
   }
+
   .operations {
     display: flex;
     flex-direction: column;
@@ -226,17 +230,21 @@
       width: 16px;
       height: 16px;
     }
+
     .input_number {
       display: flex;
       align-items: center;
+
       span {
         width: 15px;
         height: 15px;
         text-align: center;
+
         img {
           width: 100%;
         }
       }
+
       .num {
         padding: 0 10px;
         font-size: 16px;
@@ -246,6 +254,7 @@
     }
     // background: #ccc;
   }
+
   .goods_price {
     font-size: 15px;
     font-weight: 700;

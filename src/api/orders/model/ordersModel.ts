@@ -12,11 +12,13 @@ export interface OrderItem {
   coupon_id: number;
   order_from: string;
   payment_type: string;
-  goods_money: string;
+  goods_money: number;
   reduction_money: number;
+  svc_fee: number;
+  gts_fee: number;
   coupon_money: number;
   edit_money: string;
-  order_money: string;
+  order_money: number;
   user_ip: any;
   goods_img_ids: any;
   message: string;
@@ -77,11 +79,15 @@ export interface OrderUser {
 
 export interface selectParams {
   playstate?: number;
+  wordkey?: string;
   since_at?: Date;
   until_at?: Date;
-  wordkey?: string;
+  dintbl_id?: number;
+  order_from?: string;
+  order_id?: number;
   order_num?: string;
 }
+
 export interface PlaceOrderType {
   dintbl_id?: number;
   pick_code?: number;
@@ -89,4 +95,5 @@ export interface PlaceOrderType {
   message?: string;
   invite_code?: string;
 }
+
 export type OrderListResultModel = BasicFetchResult<OrderItem>;

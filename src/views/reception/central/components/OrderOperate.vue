@@ -12,91 +12,103 @@
           ref="select"
           @change="changeValue"
           :options="options"
-          v-model:value="value1"
+          v-model:value="diners"
         />
       </div>
     </div>
     <!-- button -->
     <div class="operate_item_box">
-      <div :class="props.status ? '' : 'order_status'" class="operate_item" @click="reminder"
-        >催菜</div
-      >
-      <div :class="{ order_status: !isChange }" class="operate_item item1" @click="changeTable"
-        >换桌</div
-      >
-      <div :class="props.status ? '' : 'order_status'" class="operate_item item2" @click="print"
-        >打印小票</div
-      >
-      <div
-        :class="props.clearStatus ? '' : 'order_status'"
-        class="operate_item item3"
-        @click="clearTable"
-        >清台</div
-      >
+      <div class="operate_item" :class="{ op_disable: props.isPlaced }" @click="reminder">
+        催菜
+      </div>
+      <div class="operate_item item1" :class="{ op_disable: canChange }" @click="changeTable">
+        换桌
+      </div>
+      <div class="operate_item item2" :class="{ op_disable: props.isPlaced }" @click="print">
+        打印小票
+      </div>
+      <div class="operate_item item3" :class="{ op_disable: !props.canClean }" @click="clearTable">
+        清台
+      </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-  import { defineProps, defineEmits, ref, watch } from 'vue';
+<script lang="ts">
+  import { defineComponent, reactive, toRefs } from 'vue';
   import { Select } from 'ant-design-vue';
-  const props = defineProps({
-    tableNum: {
-      type: String,
-      default: () => '',
+
+  const options = [
+    { label: '人数1/8', value: 1 },
+    { label: '人数2/8', value: 2 },
+    { label: '人数3/8', value: 3 },
+    { label: '人数4/8', value: 4 },
+    { label: '人数5/8', value: 5 },
+    { label: '人数6/8', value: 6 },
+    { label: '人数7/8', value: 7 },
+    { label: '人数8/8', value: 8 },
+  ];
+
+  export default defineComponent({
+    components: {
+      Select,
     },
-    orderTime: {
-      type: String,
-      default: () => '09:30',
+    props: {
+      tableNum: {
+        type: String,
+        default: () => '',
+      },
+      orderTime: {
+        type: String,
+        default: () => '09:30',
+      },
+      isPlaced: {
+        type: Boolean,
+        default: () => true,
+      },
+      canChange: {
+        type: Boolean,
+        default: () => true,
+      },
+      canClean: {
+        type: Boolean,
+        default: () => true,
+      },
     },
-    status: {
-      type: Boolean,
-      default: () => true,
-    },
-    isChange: {
-      type: Boolean,
-      default: () => true,
-    },
-    clearStatus: {
-      type: Boolean,
-      default: () => true,
+    emits: ['reminder', 'changeTable', 'print', 'clearTable', 'changeDiners'],
+    setup(props, { emit }) {
+      const state = reactive({
+        diners: 1,
+      });
+
+      const reminder = () => {
+        emit('reminder');
+      };
+      const changeTable = () => {
+        emit('changeTable');
+      };
+      const print = () => {
+        emit('print');
+      };
+      const clearTable = () => {
+        emit('clearTable');
+      };
+      const changeValue = (val) => {
+        emit('changeDiners', val);
+      };
+
+      return {
+        props,
+        ...toRefs(state),
+        options,
+        changeValue,
+        reminder,
+        changeTable,
+        print,
+        clearTable,
+      };
     },
   });
-  watch(
-    () => props.isChange,
-    (val) => {
-      isChange.value = val;
-    },
-  );
-
-  const isChange = ref(false);
-  const emit = defineEmits(['reminder', 'changeTable', 'print', 'clearTable', 'changeDiners']);
-  const options = [
-    { label: '人数1/8', value: '1' },
-    { label: '人数2/8', value: '2' },
-    { label: '人数3/8', value: '3' },
-    { label: '人数4/8', value: '4' },
-    { label: '人数5/8', value: '5' },
-    { label: '人数6/8', value: '6' },
-    { label: '人数7/8', value: '7' },
-    { label: '人数8/8', value: '8' },
-  ];
-  const value1 = ref<string>('1');
-  const reminder = () => {
-    emit('reminder');
-  };
-  const changeTable = () => {
-    emit('changeTable');
-  };
-  const print = () => {
-    emit('print');
-  };
-  const clearTable = () => {
-    emit('clearTable');
-  };
-  const changeValue = (val) => {
-    emit('changeDiners', val);
-  };
 </script>
 
 <style lang="less" scoped>
@@ -104,11 +116,13 @@
     .order_details {
       display: flex;
       justify-content: space-between;
+
       .table_num {
         font-size: 30px;
         font-weight: 500;
         color: #061527;
       }
+
       .order_time {
         width: 122px;
         height: 21px;
@@ -122,6 +136,7 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
+
       .operate_item {
         margin: 6px 0;
         // width: 143px;
@@ -134,18 +149,22 @@
         border-radius: 28px;
         opacity: 1;
       }
+
       .item1 {
         background: linear-gradient(133deg, #3eaeff 0%, #038ef3 100%);
       }
+
       .item2 {
         background: linear-gradient(141deg, #a586ff 0%, #715aff 100%);
         // background: linear-gradient(141deg, #a586ff 0%, #715aff 100%);
       }
+
       .item3 {
         background: linear-gradient(133deg, #24c796 0%, #07ae9a 100%);
         // background: linear-gradient(133deg, #24c796 0%, #07ae9a 100%);
       }
-      .order_status {
+
+      .op_disable {
         opacity: 0.5;
       }
     }

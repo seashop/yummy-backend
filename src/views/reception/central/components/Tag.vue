@@ -1,31 +1,41 @@
 <template>
   <div
-    :class="{ tag: props.size != 'mini', tag_size: props.size == 'mini' }"
+    :class="{ tag: size != 'mini', tag_size: size == 'mini' }"
     :style="borderColor"
-    :color="props.color"
+    :color="color"
   >
-    {{ props.text }}
+    {{ text }}
   </div>
 </template>
 
-<script setup lang="ts">
-  import { defineProps, computed } from 'vue';
-  const props = defineProps({
-    color: {
-      type: String,
-      default: '#ff0000',
+<script lang="ts">
+  import { computed, defineComponent } from 'vue';
+
+  export default defineComponent({
+    props: {
+      color: {
+        type: String,
+        default: '#ff0000',
+      },
+      text: {
+        type: String,
+        default: '',
+      },
+      size: {
+        type: String,
+        default: 'default',
+      },
     },
-    text: {
-      type: String,
-      default: '',
+    setup(props) {
+      const borderColor = computed(() => {
+        return `color: ${props.color};border: 2px solid ${props.color};`;
+      });
+
+      return {
+        ...props,
+        borderColor,
+      };
     },
-    size: {
-      type: String,
-      default: 'default',
-    },
-  });
-  const borderColor = computed(() => {
-    return `color: ${props.color};border: 2px solid ${props.color};`;
   });
 </script>
 
@@ -44,6 +54,7 @@
     // opacity: 1;
     // text-align: center;
   }
+
   .tag_size {
     // width: 43px;
     // height: 28px;

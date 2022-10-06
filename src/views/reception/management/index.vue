@@ -5,8 +5,8 @@
       <div class="header-item-box">
         <div
           class="table-header-item"
+          v-for="item in ['2', '3', '4']"
           :class="{ active: current === item }"
-          v-for="item in [2, 3, 4]"
           :key="item"
           @click="handleClick(item)"
         >
@@ -20,115 +20,106 @@
     </div>
     <!-- 内容 -->
     <div class="content">
-      <TableItem :data="tableObject[current]" @changeTable="handelClickOrder" />
+      <TableItem :tables="currentTables" @click="handelClickTable" />
     </div>
     <!-- 右下角图片 -->
     <div class="background_img"> </div>
   </div>
 </template>
 
-<script setup lang="ts">
-  import { ref, onMounted, nextTick, reactive } from 'vue';
+<script lang="ts">
+  import { onMounted, reactive, defineComponent, toRefs, computed } from 'vue';
+  import { first } from 'lodash-es';
   import { useRouter } from 'vue-router';
   import { SyncOutlined } from '@ant-design/icons-vue';
-  import { listDiningTables, getDiningTable } from '/@/api/plugins/diningTable';
+  import { listDiningTables } from '/@/api/reception/dining';
   import TableItem from './components/TableItem.vue';
-  import LocalCache from '/@/api/LocalCache/index';
+  import { DiningTableItem } from '/@/api/plugins/model/diningTableModel';
+  import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
+  import { useHeaderSetting } from '/@/hooks/setting/useHeaderSetting';
+  import { triggerWindowResize } from '/@/utils/event';
 
-  const router = useRouter();
-  // const tableItem: any = ref([]);
-  const current = ref(2);
-  const tableObject: any = reactive({
-    2: [],
-    3: [],
-    4: [],
-  });
+  export default defineComponent({
+    components: {
+      SyncOutlined,
+      TableItem,
+    },
+    setup() {
+      const router = useRouter();
 
-  const placeList = LocalCache.getCache('placeList') ?? [];
-  // console.log(placeList);
-  const getListDiningTables = async () => {
-    const data = {
-      with_status: 1,
-    };
-    const res = await getDiningTable(data);
-    // console.log(res);
-    const result = res.items;
-    res.items.forEach((item, index) => {
-      // console.log();
-      if (item.calc_info) {
-        result[index].status_label = '空闲';
-        // 本地缓存读取是否下单
-        // if (placeList.includes(item.id + '')) {
-        //   result[index].status_label = '已下单';
-        // }
-        placeList.forEach((i) => {
-          if (item.id == i.dintbl_id) {
-            result[index].status_label = '已下单';
-          }
+      const state = reactive({
+        current: '2',
+        tables: [] as Array<DiningTableItem>,
+        status: 0,
+      });
+
+      const { setMenuSetting } = useMenuSetting();
+      const { setHeaderSetting } = useHeaderSetting();
+
+      onMounted(() => {
+        // 默认全屏
+        const isUnFold = false;
+        setMenuSetting({
+          show: isUnFold,
+          hidden: !isUnFold,
         });
-      }
-    });
-    console.log('res.items', result);
-    tableObject[2] = res.items
-      .map((item) => (item.title[0] === '2' ? item : null))
-      .filter((item) => item?.title);
-    tableObject[3] = res.items
-      .map((item) => (item.title[0] === '3' ? item : null))
-      .filter((item) => item?.title);
-    tableObject[4] = res.items
-      .map((item) => (item.title[0] === '4' ? item : null))
-      .filter((item) => item?.title);
-  };
-  onMounted(() => {
-    // 获取页面元素 默认全屏
-    if (document.querySelector('.vben-layout-header-action__item')) {
-      if (document.querySelector('.vben-multiple-tabs-content__extra-fold'))
-        document.querySelector('.vben-multiple-tabs-content__extra-fold')!.click();
-    }
-    nextTick(() => {
-      if (document.querySelector('.vben-setting-drawer-feature')) {
-        document.querySelector('.vben-setting-drawer-feature')!.style.display = 'none'; //隐藏设置图标
-      }
-    });
+        setHeaderSetting({ show: isUnFold });
+        triggerWindowResize();
 
-    getListDiningTables();
+        // 加载餐桌列表
+        getListDiningTables();
+      });
+
+      const getListDiningTables = async () => {
+        const data = {
+          with_status: 1,
+        };
+        const resp = await listDiningTables(data);
+        console.log(getListDiningTables, resp);
+        state.tables = resp.items.map((item) => {
+          return item;
+        });
+      };
+
+      const currentTables = computed(() => {
+        return state.tables.filter((item) => item.title[0] === state.current);
+      });
+
+      const handelClickTable = (table_id) => {
+        console.log('handelClickTable', table_id);
+        const currentTable = first(
+          state.tables.filter((item) => {
+            return (item.id = table_id);
+          }),
+        );
+        if (!currentTable) {
+          return;
+        }
+
+        router.push({
+          path: '/reception/central',
+          query: {
+            id: currentTable.id,
+          },
+        });
+      };
+      const updateList = () => {
+        // 获取最新桌台信息
+        getListDiningTables();
+      };
+      const handleClick = (id) => {
+        state.current = id;
+      };
+
+      return {
+        ...toRefs(state),
+        currentTables,
+        handelClickTable,
+        updateList,
+        handleClick,
+      };
+    },
   });
-  const status = ref(undefined);
-  const handelClickOrder = (item) => {
-    const placeList = LocalCache.getCache('placeList') ?? [];
-    // 本地缓存含有的话就是 假下单0 否则没有订单1
-    placeList.forEach((i) => {
-      console.log('item.dintbl_id ', item.id);
-      console.log(i.dintbl_id);
-      if (item.id == i.dintbl_id) {
-        status.value = 0;
-      } else {
-        console.log(status.value);
-        status.value = 1;
-      }
-    });
-    console.log('status.value', status.value);
-    console.log(placeList);
-
-    router.push({
-      path: '/reception/central',
-      query: {
-        id: item.id,
-        title: item.title,
-        status: status.value,
-        // status: placeList.includes(item.id + '') ? 0 : 1,
-        // status: 0,
-        settlement: item.status_label == '待清台',
-      },
-    });
-  };
-  const updateList = () => {
-    // 获取最新桌台信息
-    getListDiningTables();
-  };
-  const handleClick = (id) => {
-    current.value = id;
-  };
 </script>
 
 <style lang="less" scoped>
@@ -137,6 +128,7 @@
     padding: 10px;
     height: calc(100vh - 32px);
     background: #fff;
+
     .background_img {
       position: absolute;
       right: 0;
@@ -146,6 +138,7 @@
       background: url('/@/assets/images/Group705.png') no-repeat;
       background-size: cover;
     }
+
     .table-header {
       display: flex;
       align-items: center;
@@ -156,6 +149,7 @@
       padding-bottom: 0;
       border-bottom: 4px solid #061527;
       background: #fff;
+
       .header-item-box {
         flex: 1;
         display: flex;
@@ -174,11 +168,8 @@
           // background: #061527;
           // box-shadow: 0px -2px 7px 1px rgba(0, 0, 0, 0.25);
           // border-radius: 9px;
-          opacity: 1;
           border: 2px solid #061527;
 
-          // border-radius: 9px 0px 0px 9px;
-          opacity: 1;
           .item-content {
             text-align: center;
             width: 80px;
@@ -190,9 +181,11 @@
             line-height: 31px;
           }
         }
+
         .active {
           background: #061527;
           box-shadow: 0px -2px 7px 1px rgba(0, 0, 0, 0.25);
+
           .item-content {
             color: #fff;
           }
@@ -210,6 +203,7 @@
         opacity: 1;
       }
     }
+
     .content {
       display: flex;
       flex-wrap: wrap;
