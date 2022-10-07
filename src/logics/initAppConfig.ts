@@ -14,6 +14,7 @@ import { changeTheme } from '/@/logics/theme';
 
 import { useAppStore } from '/@/store/modules/app';
 import { useLocaleStore } from '/@/store/modules/locale';
+import { useYummyStore } from '/@/store/modules/yummy';
 
 import { getCommonStoragePrefix, getStorageShortName } from '/@/utils/env';
 
@@ -25,6 +26,7 @@ import { ThemeEnum } from '/@/enums/appEnum';
 // Initial project configuration
 export function initAppConfigStore() {
   const localeStore = useLocaleStore();
+  const yummyStore = useYummyStore();
   const appStore = useAppStore();
   let projCfg: ProjectConfig = Persistent.getLocal(PROJ_CFG_KEY) as ProjectConfig;
   projCfg = deepMerge(projectSetting, projCfg || {});
@@ -60,6 +62,9 @@ export function initAppConfigStore() {
   }
   // init store
   localeStore.initLocale();
+
+  // init yummy
+  yummyStore.getPresetAction();
 
   setTimeout(() => {
     clearObsoleteStorage();

@@ -16,7 +16,7 @@
       </div>
       <!-- 购物车列表 -->
       <div class="cart_list_box">
-        <template v-if="cartGoods && cartGoods.length">
+        <template v-if="cartGoods.length && !canShowOrder">
           <!-- <template v-if="true">  -->
           <div class="cart_list_item" v-for="item in cartGoods" :key="item.id">
             <div class="godds_img_box">
@@ -73,17 +73,11 @@
       </div>
       <!-- submitDishUp -->
       <div class="submit_order">
-        <!-- <div class="submit_order" :class="cartGoods && cartGoods.length && !order_id ? '' : 'op_disable'"> -->
-        <!-- settleSummary -->
-        <!-- <div class="settleSummary" :span="pageWidth > 1024 ? 7 : 9">
-          <div class="order_details_title">121222222222</div>
-        </div> -->
-        <!-- :span="pageWidth > 1024 ? 7 : 9" -->
-        <Col :span="24" class="settleSummary" v-show="isShowOrder">
+        <Col :span="24" class="settleSummary" v-show="showOrder">
           <div class="order_details_title">
             <!-- 已下单菜品 -->
             <div style="flex: 1">已下单菜品</div>
-            <div @click="isShowOrder = false"><DownOutlined /></div>
+            <div @click="openOrderDetails"><DownOutlined /></div>
           </div>
           <div class="order_content">
             <div class="order_details_desc">
@@ -137,11 +131,11 @@
                 <span>{{ settleSummary.sub_money }}</span>
               </div>
               <div class="total_details">
-                <span>税 费(SVC)10%:</span>
+                <span>税 费(SVC){{ (getPreset.svc_rate * 100).toFixed(0) }}%:</span>
                 <span>{{ settleSummary.svc_fee }}</span>
               </div>
               <div class="total_details">
-                <span>服务费(GTS)7%:</span>
+                <span>服务费(GTS){{ (getPreset.gts_rate * 100).toFixed(0) }}%:</span>
                 <span>{{ settleSummary.gts_fee }}</span>
               </div>
               <div class="total_details">
@@ -328,7 +322,7 @@
   </Row>
 </template>
 <script lang="ts">
-  import { defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
+  import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { Row, Col, List, Input, Modal, message } from 'ant-design-vue';
   import { LeftOutlined, DownOutlined } from '@ant-design/icons-vue';
@@ -337,6 +331,7 @@
   import { CategoryItem } from '/@/api/stores/model/categoryModel';
   import { GoodsItem } from '/@/api/stores/model/goodsModel';
   import { useCentralStore } from '/@/store/modules/central';
+  import { useYummyStore } from '/@/store/modules/yummy';
   import { ScrollContainer } from '/@/components/Container';
   import { getBrowser } from '/@/utils/getBrowser';
   import {
@@ -406,6 +401,14 @@
         router.push({ path: '/reception/management' });
       }
 
+      const clearTablevisible = ref(false);
+      const closingVisible = ref(false);
+      const centralStore = useCentralStore();
+      const { getPreset } = useYummyStore();
+      const currentId = ref(0);
+      const pageWidth: any = ref(undefined);
+      const times: any = ref(null);
+
       const state = reactive({
         visible: false,
         dintbl: {} as DiningTableItem,
@@ -420,18 +423,11 @@
         message: '',
         settleSummary: {} as CalculateType,
         cartId: 0 as number,
+        showOrder: false,
       });
 
-      const isShowOrder = ref(false);
-      const clearTablevisible = ref(false);
-      const closingVisible = ref(false);
-      const CentralStore = useCentralStore();
-      const currentId = ref(0);
-      const pageWidth: any = ref(undefined);
-      const times: any = ref(null);
-
       const goTablePage = () => {
-        CentralStore.$reset();
+        centralStore.$reset();
         router.push({ path: '/reception/management' });
       };
 
@@ -465,6 +461,27 @@
         state.goodsItems = (await listGoods()).items;
         await getCartList();
       });
+
+      const canShowOrder = computed(() => {
+        console.log('canShowOrder', state.cart?.dish_up, state.order_id);
+        return state.cart?.dish_up || state.order_id > 0;
+      });
+
+      // 打开订单详情框
+      const openOrderDetails = async () => {
+        console.log('openOrderDetails', state.showOrder);
+        if (!canShowOrder.value) {
+          return;
+        }
+        // if (!state.order_id) return;
+        // const res = await calculateDiningTable(dintbl_id);
+        // const res = await listOrders({ dintbl_id, order_num: state.order_id });
+        // const result = res.items.filter((item) => item.order_id == state.order_id);
+        // console.log(result);
+        // state.settleSummary = result[0];
+        // state.settleSummary = res;
+        state.showOrder = !state.showOrder;
+      };
 
       // 获取购物车列表  查找 order_id为null的 证明没下单 然后拿到购物车id 往里面push商品
       // 接下来 下单  调取查询订单接口  展示总数总价格 结账后 清台 操作
@@ -515,7 +532,7 @@
       watch(
         () => state.cartGoods,
         async (val) => {
-          CentralStore.changeCartList(val);
+          centralStore.changeCartList(val);
           console.log('watch', state.order_id);
           if (!state.order_id && state.cartId > 0) {
             const res = await calculateDiningTable(dintbl_id);
@@ -630,19 +647,6 @@
         return state.cartGoods.reduce((prev, cur) => prev + cur.quantity, 0);
       };
 
-      // 打开订单详情框
-      const openOrderDetails = async () => {
-        // console.log('open');
-        // if (!state.order_id) return;
-        // const res = await calculateDiningTable(dintbl_id);
-        // const res = await listOrders({ dintbl_id, order_num: state.order_id });
-        // const result = res.items.filter((item) => item.order_id == state.order_id);
-        // console.log(result);
-        // state.settleSummary = result[0];
-        // state.settleSummary = res;
-        isShowOrder.value = !isShowOrder.value;
-      };
-
       // 下单|餐车上菜 弹窗
       const handleDishUpModal = () => {
         if (state.cart.dish_up) return;
@@ -720,7 +724,7 @@
         clearTablevisible.value = false;
         const res = await cleanDiningTable(dintbl_id);
         if (res === null) message.success('清台成功');
-        CentralStore.$reset();
+        centralStore.$reset();
         router.push({
           path: '/reception/management',
         });
@@ -735,13 +739,14 @@
       return {
         prefixCls: 'central',
         ...toRefs(state),
+        getPreset,
         registerPaymentModal,
         goPay,
         defaultImg:
           'https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc',
         currentId,
         pageWidth,
-        isShowOrder,
+        canShowOrder,
         clearTablevisible,
         closingVisible,
         handelChangeQuantity,

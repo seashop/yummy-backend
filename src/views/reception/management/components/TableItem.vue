@@ -133,9 +133,9 @@
       text-align: center;
 
       .price {
-        font-size: 19px;
+        font-size: 20px;
         font-family: Inter-Semi Bold, Inter;
-        font-weight: normal;
+        font-weight: bold;
         color: #fff;
         line-height: 16px;
       }
