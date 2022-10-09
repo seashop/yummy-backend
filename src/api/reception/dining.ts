@@ -96,7 +96,7 @@ export const cleanDiningTable = (id: number) => {
   return defHttp.post({ url: bindParams(Api.CleanDiningTable, { id }) });
 };
 
-export const listDiningTables = (params) => {
+export const listDiningTables = (params: any) => {
   return defHttp.get<DiningTablesListResultModel>({
     url: Api.ListDiningTables,
     params,

@@ -18,7 +18,7 @@
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
   import { useMessage } from '/@/hooks/web/useMessage';
-  import { t } from '/@/hooks/web/useI18n';
+  import { useI18n } from '/@/hooks/web/useI18n';
   import { editOrderPay } from '/@/api/orders/order';
 
   export default defineComponent({
@@ -29,6 +29,8 @@
     },
     emits: ['success', 'register'],
     setup(_, { emit }) {
+      const { t } = useI18n();
+
       const state = reactive({
         order_id: 0,
       });

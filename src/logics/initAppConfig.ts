@@ -64,7 +64,7 @@ export function initAppConfigStore() {
   localeStore.initLocale();
 
   // init yummy
-  yummyStore.getPresetAction();
+  yummyStore.init();
 
   setTimeout(() => {
     clearObsoleteStorage();

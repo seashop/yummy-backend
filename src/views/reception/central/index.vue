@@ -37,7 +37,7 @@
               <div class="goods_price">${{ goodsStack[item.goods_id].price }}</div>
             </div>
             <!-- 操作 -->
-            <div class="operations" v-if="order_id == 0">
+            <div class="operations" v-if="!order_id">
               <div class="delete_icon" @click="handleDeleteGoods(item)">
                 <img src="/@/assets/icons/Group645.png" alt="" />
               </div>
@@ -109,18 +109,19 @@
                   <div class="goods_price">${{ goodsStack[item.goods_id].price }}</div>
                 </div>
                 <!-- 操作 -->
-                <div class="operations" v-if="false">
-                  <div class="delete_icon" @click="handleDeleteGoods(item)">
+                <div class="operations">
+                  <!-- <div class="delete_icon" @click="handleDeleteGoods(item)">
                     <img src="/@/assets/icons/Group645.png" alt="" />
-                  </div>
+                  </div> -->
+                  <div class="delete_icon"></div>
                   <div class="input_number">
-                    <span @click="ChangeQuantity(item.id, --item.quantity)">
+                    <!-- <span @click="ChangeQuantity(item.id, --item.quantity)">
                       <img src="/@/assets/icons/Group620.png" alt="" />
-                    </span>
-                    <div class="num">{{ item.quantity }}</div>
-                    <span @click="ChangeQuantity(item.id, ++item.quantity)">
+                    </span> -->
+                    <div class="num">x{{ item.quantity }}</div>
+                    <!-- <span @click="ChangeQuantity(item.id, ++item.quantity)">
                       <img src="/@/assets/icons/Group621.png" alt="" />
-                    </span>
+                    </span> -->
                   </div>
                 </div>
               </div>
@@ -955,10 +956,10 @@
         .cart_list_item {
           display: flex;
           // width: 343px;
-          width: 333px;
+          // width: 333px;
           height: 72px;
           padding: 8px 5px;
-          margin: 10px 0;
+          margin: 10px 5px;
           background: #ffffff;
           // box-shadow: 0px 0px 12px 3px rgba(0, 0, 0, 0.05);
           box-shadow: 0 0px 3px 4px rgba(0, 0, 0, 0.05);
@@ -1318,7 +1319,7 @@
     // width: 333px;
     height: 72px;
     padding: 8px 5px;
-    margin: 10px 0;
+    margin: 10px 5px;
     background: #ffffff;
     // box-shadow: 0px 0px 12px 3px rgba(0, 0, 0, 0.05);
     box-shadow: 0 0px 3px 4px rgba(0, 0, 0, 0.05);

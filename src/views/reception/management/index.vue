@@ -5,8 +5,8 @@
       <div class="header-item-box">
         <div
           class="table-header-item"
-          v-for="item in ['2', '3', '4']"
-          :class="{ active: current === item }"
+          v-for="item in floors"
+          :class="{ active: getPreFloor === item }"
           :key="item"
           @click="handleClick(item)"
         >
@@ -38,6 +38,9 @@
   import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
   import { useHeaderSetting } from '/@/hooks/setting/useHeaderSetting';
   import { triggerWindowResize } from '/@/utils/event';
+  import { useYummyStore } from '/@/store/modules/yummy';
+
+  const floors = ['2', '3', '4'];
 
   export default defineComponent({
     components: {
@@ -47,14 +50,16 @@
     setup() {
       const router = useRouter();
 
+      const { setMenuSetting } = useMenuSetting();
+      const { setHeaderSetting } = useHeaderSetting();
+      const yummyStore = useYummyStore();
+
+      const getPreFloor = computed(() => yummyStore.getPreFloor);
+
       const state = reactive({
-        current: '2',
         tables: [] as Array<DiningTableItem>,
         status: 0,
       });
-
-      const { setMenuSetting } = useMenuSetting();
-      const { setHeaderSetting } = useHeaderSetting();
 
       onMounted(() => {
         // 默认全屏
@@ -79,10 +84,22 @@
         state.tables = resp.items.map((item) => {
           return item;
         });
+        if (currentTables.value.length == 0 && state.tables.length > 0) {
+          console.log('current', getPreFloor.value, getPreFloor.value?.length);
+          if (getPreFloor.value?.length === 0) {
+            const current =
+              first(
+                state.tables.filter((item) => {
+                  return floors.indexOf(item.title[0]) !== -1;
+                }),
+              )?.title[0] ?? '';
+            yummyStore.setPreFloor(current);
+          }
+        }
       };
 
       const currentTables = computed(() => {
-        return state.tables.filter((item) => item.title[0] === state.current);
+        return state.tables.filter((item) => item.title[0] === getPreFloor.value);
       });
 
       const handelClickTable = (table_id) => {
@@ -108,10 +125,12 @@
         getListDiningTables();
       };
       const handleClick = (id) => {
-        state.current = id;
+        yummyStore.setPreFloor(id);
       };
 
       return {
+        floors,
+        getPreFloor,
         ...toRefs(state),
         currentTables,
         handelClickTable,
