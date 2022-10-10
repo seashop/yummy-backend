@@ -141,7 +141,7 @@
       };
 
       const defaultIma =
-        'https://img2.baidu.com/it/u=305065602,2110439559&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1664038800&t=0c25038a0b97628f7cc9a0727162a0dc';
+        'https://yummy-1251018873.cos.ap-singapore.myqcloud.com/demo/logo.png';
       function handleAdd() {
         emit('selected', { goods_id: props.goods.goods_id });
       }
