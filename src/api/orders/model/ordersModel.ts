@@ -96,4 +96,8 @@ export interface PlaceOrderType {
   invite_code?: string;
 }
 
+export interface PayOrderType {
+  payment_type?: string;
+}
+
 export type OrderListResultModel = BasicFetchResult<OrderItem>;

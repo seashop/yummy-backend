@@ -6,10 +6,13 @@
     :title="getTitle"
     width="500px"
   >
-    <BasicButton @click="handleClick">PayPal</BasicButton>
-    <BasicButton @click="handleClick">GrabPay</BasicButton>
-    <BasicButton @click="handleClick">SG QR</BasicButton>
-    <BasicButton @click="handleClick">Cash</BasicButton>
+    <BasicButton
+      v-for="(payment, index) in payments"
+      :key="index"
+      @click="handleClick(payment.value)"
+    >
+      {{ payment.label }}
+    </BasicButton>
   </BasicModal>
 </template>
 
@@ -20,6 +23,13 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import { useI18n } from '/@/hooks/web/useI18n';
   import { editOrderPay } from '/@/api/orders/order';
+
+  const payments = [
+    { label: 'PayPal', value: 'paypal' },
+    { label: 'GrabPay', value: 'grabpay' },
+    { label: 'SG QR', value: 'sgqr' },
+    { label: 'Cash', value: 'cash' },
+  ];
 
   export default defineComponent({
     name: 'PaymentModal',
@@ -45,13 +55,13 @@
 
       const { createConfirm, createMessage } = useMessage();
 
-      const handleClick = () => {
+      const handleClick = (payment_type: string) => {
         createConfirm({
           iconType: 'warning',
           title: () => h('span', t('sys.app.logoutTip')),
           content: () => h('span', '请确认已付款'),
           onOk: async () => {
-            await editOrderPay(state.order_id)
+            await editOrderPay(state.order_id, { payment_type })
               .then(() => {
                 createMessage.success('操作成功');
                 closeModal();
@@ -67,6 +77,7 @@
       return {
         getTitle: '支付方式',
         registerModal,
+        payments,
         handleClick,
       };
     },

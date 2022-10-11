@@ -1,5 +1,5 @@
 import { defHttp } from '/@/utils/http/axios';
-import { OrderListResultModel, selectParams } from './model/ordersModel';
+import { OrderListResultModel, PayOrderType, selectParams } from './model/ordersModel';
 import { bindParams } from '../util';
 
 enum Api {
@@ -20,9 +20,10 @@ export const listOrders = (params?: selectParams) => {
   return defHttp.get<OrderListResultModel>({ url: Api.ListOrders, params });
 };
 
-export const editOrderPay = (id: number) => {
+export const editOrderPay = (id: number, data: Partial<PayOrderType>) => {
   return defHttp.patch<boolean>({
     url: bindParams(Api.EditOrderPay, { id }),
+    data,
   });
 };
 export const editOrderCourier = (id: string) => {
