@@ -21,7 +21,11 @@
           <div class="cart_list_item" v-for="item in cartGoods" :key="item.id">
             <div class="godds_img_box">
               <div class="godds_img">
-                <img :src="defaultImg" alt="" />
+                <Image
+                  :preview="false"
+                  :src="getGoodsImage(item.goods_id)"
+                  :fallback="defaultImg"
+                />
               </div>
             </div>
             <div class="goods_details">
@@ -93,7 +97,11 @@
               <div class="cart_list_item" v-for="item in cartGoods" :key="item.id">
                 <div class="godds_img_box">
                   <div class="godds_img">
-                    <img :src="defaultImg" alt="" />
+                    <Image
+                      :preview="false"
+                      :src="getGoodsImage(item.goods_id)"
+                      :fallback="defaultImg"
+                    />
                   </div>
                 </div>
                 <div class="goods_details">
@@ -325,7 +333,7 @@
 <script lang="ts">
   import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
-  import { Row, Col, List, Input, Modal, message } from 'ant-design-vue';
+  import { Row, Col, List, Input, Modal, Image, message } from 'ant-design-vue';
   import { LeftOutlined, DownOutlined } from '@ant-design/icons-vue';
   import { listCategory } from '/@/api/stores/category';
   import { getGoods, listGoods } from '/@/api/stores/goods';
@@ -333,6 +341,7 @@
   import { GoodsItem } from '/@/api/stores/model/goodsModel';
   import { useCentralStore } from '/@/store/modules/central';
   import { useYummyStore } from '/@/store/modules/yummy';
+  import { defaultImg } from '/@/settings/yummySetting';
   import { ScrollContainer } from '/@/components/Container';
   import { getBrowser } from '/@/utils/getBrowser';
   import {
@@ -375,6 +384,7 @@
       List,
       InputTextArea: Input.TextArea,
       Modal,
+      Image,
       ScrollContainer,
       OrderOperate,
       ProductCard,
@@ -529,6 +539,10 @@
       };
       getGoodsList();
       // 根据桌台查询订单列表  获取订单
+
+      const getGoodsImage = (goods_id: number) => {
+        return state.goodsStack[goods_id]?.img?.full_url;
+      };
 
       watch(
         () => state.cartGoods,
@@ -743,8 +757,9 @@
         getPreset,
         registerPaymentModal,
         goPay,
-        defaultImg:
-          'https://yummy-1251018873.cos.ap-singapore.myqcloud.com/demo/logo.png',
+        getGoodsList,
+        getGoodsImage,
+        defaultImg,
         currentId,
         pageWidth,
         canShowOrder,

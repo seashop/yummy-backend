@@ -14,9 +14,13 @@
   >
     <div class="mark" v-if="!goods.state"> </div>
     <div :class="`${prefixCls}__card-title`">
-      <!-- <Image class="icon" :src="goods.img.full_url" /> -->
-      <img @click="handleAdd" class="icon" :src="goods.img.full_url && defaultIma" />
-
+      <Image
+        class="icon"
+        :preview="false"
+        :src="goods.img.full_url"
+        :fallback="defaultImg"
+        @click="handleAdd"
+      />
       <div
         style="
           overflow: hidden;
@@ -56,7 +60,6 @@
                   CartList.find((item) => item.goods_id === goods.goods_id) &&
                   CartList.find((item) => item.goods_id === goods.goods_id).quantity
                 }} -->
-
                 {{ current.quantity || '' }}
                 <!-- {{ goods.quantity }} -->
               </div>
@@ -92,14 +95,17 @@
 <script lang="ts">
   import { defineComponent, watch, onMounted, ref } from 'vue';
   import { storeToRefs } from 'pinia';
+  import { Image } from 'ant-design-vue';
   import { useCentralStore } from '/@/store/modules/central';
   import { ShoppingCartOutlined, LikeOutlined } from '@ant-design/icons-vue';
   import { GoodsItem } from '/@/api/stores/model/goodsModel';
+  import { defaultImg } from '/@/settings/yummySetting';
   import Tag from './Tag.vue';
   // import BasicButton from '/@/components/Button/src/BasicButton.vue';
 
   export default defineComponent({
     components: {
+      Image,
       Tag,
       ShoppingCartOutlined,
       LikeOutlined,
@@ -140,8 +146,6 @@
         }
       };
 
-      const defaultIma =
-        'https://yummy-1251018873.cos.ap-singapore.myqcloud.com/demo/logo.png';
       function handleAdd() {
         emit('selected', { goods_id: props.goods.goods_id });
       }
@@ -152,7 +156,7 @@
         prefixCls: 'product__card',
         handleAdd,
         changeProduct,
-        defaultIma,
+        defaultImg,
         current,
         CartList,
       };
