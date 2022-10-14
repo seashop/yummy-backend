@@ -371,6 +371,7 @@
   import { useHeaderSetting } from '/@/hooks/setting/useHeaderSetting';
   import { triggerWindowResize } from '/@/utils/event';
   import { OrderItem } from '/@/api/orders/model/ordersModel';
+  import { useTabs } from '/@/hooks/web/useTabs';
 
   import OrderOperate from './components/OrderOperate.vue';
   import ProductCard from './components/ProductCard.vue';
@@ -442,6 +443,7 @@
         router.push({ path: '/reception/management' });
       };
 
+      const { setTitle } = useTabs();
       const { setMenuSetting } = useMenuSetting();
       const { setHeaderSetting } = useHeaderSetting();
 
@@ -465,6 +467,7 @@
 
         if (dintbl_id) {
           state.dintbl = await getDiningTable(dintbl_id);
+          setTitle(state.dintbl.title + '桌');
         }
         console.log('dintbl', state.dintbl);
         state.categoryItems = (await listCategory()).items;
