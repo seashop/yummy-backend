@@ -2,7 +2,7 @@
   <Row type="flex" :class="prefixCls">
     <Col :span="pageWidth > 1024 ? 7 : 9" class="cart_list">
       <!-- order Header -->
-      <div class="order_header" @click="goTablePage"><LeftOutlined /> 返回 </div>
+      <div class="order_header" @click="goTablePage"><LeftOutlined />返回</div>
       <div class="operate">
         <OrderOperate
           :tableNum="dintbl.title"
@@ -12,6 +12,7 @@
           @change-diners="changeDiners"
           @change-table="changeTable"
           @clear-table="openClearTableModal"
+          @print-receipt="printReceipt"
         />
       </div>
       <!-- 购物车列表 -->
@@ -358,7 +359,7 @@
     updateCart,
     dishUpCart,
   } from '/@/api/reception/dining';
-  import { listOrders } from '/@/api/orders/order';
+  import { listOrders, printOrderReceipt } from '/@/api/orders/order';
   import {
     CalculateType,
     DiningCartItem,
@@ -566,7 +567,7 @@
       async function reloadCart(cart) {
         state.cart = cart;
         state.cartId = state.cart.id;
-        state.order_id = state.cart.order_id;
+        state.order_id = state.cart.order_id ?? 0;
         const result = await listGoods({
           goods_ids: cart.goods.map((item) => item.goods_id),
         });
@@ -738,6 +739,17 @@
         }
       };
 
+      // 打印小票
+      const printReceipt = async () => {
+        console.log('打印小票', state.order_id);
+        if (!state.order_id) {
+          return;
+        }
+        const resp = await printOrderReceipt(state.order_id);
+        console.log(resp);
+        message.success('打印成功');
+      };
+
       const handleCleanDiningTable = async () => {
         clearTablevisible.value = false;
         const res = await cleanDiningTable(dintbl_id);
@@ -783,6 +795,7 @@
         computedQuantity,
         handleCleanDiningTable,
         openClearTableModal,
+        printReceipt,
         openOrderDetails,
         openCheckoutModal,
         handlePaymentSuccess,

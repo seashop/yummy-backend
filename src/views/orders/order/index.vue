@@ -144,7 +144,7 @@
 
   import {
     listOrders,
-    printOrder,
+    printOrderReceipt,
     editOrderPay,
     editOrderCourier,
     editOrderReceive,
@@ -184,7 +184,7 @@
       });
 
       function print_tik(order_num) {
-        printOrder(order_num).then((_) => {
+        printOrderReceipt(order_num).then((_) => {
           createMessage.success('打印中...');
           setTimeout(() => {
             createMessage.success('打印成功');

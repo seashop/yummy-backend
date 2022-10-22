@@ -8,8 +8,7 @@ enum Api {
   EditOrderCourier = '/order/admin/{id}/courier',
   EditOrderReceive = '/order/admin/{id}/receive',
   DeleteOrder = '/order/admin/{id}/destroy',
-  PrintOrder = '/cms/print_order',
-  // PlaceDiningTable = '/order/admin/place',
+  PrintOrderReceipt = '/order/admin/{id}/print/receipt',
 }
 
 /**
@@ -41,11 +40,8 @@ export const deleteOrder = (id: string) => {
     url: bindParams(Api.DeleteOrder, { id }),
   });
 };
-export const printOrder = (order_num: string) => {
-  return defHttp.get<OrderListResultModel>({
-    url: Api.PrintOrder,
-    params: {
-      order_num,
-    },
+export const printOrderReceipt = (id: number) => {
+  return defHttp.post<OrderListResultModel>({
+    url: bindParams(Api.PrintOrderReceipt, { id }),
   });
 };

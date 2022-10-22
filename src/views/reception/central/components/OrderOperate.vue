@@ -24,7 +24,7 @@
       <div class="operate_item item1" :class="{ op_disable: canChange }" @click="changeTable">
         换桌
       </div>
-      <div class="operate_item item2" :class="{ op_disable: props.isPlaced }" @click="print">
+      <div class="operate_item item2" :class="{ op_disable: props.isPlaced }" @click="printReceipt">
         打印小票
       </div>
       <div class="operate_item item3" :class="{ op_disable: !props.canClean }" @click="clearTable">
@@ -75,7 +75,7 @@
         default: () => true,
       },
     },
-    emits: ['reminder', 'changeTable', 'print', 'clearTable', 'changeDiners'],
+    emits: ['changeDiners', 'changeTable', 'clearTable', 'printReceipt', 'reminder'],
     setup(props, { emit }) {
       const state = reactive({
         diners: 1,
@@ -87,8 +87,8 @@
       const changeTable = () => {
         emit('changeTable');
       };
-      const print = () => {
-        emit('print');
+      const printReceipt = () => {
+        emit('printReceipt');
       };
       const clearTable = () => {
         emit('clearTable');
@@ -104,7 +104,7 @@
         changeValue,
         reminder,
         changeTable,
-        print,
+        printReceipt,
         clearTable,
       };
     },
