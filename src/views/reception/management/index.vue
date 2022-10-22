@@ -1,10 +1,10 @@
 <template>
-  <div class="management">
+  <PageWrapper contentBackground contentFullHeight>
     <!-- 头部 -->
-    <div class="table-header">
+    <template #headerContent>
       <div class="header-item-box">
         <div
-          class="table-header-item"
+          class="header-tabs-item"
           v-for="item in floors"
           :class="{ active: getPreFloor === item }"
           :key="item"
@@ -17,14 +17,10 @@
         <SyncOutlined />
         <div>刷新</div>
       </div>
-    </div>
+    </template>
     <!-- 内容 -->
-    <div class="content">
-      <TableItem :tables="currentTables" @click="handelClickTable" />
-    </div>
-    <!-- 右下角图片 -->
-    <div class="background_img"> </div>
-  </div>
+    <TableItem :tables="currentTables" @click="handelClickTable" />
+  </PageWrapper>
 </template>
 
 <script lang="ts">
@@ -33,17 +29,19 @@
   import { useRouter } from 'vue-router';
   import { SyncOutlined } from '@ant-design/icons-vue';
   import { listDiningTables } from '/@/api/reception/dining';
-  import TableItem from './components/TableItem.vue';
   import { DiningTableItem } from '/@/api/plugins/model/diningTableModel';
+  import { PageWrapper } from '/@/components/Page';
   import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
   import { useHeaderSetting } from '/@/hooks/setting/useHeaderSetting';
   import { triggerWindowResize } from '/@/utils/event';
   import { useYummyStore } from '/@/store/modules/yummy';
+  import TableItem from './components/TableItem.vue';
 
   const floors = ['2', '3', '4'];
 
   export default defineComponent({
     components: {
+      PageWrapper,
       SyncOutlined,
       TableItem,
     },
@@ -141,92 +139,103 @@
   });
 </script>
 
-<style lang="less" scoped>
-  .management {
+<style lang="less">
+  @prefix-cls: ~'@{namespace}-page-wrapper';
+
+  .@{prefix-cls} {
     position: relative;
-    padding: 10px;
-    height: calc(100vh - 32px);
     background: #fff;
+    // height: calc(100vh - 32px);
 
-    .background_img {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      width: 441px;
-      height: 432px;
-      background: url('/@/assets/images/Group705.png') no-repeat;
-      background-size: cover;
-    }
-
-    .table-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 158px;
-      padding: 10px;
-      padding-top: 95px;
-      padding-bottom: 0;
-      border-bottom: 4px solid #061527;
-      background: #fff;
-
-      .header-item-box {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        // justify-content: space-between;
-        .table-header-item {
-          // flex: 1;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          width: 180px;
-          height: 61px;
-          margin: 0 6px;
-          opacity: 1;
-          border-radius: 9px 9px 0 0;
-          // background: #061527;
-          // box-shadow: 0px -2px 7px 1px rgba(0, 0, 0, 0.25);
-          // border-radius: 9px;
-          border: 2px solid #061527;
-
-          .item-content {
-            text-align: center;
-            width: 80px;
-            height: 31px;
-            font-size: 22px;
-            font-family: PingFang SC-Medium, PingFang SC;
-            font-weight: 500;
-            // color: #ffffff;
-            line-height: 31px;
-          }
-        }
-
-        .active {
-          background: #061527;
-          box-shadow: 0px -2px 7px 1px rgba(0, 0, 0, 0.25);
-
-          .item-content {
-            color: #fff;
-          }
-        }
-      }
-
-      .update {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 117px;
-        height: 51px;
-        background: #ffc165;
-        border-radius: 8px 8px 8px 8px;
-        opacity: 1;
-      }
-    }
-
-    .content {
+    .@{prefix-cls}-content {
+      margin: 0;
       display: flex;
       flex-wrap: wrap;
       padding: 10px;
+    }
+
+    .ant-page-header {
+      &:empty {
+        padding: 0;
+      }
+
+      &-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        // height: 158px;
+        padding: 10px;
+        // padding-top: 95px;
+        padding-bottom: 0;
+        border-bottom: 4px solid #061527;
+        background: #fff;
+
+        .header-item-box {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          // justify-content: space-between;
+          .header-tabs-item {
+            // flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 180px;
+            height: 61px;
+            margin: 0 6px;
+            opacity: 1;
+            border-radius: 9px 9px 0 0;
+            // background: #061527;
+            // box-shadow: 0px -2px 7px 1px rgba(0, 0, 0, 0.25);
+            // border-radius: 9px;
+            border: 2px solid #061527;
+
+            .item-content {
+              text-align: center;
+              width: 80px;
+              height: 31px;
+              font-size: 22px;
+              font-family: PingFang SC-Medium, PingFang SC;
+              font-weight: 500;
+              // color: #ffffff;
+              line-height: 31px;
+            }
+          }
+
+          .active {
+            background: #061527;
+            box-shadow: 0px -2px 7px 1px rgba(0, 0, 0, 0.25);
+
+            .item-content {
+              color: #fff;
+            }
+          }
+        }
+
+        .update {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 117px;
+          height: 51px;
+          background: #ffc165;
+          border-radius: 8px 8px 8px 8px;
+          opacity: 1;
+        }
+      }
+    }
+
+    &-content-bg {
+      background: url('/@/assets/images/Group705.png') no-repeat;
+      background-attachment: fixed;
+      background-position: bottom right;
+      background-size: auto;
+    }
+
+    &--dense {
+      .@{prefix-cls}-content {
+        margin: 0;
+      }
     }
   }
 </style>
