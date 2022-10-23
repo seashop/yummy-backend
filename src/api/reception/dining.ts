@@ -22,6 +22,7 @@ enum Api {
   DishUpCart = '/dining/admin/cart/{id}/dishUp',
   PlaceCart = '/dining/admin/cart/{id}/place',
   AppendCart = '/dining/admin/cart/{id}/append',
+  PrintCartReceipt = '/dining/admin/cart/{id}/print/receipt',
   UpdateGoods = '/dining/admin/goods/{id}/update',
   DeleteGoods = '/dining/admin/goods/{id}/delete',
 }
@@ -69,6 +70,12 @@ export const appendCart = (id: number, data: Partial<DiningGoodsItem>) => {
   return defHttp.patch<DiningCartItem>({
     url: bindParams(Api.AppendCart, { id }),
     data,
+  });
+};
+
+export const printCartReceipt = (id: number) => {
+  return defHttp.post<DiningCartItem>({
+    url: bindParams(Api.PrintCartReceipt, { id }),
   });
 };
 

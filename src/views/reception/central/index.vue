@@ -358,6 +358,7 @@
     cleanDiningTable,
     updateCart,
     dishUpCart,
+    printCartReceipt,
   } from '/@/api/reception/dining';
   import { listOrders, printOrderReceipt } from '/@/api/orders/order';
   import {
@@ -741,11 +742,15 @@
 
       // 打印小票
       const printReceipt = async () => {
-        console.log('打印小票', state.order_id);
-        if (!state.order_id) {
-          return;
+        console.log('打印小票', state.order_id, state.cartId);
+        var resp;
+        if (state.order_id) {
+          console.log('打印订单');
+          resp = await printOrderReceipt(state.order_id);
+        } else if (state.cartId) {
+          console.log('打印餐车');
+          resp = await printCartReceipt(state.cartId);
         }
-        const resp = await printOrderReceipt(state.order_id);
         console.log(resp);
         message.success('打印成功');
       };
