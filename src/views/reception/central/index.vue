@@ -202,7 +202,7 @@
               >
                 <div class="category_item_img">
                   <div class="item_img">
-                    <img src="/@/assets/icons/Juice.png" alt="" />
+                    <img :src="demoImg" alt="" />
                   </div>
                 </div>
                 <div class="category_item_title"> 全部</div>
@@ -216,7 +216,7 @@
               >
                 <div class="category_item_img">
                   <div class="item_img">
-                    <img src="/@/assets/icons/Juice.png" alt="" />
+                    <img :src="category.img.full_url" alt="" />
                   </div>
                 </div>
                 <div class="category_item_title"> {{ category.title }}</div>
@@ -345,6 +345,7 @@
   import { defaultImg } from '/@/settings/yummySetting';
   import { ScrollContainer } from '/@/components/Container';
   import { getBrowser } from '/@/utils/getBrowser';
+  import demoImg from '/@/assets/icons/Group 647@2x.png';
   import {
     listCarts,
     appendCart,
@@ -772,6 +773,7 @@
       };
 
       return {
+        demoImg,
         prefixCls: 'central',
         ...toRefs(state),
         getPreset,
