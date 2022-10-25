@@ -202,7 +202,7 @@
               >
                 <div class="category_item_img">
                   <div class="item_img">
-                    <img src="/@/assets/icons/Juice.png" alt="" />
+                    <img :src="demoImg" alt="" />
                   </div>
                 </div>
                 <div class="category_item_title"> 全部</div>
@@ -216,7 +216,7 @@
               >
                 <div class="category_item_img">
                   <div class="item_img">
-                    <img src="/@/assets/icons/Juice.png" alt="" />
+                    <img :src="category.img.full_url" alt="" />
                   </div>
                 </div>
                 <div class="category_item_title"> {{ category.title }}</div>
@@ -345,6 +345,7 @@
   import { defaultImg } from '/@/settings/yummySetting';
   import { ScrollContainer } from '/@/components/Container';
   import { getBrowser } from '/@/utils/getBrowser';
+  import demoImg from '/@/assets/icons/Group 647@2x.png';
   import {
     listCarts,
     appendCart,
@@ -474,7 +475,7 @@
         console.log('dintbl', state.dintbl);
         state.categoryItems = (await listCategory()).items;
         // console.log('state.categoryItems ', state.categoryItems);
-        state.goodsItems = (await listGoods()).items;
+        state.goodsItems = (await listGoods()).items.filter((item: any) => item.state);
         await getCartList();
       });
 
@@ -614,7 +615,7 @@
           await listGoods({
             category_id: id,
           })
-        ).items;
+        ).items.filter((item: any) => item.state);
       }
 
       //创建购物车
@@ -772,6 +773,7 @@
       };
 
       return {
+        demoImg,
         prefixCls: 'central',
         ...toRefs(state),
         getPreset,
@@ -925,8 +927,8 @@
         border-radius: 50%;
 
         .item_img {
-          width: 30px;
-          height: 30px;
+          width: 100px;
+          height: 100px;
 
           img {
             width: 100%;

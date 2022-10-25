@@ -14,13 +14,16 @@
   >
     <div class="mark" v-if="!goods.state"> </div>
     <div :class="`${prefixCls}__card-title`">
-      <Image
-        class="icon"
-        :preview="false"
-        :src="goods.img.full_url"
-        :fallback="defaultImg"
-        @click="handleAdd"
-      />
+      <div style="width: 100%; text-align: center">
+        <Image
+          class="icon"
+          :preview="false"
+          :src="goods.img.full_url"
+          :fallback="defaultImg"
+          @click="handleAdd"
+          style="height: 160px; margin: 0 auto; width: auto; text-align: center"
+        />
+      </div>
       <div
         style="
           overflow: hidden;
@@ -176,6 +179,8 @@
       color: @text-color;
 
       .icon {
+        width: 100%;
+        text-align: center;
         margin-top: -5px;
         margin-right: 10px;
         font-size: 38px !important;
@@ -264,5 +269,12 @@
     font-weight: 700;
     color: #ff4258;
     margin-right: 5px;
+  }
+
+  .ant-image {
+    height: 160px;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
   }
 </style>
