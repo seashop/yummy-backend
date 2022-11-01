@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-  import { onMounted, reactive, defineComponent, toRefs, computed } from 'vue';
+  import { onMounted, reactive, defineComponent, toRefs, computed, onBeforeUnmount } from 'vue';
   import { first } from 'lodash-es';
   import { useRouter } from 'vue-router';
   import { SyncOutlined } from '@ant-design/icons-vue';
@@ -59,6 +59,7 @@
         status: 0,
       });
 
+      let timer: any = null;
       onMounted(() => {
         // 默认全屏
         const isUnFold = false;
@@ -71,6 +72,14 @@
 
         // 加载餐桌列表
         getListDiningTables();
+        timer = setInterval(() => {
+          updateList();
+        }, 30000);
+      });
+
+      onBeforeUnmount(() => {
+        clearInterval(timer);
+        timer = null;
       });
 
       const getListDiningTables = async () => {
