@@ -94,18 +94,20 @@
         if (currentTables.value.length == 0 && state.tables.length > 0) {
           console.log('current', getPreFloor.value, getPreFloor.value?.length);
           if (getPreFloor.value?.length === 0) {
-            const current =
-              first(
-                state.tables.filter((item) => {
-                  return floors.indexOf(item.title[1]) !== -1;
-                }),
-              )?.title[0] ?? '';
-            yummyStore.setPreFloor(current);
+            // const current =
+            //   first(
+            //     state.tables.filter((item) => {
+            //       return floors.indexOf(item.title[0]) !== -1;
+            //     }),
+            //   )?.title[0] ?? '';
+            // console.log('current--->', current);
+            yummyStore.setPreFloor('3');
           }
         }
       };
 
       const currentTables = computed(() => {
+        console.log('----->', getPreFloor.value);
         return state.tables.filter((item) => item.title[0] === getPreFloor.value);
       });
 
