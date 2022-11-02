@@ -20,6 +20,7 @@ jobs:
         env:
           CI: true
         run: |
+          npm install -g pnpm
           pnpm install
           pnpm run build
 
