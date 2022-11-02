@@ -74,7 +74,7 @@
         getListDiningTables();
         timer = setInterval(() => {
           updateList();
-        }, 30000);
+        }, 10000);
       });
 
       onBeforeUnmount(() => {
