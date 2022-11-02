@@ -97,7 +97,7 @@
             const current =
               first(
                 state.tables.filter((item) => {
-                  return floors.indexOf(item.title[0]) !== -1;
+                  return floors.indexOf(item.title[1]) !== -1;
                 }),
               )?.title[0] ?? '';
             yummyStore.setPreFloor(current);
