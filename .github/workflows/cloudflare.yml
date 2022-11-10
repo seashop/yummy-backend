@@ -21,7 +21,7 @@ jobs:
         run: |
           # cat .env.production | base64
           # echo ${{ secrets.CONFIG }} | base64 --decode > .env.production
-          sed -i '#VITE_GLOB_API_URL#s#=.*#=https://sea.fly.dev/api/v0#g' ./.env.production
+          sed -i '/VITE_GLOB_API_URL=/s#.*#https://sea.fly.dev/api/v0#g' ./.env.production
           cat ./.env.production
 
       - name: Build
