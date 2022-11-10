@@ -3,7 +3,7 @@ name: Nodejs
 on: [push]
 
 jobs:
-  deploy-gh-pages:
+  cloudflare-deployment:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
