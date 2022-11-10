@@ -1,0 +1,49 @@
+name: Nodejs
+
+on: [push]
+
+jobs:
+  deploy-gh-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Sed Config Base
+        shell: bash
+        run: |
+          # cat .env.production | base64
+          # echo ${{ secrets.CONFIG }} | base64 --decode > .env.production
+          sed -i '#VITE_GLOB_API_URL#s#=.*#=https://sea.fly.dev/api/v0#g' ./.env.production
+          cat ./.env.production
+
+      - name: Build
+        env:
+          CI: true
+        run: |
+          npm install -g pnpm
+          pnpm install
+          pnpm run build
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUBBOTTOKEN }}
+          publish_branch: gh-pages
+          publish_dir: dist
+
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
+          directory: ${{ secrets.CLOUDFLARE_ASSET_DIRECTORY }}
+          gitHubToken: ${{ secrets.GITHUBBOTTOKEN }}
