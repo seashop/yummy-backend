@@ -17,7 +17,7 @@ export interface OrderItem {
   svc_fee: number;
   gts_fee: number;
   coupon_money: number;
-  edit_money: string;
+  edit_money: number;
   order_money: number;
   user_ip: any;
   goods_img_ids: any;
@@ -98,6 +98,11 @@ export interface PlaceOrderType {
 
 export interface PayOrderType {
   payment_type?: string;
+}
+
+export interface OrderPriceType {
+  discount_money?: number;
+  discount_rate?: number;
 }
 
 export type OrderListResultModel = BasicFetchResult<OrderItem>;

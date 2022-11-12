@@ -2,34 +2,19 @@
   <div
     class="table_item"
     v-for="(table, index) in tables"
-    :class="{
-      item_active: table.status_label === '已下单',
-      item_success: table.status_label === '待清台',
-    }"
     :key="index"
+    :class="table.status_label && dintblStatus[table.status_label].class_bg"
     @click="handelTable(table.id)"
   >
     <div class="table_title">
       <span class="title_img">
-        <!-- <img :src="imags[table.is_cleaned]" alt="" /> -->
-        <!-- 1表示空闲 0表示已下单  -->
-        <template v-if="table.status_label === '空闲'">
-          <img src="/@/assets/images/fi-sr-room-service.png" alt="" />
-        </template>
-        <template v-if="table.status_label === '已下单'">
-          <img src="/@/assets/images/fi-sr-utensils.png" alt="" />
-        </template>
-        <template v-if="table.status_label === '待清台'">
-          <img src="/@/assets/images/Group704.png" alt="" />
-        </template>
+        <img v-if="table.status_label" :src="dintblStatus[table.status_label].icon" alt="" />
       </span>
     </div>
     <div class="table_content">
       <div class="table_num">{{ table.title }}</div>
       <div class="table_status">
-        <template v-if="table.status_label === '空闲'">空闲</template>
-        <template v-else-if="table.status_label === '已下单'">已下单</template>
-        <template v-else-if="table.status_label === '待清台'">已结算</template>
+        {{ table.status_label }}
         <span class="number_people">（{{ table.diners }}人）</span>
       </div>
     </div>
@@ -43,6 +28,13 @@
 <script lang="ts">
   import { defineComponent, toRefs } from 'vue';
   import { DiningTableItem } from '/@/api/plugins/model/diningTableModel';
+
+  const dintblStatus = {
+    空闲: { class_bg: '', icon: '/@/assets/images/fi-sr-room-service.png' },
+    已下单: { class_bg: 'table_item_dish_up', icon: '/@/assets/images/fi-sr-utensils.png' },
+    待支付: { class_bg: 'table_item_placed', icon: '/@/assets/images/fi-sr-utensils.png' },
+    待清台: { class_bg: 'table_item_clean', icon: '/@/assets/images/Group704.png' },
+  };
 
   export default defineComponent({
     props: {
@@ -59,6 +51,7 @@
 
       return {
         ...toRefs(props),
+        dintblStatus,
         handelTable,
       };
     },
@@ -66,6 +59,18 @@
 </script>
 
 <style lang="less" scoped>
+  .has_status() {
+    .table_content {
+      .table_num {
+        color: #fff;
+      }
+
+      .table_status {
+        color: #fff;
+      }
+    }
+  }
+
   .table_item {
     display: flex;
     flex-direction: column;
@@ -92,6 +97,7 @@
         }
       }
     }
+
     // content
     .table_content {
       flex: 1;
@@ -153,33 +159,20 @@
         color: rgba(255, 255, 255, 0.8);
       }
     }
-  }
 
-  .item_active {
-    background: linear-gradient(156deg, #ff9674 0%, #fb6900 100%);
-
-    .table_content {
-      .table_num {
-        color: #fff;
-      }
-
-      .table_status {
-        color: #fff;
-      }
+    &_dish_up {
+      background: linear-gradient(156deg, #ff9674 0%, #fb6900 100%);
+      .has_status();
     }
-  }
 
-  .item_success {
-    background: linear-gradient(135deg, #00d4c8 0%, #00af85 100%);
+    &_placed {
+      background: linear-gradient(156deg, #ff9674 0%, #fb6900 100%);
+      .has_status();
+    }
 
-    .table_content {
-      .table_num {
-        color: #fff;
-      }
-
-      .table_status {
-        color: #fff;
-      }
+    &_clean {
+      background: linear-gradient(135deg, #00d4c8 0%, #00af85 100%);
+      .has_status();
     }
   }
 </style>

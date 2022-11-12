@@ -1,5 +1,11 @@
 import { defHttp } from '/@/utils/http/axios';
-import { OrderListResultModel, PayOrderType, selectParams } from './model/ordersModel';
+import {
+  OrderItem,
+  OrderListResultModel,
+  OrderPriceType,
+  PayOrderType,
+  selectParams,
+} from './model/ordersModel';
 import { bindParams } from '../util';
 
 enum Api {
@@ -8,6 +14,7 @@ enum Api {
   EditOrderCourier = '/order/admin/{id}/courier',
   EditOrderReceive = '/order/admin/{id}/receive',
   DeleteOrder = '/order/admin/{id}/destroy',
+  UpdateOrderPrice = '/order/admin/{id}/price',
   PrintOrderReceipt = '/order/admin/{id}/print/receipt',
 }
 
@@ -38,6 +45,12 @@ export const editOrderReceive = (id: string) => {
 export const deleteOrder = (id: string) => {
   return defHttp.delete<OrderListResultModel>({
     url: bindParams(Api.DeleteOrder, { id }),
+  });
+};
+export const updateOrderPrice = (id: number, data: Partial<OrderPriceType>) => {
+  return defHttp.patch<OrderItem>({
+    url: bindParams(Api.UpdateOrderPrice, { id }),
+    data,
   });
 };
 export const printOrderReceipt = (id: number) => {

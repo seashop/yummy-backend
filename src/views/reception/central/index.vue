@@ -289,6 +289,15 @@
         <div class="modal_title">
           <div class="tips">结账提示</div>
           <p>是否立即结账</p>
+          <RadioGroup v-model:value="discountRate" button-style="solid">
+            <RadioButton :value="75">7.5折</RadioButton>
+            <RadioButton :value="85">8.5折</RadioButton>
+            <RadioButton :value="90">9.折</RadioButton>
+            <RadioButton :value="100">无折扣</RadioButton>
+          </RadioGroup>
+          <template v-if="order_id > 0 && order.edit_money != 0">
+            已优惠金额：{{ order.edit_money }}
+          </template>
         </div>
         <div class="modal_btn">
           <div class="btn">
@@ -334,7 +343,7 @@
 <script lang="ts">
   import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
-  import { Row, Col, List, Input, Modal, Image, message } from 'ant-design-vue';
+  import { Row, Col, List, Input, Modal, Image, Radio, message } from 'ant-design-vue';
   import { LeftOutlined, DownOutlined } from '@ant-design/icons-vue';
   import { listCategory } from '/@/api/stores/category';
   import { getGoods, listGoods } from '/@/api/stores/goods';
@@ -361,7 +370,7 @@
     dishUpCart,
     printCartReceipt,
   } from '/@/api/reception/dining';
-  import { listOrders, printOrderReceipt } from '/@/api/orders/order';
+  import { listOrders, printOrderReceipt, updateOrderPrice } from '/@/api/orders/order';
   import {
     CalculateType,
     DiningCartItem,
@@ -389,6 +398,8 @@
       InputTextArea: Input.TextArea,
       Modal,
       Image,
+      RadioGroup: Radio.Group,
+      RadioButton: Radio.Button,
       ScrollContainer,
       OrderOperate,
       ProductCard,
@@ -427,6 +438,7 @@
       const state = reactive({
         visible: false,
         dintbl: {} as DiningTableItem,
+        discountRate: 100, // 折扣
         categoryItems: [] as Array<CategoryItem>,
         goodsItems: [] as Array<GoodsItem>,
         cart: {} as DiningCartItem,
@@ -718,15 +730,26 @@
 
         console.log('goPay', state.order_id);
         if (!state.order_id) {
-          const resp: any = await placeDiningTable(dintbl_id, data);
+          let result: any;
+          await placeDiningTable(dintbl_id, data)
+            .then((resp) => {
+              result = resp;
+              message.success('结账成功');
+              return updateOrderPrice(resp.id, {
+                discount_rate: state.discountRate,
+              });
+            })
+            .then((_) => {
+              message.success('打折成功');
+            });
           state.cart.placed = true;
-          // console.log('placeDiningTable', resp);
-          if (resp.id) {
-            state.order_id = resp.id;
-            // state.settleSummary.payment_state = 0; // payment
+          if (result.id) {
+            state.order_id = result.id;
           }
-          // console.log('goPay', resp);
-          message.success('结账成功');
+        } else if (state.order_id && state.discountRate < 100) {
+          updateOrderPrice(state.order_id, {
+            discount_rate: state.discountRate,
+          });
         }
 
         openPaymentModal(true, { order_id: state.order_id });
