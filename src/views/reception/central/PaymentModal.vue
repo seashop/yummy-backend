@@ -6,18 +6,26 @@
     :title="getTitle"
     width="500px"
   >
-    <BasicButton
-      v-for="(payment, index) in payments"
-      :key="index"
-      @click="handleClick(payment.value)"
-    >
-      {{ payment.label }}
-    </BasicButton>
+    <div>
+      <div class="discountInfo" v-if="Number(edit_money) !== 0">
+        Discount Money: {{ edit_money }}
+      </div>
+      <div class="discountInfo" v-if="Number(edit_money) !== 0">
+        Order Money: <span>{{ order_money }}</span>
+      </div>
+      <BasicButton
+        v-for="(payment, index) in payments"
+        :key="index"
+        @click="handleClick(payment.value)"
+      >
+        {{ payment.label }}
+      </BasicButton>
+    </div>
   </BasicModal>
 </template>
 
 <script lang="ts">
-  import { defineComponent, h, reactive } from 'vue';
+  import { defineComponent, h, reactive, toRefs } from 'vue';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
   import { useMessage } from '/@/hooks/web/useMessage';
@@ -43,14 +51,18 @@
 
       const state = reactive({
         order_id: 0,
+        edit_money: 0,
+        order_money: 0,
       });
 
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
         setModalProps({ confirmLoading: false });
 
-        const { order_id } = data;
+        const { order_id, edit_money, order_money } = data;
         state.order_id = order_id;
-        console.log('model', data, order_id);
+        state.edit_money = edit_money;
+        state.order_money = order_money;
+        console.log('model', data, order_id, edit_money, order_money);
       });
 
       const { createConfirm, createMessage } = useMessage();
@@ -79,7 +91,21 @@
         registerModal,
         payments,
         handleClick,
+        ...toRefs(state),
       };
     },
   });
 </script>
+<style scoped lang="less">
+  .discountInfo {
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+
+    span {
+      color: red;
+      font-weight: 600;
+      font-size: 30px;
+    }
+  }
+</style>

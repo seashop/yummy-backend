@@ -729,6 +729,8 @@
         state.visible = false;
 
         console.log('goPay', state.order_id);
+        let edit_money = 0;
+        let order_money = 0;
         if (!state.order_id) {
           let result: any;
           await placeDiningTable(dintbl_id, data)
@@ -740,6 +742,9 @@
               });
             })
             .then((_) => {
+              console.log('1111111111-->', _);
+              edit_money = _.edit_money;
+              order_money = _.order_money;
               message.success('打折成功');
             });
           state.cart.placed = true;
@@ -747,12 +752,14 @@
             state.order_id = result.id;
           }
         } else if (state.order_id && state.discountRate < 100) {
-          updateOrderPrice(state.order_id, {
+          const _ = await updateOrderPrice(state.order_id, {
             discount_rate: state.discountRate,
           });
+          edit_money = _.edit_money;
+          order_money = _.order_money;
         }
 
-        openPaymentModal(true, { order_id: state.order_id });
+        openPaymentModal(true, { order_id: state.order_id, edit_money, order_money });
       };
 
       // 清台
@@ -1292,7 +1299,7 @@
   // modal_box style
   .modal_box {
     width: 600px;
-    height: 320px;
+    height: 360px;
     padding: 54px 95px 58px 95px;
     background: #ffffff;
     border-radius: 12px 12px 12px 12px;

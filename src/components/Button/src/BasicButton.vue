@@ -1,5 +1,5 @@
 <template>
-  <Button v-bind="getBindValue" :class="getButtonClass" @click="onClick">
+  <Button v-bind="getBindValue" :class="getButtonClass" @click="onClick" size="large">
     <template #default="data">
       <Icon :icon="preIcon" v-if="preIcon" :size="iconSize" />
       <slot v-bind="data || {}"></slot>
