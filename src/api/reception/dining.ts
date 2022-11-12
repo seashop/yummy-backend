@@ -31,8 +31,8 @@ enum Api {
  */
 
 export const listCarts = (params?: Partial<listCartsParams>) => {
-  if (params?.is_ordered !== undefined) {
-    params.is_ordered = params.is_ordered ? 1 : 0;
+  if (params?.is_placed !== undefined) {
+    params.is_placed = params.is_placed ? 1 : 0;
   }
   return defHttp.get<DiningCartListResultModel>({ url: Api.ListCarts, params });
 };

@@ -86,6 +86,7 @@ export interface selectParams {
   order_from?: string;
   order_id?: number;
   order_num?: string;
+  state?: number;
 }
 
 export interface PlaceOrderType {

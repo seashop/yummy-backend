@@ -6,7 +6,7 @@
         <div
           class="header-tabs-item"
           v-for="item in floors"
-          :class="{ active: getPreFloor === item }"
+          :class="{ active: getFloor === item }"
           :key="item"
           @click="handleClick(item)"
         >
@@ -28,7 +28,7 @@
   import { first } from 'lodash-es';
   import { useRouter } from 'vue-router';
   import { SyncOutlined } from '@ant-design/icons-vue';
-  import { listDiningTables } from '/@/api/reception/dining';
+  import { listCarts, listDiningTables } from '/@/api/reception/dining';
   import { DiningTableItem } from '/@/api/plugins/model/diningTableModel';
   import { PageWrapper } from '/@/components/Page';
   import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
@@ -52,7 +52,7 @@
       const { setHeaderSetting } = useHeaderSetting();
       const yummyStore = useYummyStore();
 
-      const getPreFloor = computed(() => yummyStore.getPreFloor);
+      const getFloor = computed(() => yummyStore.getFloor);
 
       const state = reactive({
         tables: [] as Array<DiningTableItem>,
@@ -73,7 +73,7 @@
         // 加载餐桌列表
         getListDiningTables();
         timer = setInterval(() => {
-          updateList();
+          // updateList();
         }, 10000);
       });
 
@@ -92,34 +92,46 @@
           return item;
         });
         if (currentTables.value.length == 0 && state.tables.length > 0) {
-          console.log('current', getPreFloor.value, getPreFloor.value?.length);
-          if (getPreFloor.value?.length === 0) {
-            // const current =
-            //   first(
-            //     state.tables.filter((item) => {
-            //       return floors.indexOf(item.title[0]) !== -1;
-            //     }),
-            //   )?.title[0] ?? '';
-            // console.log('current--->', current);
-            yummyStore.setPreFloor('3');
+          console.log('current', getFloor.value, getFloor.value?.length);
+          if (getFloor.value?.length === 0) {
+            const current =
+              first(
+                state.tables.filter((item) => {
+                  return floors.indexOf(item.title[0]) !== -1;
+                }),
+              )?.title[0] ?? '';
+            console.log('current--->', current);
           }
         }
       };
 
       const currentTables = computed(() => {
-        console.log('----->', getPreFloor.value);
-        return state.tables.filter((item) => item.title[0] === getPreFloor.value);
+        console.log('----->', getFloor.value);
+        return state.tables.filter((item) => item.title[0] === getFloor.value);
       });
 
-      const handelClickTable = (table_id) => {
+      const handelClickTable = async (table_id) => {
         console.log('handelClickTable', table_id);
         const currentTable = first(
           state.tables.filter((item) => {
-            return (item.id = table_id);
+            return item.id == table_id;
           }),
         );
         if (!currentTable) {
           return;
+        }
+
+        // 查询当前未下订单餐车
+        // NOTICE: 理论上一个订单只能绑定一个餐车，所以没必要判断订单数
+        console.log(currentTable.remain_carts, currentTable.remain_orders);
+        if (currentTable.remain_carts ?? 0 > 1) {
+          const respCarts = await listCarts({
+            dintbl_id: currentTable.id,
+            is_placed: 0, // 状态未下单
+          });
+
+          // TODO: show modal and select cart
+          console.log(respCarts);
         }
 
         router.push({
@@ -134,12 +146,12 @@
         getListDiningTables();
       };
       const handleClick = (id) => {
-        yummyStore.setPreFloor(id);
+        yummyStore.setFloor(id);
       };
 
       return {
         floors,
-        getPreFloor,
+        getFloor,
         ...toRefs(state),
         currentTables,
         handelClickTable,

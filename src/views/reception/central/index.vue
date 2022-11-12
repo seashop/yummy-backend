@@ -537,7 +537,7 @@
         }
 
         // 加载餐车
-        const resp = await listCarts({ dintbl_id, is_ordered: false });
+        const resp = await listCarts({ dintbl_id, is_placed: false });
         console.log('getCartList', { resp });
 
         if (resp.items && resp.items.length) {

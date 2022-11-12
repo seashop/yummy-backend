@@ -4,11 +4,18 @@ import { PresetModel } from '/@/api/common/model/preset';
 import { defaultCommonPreset } from '/@/api/common/preset';
 import { DiningTableItem } from '/@/api/plugins/model/diningTableModel';
 import { listDiningTables } from '/@/api/reception/dining';
+import { createLocalStorage } from '/@/utils/cache';
+import { YUMMY_KEY } from '/@/enums/cacheEnum';
+import { YummySetting, yummySetting } from '/@/settings/yummySetting';
+
+const ls = createLocalStorage();
+
+const lsYummySetting = (ls.get(YUMMY_KEY) || yummySetting) as YummySetting;
 
 interface YummyState {
   preset?: PresetModel;
   diningTables?: DiningTableItem[];
-  preFloor?: string;
+  yummyInfo: YummySetting;
 }
 
 export const useYummyStore = defineStore({
@@ -16,14 +23,14 @@ export const useYummyStore = defineStore({
   state: (): YummyState => ({
     preset: undefined,
     diningTables: undefined,
-    preFloor: undefined,
+    yummyInfo: lsYummySetting,
   }),
   getters: {
     getPreset(): PresetModel {
       return this.preset || ({} as PresetModel);
     },
-    getPreFloor(): string {
-      return this.preFloor || '';
+    getFloor(): string {
+      return this.yummyInfo.floor || '';
     },
   },
   actions: {
@@ -35,9 +42,10 @@ export const useYummyStore = defineStore({
       this.diningTables = tables;
     },
 
-    setPreFloor(floor: string): void {
-      console.log('setPreFloor', floor);
-      this.preFloor = floor;
+    setFloor(floor: string): void {
+      this.yummyInfo = { ...this.yummyInfo, ...{ floor } };
+      console.log('setFloor', floor);
+      ls.set(YUMMY_KEY, this.yummyInfo);
     },
 
     resetState() {

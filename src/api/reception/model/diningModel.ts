@@ -37,7 +37,7 @@ export interface CalculateType {
 export interface listCartsParams {
   dintbl_id: number;
   pick_code: string;
-  is_ordered: boolean | number;
+  is_placed: boolean | number;
 }
 
 export type DiningCartListResultModel = BasicFetchResult<DiningCartItem>;

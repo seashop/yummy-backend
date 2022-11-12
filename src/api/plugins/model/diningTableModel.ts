@@ -12,6 +12,8 @@ export interface DiningTableItem {
   deleted_at?: Date;
   status_label?: string;
   diners?: number;
+  remain_carts?: number;
+  remain_orders?: number;
   calc_info?: any;
 }
 
