@@ -289,7 +289,7 @@
         <div class="modal_title">
           <div class="tips">结账提示</div>
           <p>是否立即结账</p>
-          <RadioGroup v-model:value="discountRate" button-style="solid">
+          <RadioGroup v-model:value="discountRate" button-style="solid" size="large">
             <RadioButton :value="75">7.5折</RadioButton>
             <RadioButton :value="85">8.5折</RadioButton>
             <RadioButton :value="90">9.折</RadioButton>
