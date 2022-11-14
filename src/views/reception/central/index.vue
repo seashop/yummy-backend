@@ -343,7 +343,17 @@
 <script lang="ts">
   import { computed, defineComponent, onMounted, reactive, ref, toRefs, watch } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
-  import { Row, Col, List, Input, Modal, Image, Radio, message } from 'ant-design-vue';
+  import {
+    Row,
+    Col,
+    List,
+    Input,
+    Modal,
+    Image,
+    RadioGroup,
+    RadioButton,
+    message,
+  } from 'ant-design-vue';
   import { LeftOutlined, DownOutlined } from '@ant-design/icons-vue';
   import { listCategory } from '/@/api/stores/category';
   import { getGoods, listGoods } from '/@/api/stores/goods';
@@ -391,6 +401,7 @@
   import PaymentModal from './PaymentModal.vue';
 
   export default defineComponent({
+    name: 'ReceptionCentral',
     components: {
       Row,
       Col,
@@ -398,8 +409,8 @@
       InputTextArea: Input.TextArea,
       Modal,
       Image,
-      RadioGroup: Radio.Group,
-      RadioButton: Radio.Button,
+      RadioGroup,
+      RadioButton,
       ScrollContainer,
       OrderOperate,
       ProductCard,
