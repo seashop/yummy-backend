@@ -7,10 +7,10 @@
     width="500px"
   >
     <div>
-      <div class="discountInfo" v-if="Number(edit_money) !== 0">
+      <div class="discountInfo" v-if="Number(order_money) !== 0">
         Discount Money: {{ edit_money }}
       </div>
-      <div class="discountInfo" v-if="Number(edit_money) !== 0">
+      <div class="discountInfo" v-if="Number(order_money) !== 0">
         Order Money: <span>{{ order_money }}</span>
       </div>
       <BasicButton
@@ -87,7 +87,7 @@
       };
 
       return {
-        getTitle: '支付方式',
+        getTitle: '支付信息',
         registerModal,
         payments,
         handleClick,
