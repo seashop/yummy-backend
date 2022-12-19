@@ -1,0 +1,33 @@
+version: v1
+
+managed:
+  enabled: true
+  go_package_prefix:
+    default: github.com/seashop/yummy-go/genproto
+    except:
+      - buf.build/googleapis/googleapis
+      - buf.build/einride/iam
+      - buf.build/envoyproxy/protoc-gen-validate
+      - buf.build/grpc-ecosystem/grpc-gateway
+
+plugins:
+  # Node.js
+  - name: ts
+    path: ./node_modules/ts-proto/protoc-gen-ts_proto
+    out: ./src/gen
+    strategy: all
+    opt:
+      - onlyTypes=true
+  # - name: grpc-web
+  #   opt:
+  #     - import_style=typescript
+  #     - mode=grpcweb
+  #   out: src/gen
+  # - name: es
+  #   path: ./node_modules/.bin/protoc-gen-es
+  #   opt: target=ts
+  #   out: src/gen
+  # - name: connect-web
+  #   path: ./node_modules/.bin/protoc-gen-connect-web
+  #   out: src/gen
+  #   opt: target=ts

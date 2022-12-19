@@ -44,9 +44,12 @@ const transform: AxiosTransform = {
     if (!isTransformResponse) {
       return res.data;
     }
+
+    return res.data;
     // 错误的时候返回
 
     const { data } = res;
+    console.log(res, data);
     if (!data) {
       // return '[HTTP] Request has no return value';
       throw new Error(t('sys.api.apiRequestFailed'));
@@ -174,7 +177,7 @@ const transform: AxiosTransform = {
     errorLogStore.addAjaxErrorInfo(error);
     const { response, code, message, config } = error || {};
     const errorMessageMode = config?.requestOptions?.errorMessageMode || 'none';
-    const msg: string = response?.data?.error?.message ?? '';
+    const msg: string = response?.data?.message ?? '';
     const err: string = error?.toString?.() ?? '';
     let errMessage = '';
 

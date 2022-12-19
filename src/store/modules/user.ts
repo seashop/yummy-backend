@@ -6,7 +6,7 @@ import { RoleEnum } from '/@/enums/roleEnum';
 import { PageEnum } from '/@/enums/pageEnum';
 import { ROLES_KEY, TOKEN_KEY, USER_INFO_KEY } from '/@/enums/cacheEnum';
 import { getAuthCache, setAuthCache } from '/@/utils/auth';
-import { GetUserInfoModel, LoginParams } from '/@/api/sys/model/userModel';
+import { GetUserInfoModel } from '/@/api/sys/model/userModel';
 import { doLogout, getUserInfo, loginApi } from '/@/api/sys/user';
 import { useI18n } from '/@/hooks/web/useI18n';
 import { useMessage } from '/@/hooks/web/useMessage';
@@ -16,6 +16,7 @@ import { RouteRecordRaw } from 'vue-router';
 import { PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 import { isArray } from '/@/utils/is';
 import { h } from 'vue';
+import { LoginRequest } from '/@/gen/yummy/v1/passport_service';
 
 interface UserState {
   userInfo: Nullable<UserInfo>;
@@ -83,18 +84,18 @@ export const useUserStore = defineStore({
      * @description: login
      */
     async login(
-      params: LoginParams & {
+      params: LoginRequest & {
         goHome?: boolean;
         mode?: ErrorMessageMode;
       },
     ): Promise<GetUserInfoModel | null> {
       try {
         const { goHome = true, mode, ...loginParams } = params;
-        const data = await loginApi(loginParams, mode);
-        const { token_type, access_token } = data;
+        const data = await loginApi(loginParams as LoginRequest, mode);
+        const { token } = data;
 
         // save token
-        this.setToken(`${token_type} ${access_token}`);
+        this.setToken(`${token?.type} ${token?.access}`);
         return this.afterLoginAction(goHome);
       } catch (error) {
         return Promise.reject(error);
@@ -124,10 +125,15 @@ export const useUserStore = defineStore({
     },
     async getUserInfoAction(): Promise<UserInfo | null> {
       if (!this.getToken) return null;
-      const userInfo = await getUserInfo();
-      const { roles = [] } = userInfo;
+      const passport = await getUserInfo();
+      const { role } = passport;
+      const roles = role ? [role] : null;
+      const userInfo = {
+        username: passport.username,
+        realName: passport.name,
+      } as UserInfo;
       if (isArray(roles)) {
-        const roleList = roles.map((item) => item.value) as RoleEnum[];
+        const roleList = roles.map((item) => item.toString()) as RoleEnum[];
         this.setRoleList(roleList);
       } else {
         userInfo.roles = [];
