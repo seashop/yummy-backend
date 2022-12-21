@@ -1,28 +1,30 @@
 import { defHttp } from '/@/utils/http/axios';
-import { UsersListResultModel, selectParams, UserItem } from './model/userModel';
+import { UserItem } from './model/userModel';
 import { bindParams } from '../util';
+import { User } from '/@/gen/yummy/v1/user';
+import { ListUsersRequest, ListUsersResponse } from '/@/gen/yummy/v1/user_service';
 
 export enum Api {
-  ListUsers = '/cms/admin/users',
-  CreateUser = '/cms/admin/user',
-  UpdateUser = '/cms/admin//user/{id}',
-  UpdateUserPassword = '/cms/admin/user/{id}/password',
-  DeleteUser = '/cms/admin/user/{id}',
+  ListUsers = '/users',
+  CreateUser = '/users',
+  UpdateUser = '/users/{id}',
+  UpdateUserPassword = '/users/{id}/password',
+  DeleteUser = '/users/{id}',
 }
 
 /**
  * @description: coupon management
  */
 
-export const listUsers = (params?: selectParams) => {
-  return defHttp.get<UsersListResultModel>({ url: Api.ListUsers, params });
+export const listUsers = (params?: ListUsersRequest) => {
+  return defHttp.get<ListUsersResponse>({ url: Api.ListUsers, params });
 };
 
-export const createUser = (data: UserItem) => {
+export const createUser = (data: User) => {
   return defHttp.post({ url: Api.CreateUser, data });
 };
 
-export const updateUser = (id: number, data: UserItem) => {
+export const updateUser = (id: number, data: User) => {
   return defHttp.patch({ url: bindParams(Api.UpdateUser, { id }), data });
 };
 

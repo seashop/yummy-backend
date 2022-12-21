@@ -5,12 +5,22 @@ export const columns: BasicColumn[] = [
   {
     title: '序号',
     dataIndex: 'id',
-    width: 60,
+    width: 240,
   },
   {
     title: '用户名',
-    dataIndex: 'username',
+    dataIndex: 'loginName',
     width: 120,
+  },
+  {
+    title: '角色',
+    dataIndex: 'role',
+    width: 200,
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    width: 200,
   },
   {
     title: '描述',
@@ -29,7 +39,7 @@ export const columns: BasicColumn[] = [
 
 export const searchFormSchema: FormSchema[] = [
   {
-    field: 'username',
+    field: 'loginName',
     label: '用户名',
     component: 'Input',
     colProps: { span: 8 },
@@ -38,7 +48,7 @@ export const searchFormSchema: FormSchema[] = [
 
 export const formSchema: FormSchema[] = [
   {
-    field: 'username',
+    field: 'loginName',
     label: '用户名',
     required: true,
     component: 'Input',

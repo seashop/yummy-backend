@@ -1,11 +1,11 @@
-import { listCategory } from '/@/api/stores/category';
+import { listInns } from '/@/api/customers/inn';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
 
 export const columns: BasicColumn[] = [
   {
     title: '序号',
-    dataIndex: 'category_id',
+    dataIndex: 'id',
     width: 200,
   },
   {
@@ -15,12 +15,25 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '图片',
-    dataIndex: 'img',
+    dataIndex: 'imgId',
     width: 180,
   },
 ];
 
 export const searchFormSchema: FormSchema[] = [
+  {
+    field: 'innId',
+    label: '商户',
+    required: true,
+    component: 'ApiSelect',
+    componentProps: {
+      api: listInns,
+      resultField: 'inns',
+      labelField: 'title',
+      valueField: 'id',
+    },
+    colProps: { span: 8 },
+  },
   {
     field: 'title',
     label: '名称',
@@ -31,20 +44,17 @@ export const searchFormSchema: FormSchema[] = [
 
 export const formSchema: FormSchema[] = [
   {
-    field: 'pid',
-    label: '父级',
+    field: 'innId',
+    label: '商户',
     required: true,
     component: 'ApiSelect',
     componentProps: {
-      api: listCategory,
-      resultField: 'items',
-      params: {
-        withRoot: true,
-      },
+      api: listInns,
+      resultField: 'inns',
       labelField: 'title',
-      valueField: 'category_id',
+      valueField: 'id',
     },
-    defaultValue: 0,
+    defaultValue: null,
   },
   {
     field: 'title',
@@ -53,13 +63,7 @@ export const formSchema: FormSchema[] = [
     component: 'Input',
   },
   {
-    field: 'short_name',
-    label: '简称',
-    required: true,
-    component: 'Input',
-  },
-  {
-    field: 'img_id',
+    field: 'imgId',
     label: '图片',
     required: true,
     slot: 'picDrawer',

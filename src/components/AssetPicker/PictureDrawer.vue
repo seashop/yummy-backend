@@ -11,7 +11,7 @@
       <a-tab-pane key="1" tab="全部" />
     </a-tabs>
     <Upload
-      name="img"
+      name="attachment"
       :action="uploadUrl"
       :headers="upfileHeaders"
       :showUploadList="false"
@@ -27,7 +27,7 @@
       <Image
         v-for="image of images"
         :key="image.id"
-        :src="image.full_url"
+        :src="imageUrl(image.id)"
         :width="80"
         :preview="false"
         :class="tabCss(image)"
@@ -43,10 +43,11 @@
   import { UploadOutlined } from '@ant-design/icons-vue';
   import { useMessage } from '/@/hooks/web/useMessage';
   import { BasicDrawer, useDrawerInner } from '/@/components/Drawer';
-  import { ImageItem } from '/@/api/asset/model/imageModel';
-  import { CreateImageUrl } from '/@/api/asset/image';
+  import { createImage } from '/@/api/asset/image';
+  import { CreateImageUrl, imageUrl } from '/@/api/asset/image';
   import { getToken } from '/@/utils/auth';
   import type { UploadChangeParam } from 'ant-design-vue';
+  import { Image as ImageItem } from '/@/gen/yummy/v1/storage';
 
   export default defineComponent({
     name: 'PictureDrawer',
@@ -64,6 +65,9 @@
         type: Number as PropType<number>,
         default: 1,
       },
+      innId: {
+        type: String as PropType<string>,
+      },
       images: {
         type: Array as PropType<ImageItem[]>,
         default() {
@@ -74,7 +78,7 @@
     emits: ['success', 'reload', 'register'],
     setup(props, { emit }) {
       const activeKey = ref('1');
-      const ids = ref<Array<number>>([]);
+      const ids = ref<Array<string>>([]);
       const items = ref<Array<ImageItem>>([]);
       const data = ref<any>();
 
@@ -126,7 +130,18 @@
 
       function handleUploadChange(info: UploadChangeParam) {
         if (info.file.status === 'done') {
-          emit('reload');
+          createImage({
+            id: info.file.response.id as string,
+            innId: props.innId,
+            from: 'backend',
+            disk: 'cos',
+          })
+            .then((_) => {
+              emit('reload');
+            })
+            .catch((err) => {
+              throw err;
+            });
         }
         if (info.file.status !== 'uploading') {
           console.log(info.file, info.fileList);
@@ -139,6 +154,7 @@
       }
 
       return {
+        props,
         registerDrawer,
         getTitle,
         activeKey,
@@ -151,6 +167,7 @@
         },
         handleUploadChange,
         handleSubmit,
+        imageUrl,
       };
     },
   });

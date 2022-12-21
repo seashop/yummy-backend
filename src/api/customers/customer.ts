@@ -2,8 +2,8 @@ import { defHttp } from '/@/utils/http/axios';
 import { CustomersListResultModel, selectParams } from './model/customerModel';
 
 export enum Api {
-  ListCustomers = '/user/admin/get_all',
-  UpdateCustomer = '/user/admin/edit_user',
+  ListCustomers = '/accounts',
+  UpdateCustomer = '/accounts/{id}',
 }
 
 /**

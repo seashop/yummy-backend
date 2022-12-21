@@ -1,14 +1,8 @@
 <template>
   <div>
     <BasicTable @register="registerTable">
-      <template #toolbar>
-        <a-button type="primary" @click="handleCreate"> 新增分类 </a-button>
-      </template>
       <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'imgId'">
-          <Image :src="imageUrl(record?.imgId)" :width="60" />
-        </template>
-        <template v-else-if="column.key === 'action'">
+        <template v-if="column.key === 'action'">
           <TableAction
             :actions="[
               {
@@ -29,31 +23,29 @@
         </template>
       </template>
     </BasicTable>
-    <CategoryModal @register="registerModal" @success="handleSuccess" />
+    <DetailModal @register="registerModal" @success="handleUpdateSuccess" />
   </div>
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue';
-  import { Image } from 'ant-design-vue';
 
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { imageUrl } from '/@/api/asset/image';
-  import { createCategory, listCategory, updateCategory } from '/@/api/stores/category';
+  import { listInns, updateInn } from '/@/api/customers/inn';
   import { useModal } from '/@/components/Modal';
 
-  import CategoryModal from './CategoryModal.vue';
-  import { columns, searchFormSchema } from './category.data';
+  import DetailModal from './DetailModal.vue';
+  import { columns, searchFormSchema } from './inn.data';
 
   export default defineComponent({
-    name: 'CategoryManagement',
-    components: { BasicTable, CategoryModal, TableAction, Image },
+    name: 'InnManagement',
+    components: { BasicTable, DetailModal, TableAction },
     setup() {
       const [registerModal, { openModal }] = useModal();
       const [registerTable, { reload }] = useTable({
-        title: '分类列表',
-        api: listCategory,
+        title: '用户列表',
+        api: listInns,
         fetchSetting: {
-          listField: 'productCats',
+          listField: 'inns',
         },
         columns,
         formConfig: {
@@ -68,16 +60,9 @@
           width: 80,
           title: '操作',
           dataIndex: 'action',
-          // slots: { customRender: 'action' },
           fixed: undefined,
         },
       });
-
-      function handleCreate() {
-        openModal(true, {
-          isUpdate: false,
-        });
-      }
 
       function handleEdit(record: Recordable) {
         openModal(true, {
@@ -90,25 +75,18 @@
         console.log(record);
       }
 
-      function handleSuccess({ isUpdate, values }) {
-        if (isUpdate) {
-          const result = updateCategory(values);
-          console.log(result);
-        } else {
-          const result = createCategory(values);
-          console.log(result);
-        }
+      async function handleUpdateSuccess({ values }) {
+        const result = await updateInn(values.id, values);
+        console.log(result);
         reload();
       }
 
       return {
         registerTable,
         registerModal,
-        handleCreate,
         handleEdit,
         handleDelete,
-        handleSuccess,
-        imageUrl,
+        handleUpdateSuccess,
       };
     },
   });

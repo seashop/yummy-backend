@@ -21,7 +21,7 @@ const imageList = (() => {
 export default [
   // mock user login
   {
-    url: '/basic-api/img_category/admin/get_all_img',
+    url: '/basic-api/images',
     timeout: 200,
     method: 'get',
     response: ({ query }) => {

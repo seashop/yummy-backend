@@ -62,6 +62,9 @@
       const [registerTable, { reload }] = useTable({
         title: '管理员列表',
         api: listUsers,
+        fetchSetting: {
+          listField: 'users',
+        },
         columns,
         formConfig: {
           labelWidth: 120,

@@ -1,20 +1,32 @@
 import { defHttp } from '/@/utils/http/axios';
 import { useGlobSetting } from '/@/hooks/setting';
-import { ImageListResultModel } from './model/imageModel';
+import { ListImagesRequest, ListImagesResponse } from '/@/gen/yummy/v1/storage_service';
+import { Image } from '/@/gen/yummy/v1/storage';
+import { bindParams } from '../util';
 
 const globSetting = useGlobSetting();
 
 enum Api {
-  ListCategory = '/img_category/admin/get_all_img',
-  CreateImage = '/img_category/admin/upload/img',
+  ListCategory = '/images',
+  CreateImage = '/images',
+  ImageUrl = ':common/images/{id}/url',
+  Upload = '/upload',
 }
 
 /**
  * @description: category management
  */
 
-export const listImages = () => {
-  return defHttp.get<ImageListResultModel>({ url: Api.ListCategory });
+export const listImages = (params?: Partial<ListImagesRequest>) => {
+  return defHttp.get<ListImagesResponse>({ url: Api.ListCategory, params });
 };
 
-export const CreateImageUrl = globSetting.apiUrl + globSetting.urlPrefix + Api.CreateImage;
+export const createImage = (data: Partial<Image>) => {
+  return defHttp.post<Image>({ url: Api.ListCategory, data });
+};
+
+export const CreateImageUrl = globSetting.apiUrl + globSetting.urlPrefix + Api.Upload;
+
+export const imageUrl = (id: string) => {
+  return bindParams(globSetting.apiUrl + globSetting.urlPrefix + Api.ImageUrl, { id });
+};

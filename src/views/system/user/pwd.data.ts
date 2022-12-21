@@ -22,7 +22,7 @@ export const formSchema: FormSchema[] = [
     ],
   },
   {
-    field: 'confirmPassword',
+    field: 'passwordConfirm',
     label: '确认密码',
     component: 'InputPassword',
     dynamicRules: ({ values }) => {
