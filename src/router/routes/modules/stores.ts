@@ -5,9 +5,9 @@ import { t } from '/@/hooks/web/useI18n';
 
 const stores: AppRouteModule = {
   path: '/stores',
-  name: 'Goods',
+  name: 'Stores',
   component: LAYOUT,
-  redirect: '/stores/goods',
+  redirect: '/stores/product',
   meta: {
     orderNo: 20,
     icon: 'ion:grid-outline',
@@ -15,12 +15,12 @@ const stores: AppRouteModule = {
   },
   children: [
     {
-      path: 'goods',
-      name: 'Goods',
-      component: () => import('/@/views/stores/goods/index.vue'),
+      path: 'product',
+      name: 'Product',
+      component: () => import('/@/views/stores/product/index.vue'),
       meta: {
         // affix: true,
-        title: t('routes.stores.goods'),
+        title: t('routes.stores.product'),
       },
     },
     {

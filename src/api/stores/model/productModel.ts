@@ -1,7 +1,7 @@
 import { ImageItem } from '/@/api/asset/model/imageModel';
 import { BasicFetchResult } from '/@/api/model/baseModel';
 
-export interface GoodsItem {
+export interface ProductItem {
   goods_id: number;
   title: string;
   description: string;
@@ -19,7 +19,7 @@ export interface GoodsItem {
   banner_imgs: Array<number>;
   detail_imgs: Array<number>;
   sort: number;
-  sku_arr: GoodsSkuArr;
+  sku_arr: ProductSkuArr;
 }
 
 export interface SpuValue {
@@ -40,12 +40,12 @@ export interface Sku {
   stock_num: number;
 }
 
-export interface GoodsSkuArr {
+export interface ProductSkuArr {
   tree: Array<Spu>;
   list: Array<Sku>;
 }
 
-export interface GoodsSkuItem {
+export interface ProductSkuItem {
   price?: number;
   stock_num?: number;
 }
@@ -56,4 +56,4 @@ export interface selectParams {
   goods_ids: Array<number>;
 }
 
-export type GoodsListResultModel = BasicFetchResult<GoodsItem>;
+export type ProductListResultModel = BasicFetchResult<ProductItem>;

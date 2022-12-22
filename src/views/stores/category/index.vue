@@ -90,12 +90,12 @@
         console.log(record);
       }
 
-      function handleSuccess({ isUpdate, values }) {
+      async function handleSuccess({ isUpdate, values }) {
         if (isUpdate) {
-          const result = updateCategory(values);
+          const result = await updateCategory(values);
           console.log(result);
         } else {
-          const result = createCategory(values);
+          const result = await createCategory(values);
           console.log(result);
         }
         reload();

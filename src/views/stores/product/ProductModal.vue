@@ -7,13 +7,13 @@
     width="500px"
     @ok="handleSubmit"
   >
-    <BasicForm @register="registerForm">
+    <BasicForm @register="registerForm" @field-value-change="fieldValueChange">
       <template #picDrawer="{ model, field }">
         <template v-if="model[field]?.length > 0">
           <Image
-            v-for="image in model[field]"
-            :key="image"
-            :src="image.full_url"
+            v-for="id in model[field]"
+            :key="id"
+            :src="getImageUrlById(id)"
             :width="60"
             :preview="false"
           />
@@ -29,6 +29,7 @@
     </BasicForm>
   </BasicModal>
   <PictureDrawer
+    :innId="innId"
     :images="images"
     :limit="3"
     @register="registerDrawer"
@@ -38,25 +39,24 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref, computed, unref } from 'vue';
+  import { defineComponent, computed, unref, reactive, toRefs } from 'vue';
   import { Image } from 'ant-design-vue';
   import { FormItemRest } from 'ant-design-vue/es/form';
   import { useDrawer } from '/@/components/Drawer';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import Sku from './components/Sku.vue';
-  import { formSchema } from './goods.data';
+  import { formSchema } from './product.data';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import PictureDrawer from '/@/components/AssetPicker/PictureDrawer.vue';
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
   import { useMessage } from '/@/hooks/web/useMessage';
-  import { listImages } from '/@/api/asset/image';
-  import { ImageItem } from '/@/api/asset/model/imageModel';
-  import { GoodsSkuArr } from '/@/api/stores/model/goodsModel';
-  import { getGoods, createGoods, updateGoods } from '/@/api/stores/goods';
+  import { imageUrl, listImages } from '/@/api/asset/image';
+  import { Image as ImageItem } from '/@/gen/yummy/v1/storage';
+  import { getProduct, createProduct, updateProduct } from '/@/api/stores/product';
   import { set } from 'lodash-es';
 
   export default defineComponent({
-    name: 'GoodsDrawer',
+    name: 'ProductDrawer',
     components: {
       FormItemRest,
       Image,
@@ -71,13 +71,15 @@
       const { createMessage } = useMessage();
       const [registerDrawer, { openDrawer }] = useDrawer();
 
-      const sub = ref(0);
-      const sku_comfirm = ref(0);
-      const rdata = ref<GoodsSkuArr>();
-
-      const isUpdate = ref(true);
-      const images = ref<Array<ImageItem>>([]);
-      const rowId = ref<number>(0);
+      const state = reactive({
+        innId: '',
+        sub: 0,
+        sku_comfirm: 0,
+        rdata: [] as Array<string> | undefined,
+        isUpdate: true,
+        images: [] as Array<ImageItem>,
+        rowId: '' as string,
+      });
 
       const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
         labelWidth: 90,
@@ -88,21 +90,21 @@
 
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
         resetFields();
-        rdata.value = undefined;
-        rowId.value = 0;
+        state.rdata = undefined;
+        state.rowId = '';
 
         setModalProps({ confirmLoading: false });
-        isUpdate.value = !!data?.isUpdate;
+        state.isUpdate = !!data?.isUpdate;
 
-        if (unref(isUpdate)) {
-          const record = await getGoods(data.record.goods_id);
-          rowId.value = record.goods_id;
+        if (unref(state.isUpdate)) {
+          const record = await getProduct(data.record.innId, data.record.id);
+          state.rowId = record.id;
 
-          if (record?.sku_arr?.tree?.length > 0) {
+          if (record?.skuAttrIds.length > 0) {
             setFieldsValue({
-              show_sku: true,
+              hasSku: true,
             });
-            rdata.value = record.sku_arr;
+            state.rdata = record.skuAttrIds;
           }
 
           setFieldsValue({
@@ -111,7 +113,17 @@
         }
       });
 
-      const getTitle = computed(() => (!unref(isUpdate) ? '新增商品' : '编辑商品'));
+      const getTitle = computed(() => (!unref(state.isUpdate) ? '新增商品' : '编辑商品'));
+
+      function fieldValueChange(k, v) {
+        switch (k) {
+          case 'innId':
+            state.innId = v;
+            break;
+          default:
+            break;
+        }
+      }
 
       function fillSkuInfo(values) {
         console.log(values, skuInfo);
@@ -125,24 +137,24 @@
         return values;
       }
 
-      function getImageUrlById(id: Number) {
-        for (let index = 0; index < images?.value?.length; index++) {
-          const image = images.value[index];
+      function getImageUrlById(id: String) {
+        for (let index = 0; index < state.images?.length; index++) {
+          const image = state.images[index];
           if (image.id == id) {
-            return image.full_url;
+            return imageUrl(image.id);
           }
         }
         return '';
       }
 
       async function handlePictureDrawerRealod() {
-        images.value = (await listImages()).items;
+        state.images = (await listImages()).images;
       }
       handlePictureDrawerRealod();
 
       function handlePictureDrawerSuccess({ data, items }) {
         let payload = {};
-        set(payload, data.field, items?.length > 0 ? [...items] : []);
+        set(payload, data.field, items?.length > 0 ? items.map((item) => item.id) : []);
         setFieldsValue(payload);
       }
 
@@ -177,7 +189,7 @@
 
       // 提交 修改商品
       function doUpdate(values) {
-        return { ...values, goods_id: rowId.value };
+        return { ...values, id: state.rowId };
       }
 
       let skuInfo: Object = {};
@@ -193,11 +205,11 @@
           }
 
           setModalProps({ confirmLoading: true });
-          values = isUpdate.value ? doUpdate(values) : doCreate(values);
+          values = state.isUpdate ? doUpdate(values) : doCreate(values);
           if (values === undefined) {
             return;
           }
-          const result = isUpdate.value ? await updateGoods(values) : await createGoods(values);
+          const result = state.isUpdate ? await updateProduct(values) : await createProduct(values);
 
           // TODO custom api
           console.log(values, values?.value, '---');
@@ -209,13 +221,11 @@
       }
 
       return {
-        sub,
-        sku_comfirm,
-        rdata,
-        images,
+        ...toRefs(state),
         registerModal,
         registerForm,
         getTitle,
+        fieldValueChange,
         handleSkuResult,
         handleSubmit,
         registerDrawer,

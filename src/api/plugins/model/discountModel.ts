@@ -1,4 +1,4 @@
-import { GoodsItem } from '/@/api/stores/model/goodsModel';
+import { GoodsItem } from '../../stores/model/productModel';
 import { BasicFetchResult } from '/@/api/model/baseModel';
 
 export interface DiscountItem {

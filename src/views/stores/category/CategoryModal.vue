@@ -67,7 +67,7 @@
         images.value = (await listImages()).images;
 
         if (unref(isUpdate)) {
-          rowId.value = data.record.category_id;
+          rowId.value = data.record.id;
           setFieldsValue({
             ...data.record,
           });
@@ -107,18 +107,13 @@
       }
 
       async function handleSubmit() {
-        console.log('a');
         try {
-          console.log('b');
           const values = await validate();
-          console.log('c');
           setModalProps({ confirmLoading: true });
-          // TODO custom api
-          console.log(values);
           closeModal();
           emit('success', {
             isUpdate: unref(isUpdate),
-            values: { ...values, category_id: unref(isUpdate) ? rowId.value : undefined },
+            values: { ...values, id: unref(isUpdate) ? rowId.value : undefined },
           });
         } catch (e) {
           console.log(e);

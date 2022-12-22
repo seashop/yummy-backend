@@ -1,4 +1,4 @@
-import { GoodsItem } from '../../stores/model/goodsModel';
+import { GoodsItem } from '../../stores/model/productModel';
 import { OrderUser } from './ordersModel';
 import { BasicFetchResult } from '/@/api/model/baseModel';
 

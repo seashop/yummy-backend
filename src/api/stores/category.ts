@@ -25,6 +25,9 @@ export const createCategory = (data: Partial<ProductCat>) => {
   return defHttp.post<ProductCat>({ url: bindParams(Api.CreateCategory, data), data });
 };
 
-export const updateCategory = (data?: ProductCat) => {
-  return defHttp.post<ProductCat>({ url: Api.UpdateCategory, data });
+export const updateCategory = (data: ProductCat) => {
+  return defHttp.patch<ProductCat>({
+    url: bindParams(Api.UpdateCategory, data),
+    data,
+  });
 };

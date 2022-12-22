@@ -40,7 +40,7 @@
         </template>
       </template>
     </BasicTable>
-    <GoodsModal @register="registerModal" @success="handleSuccess" />
+    <ProductModal @register="registerModal" @success="handleSuccess" />
   </div>
 </template>
 
@@ -48,22 +48,23 @@
   import { defineComponent } from 'vue';
   import { Image, Switch } from 'ant-design-vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { listGoods, switchGoods } from '/@/api/stores/goods';
-
+  import { listProducts, switchProduct } from '/@/api/stores/product';
   import { useModal } from '/@/components/Modal';
-  import GoodsModal from './GoodsModal.vue';
-
-  import { columns, searchFormSchema } from './goods.data';
-  import { GoodsItem } from '/@/api/stores/model/goodsModel';
+  import ProductModal from './ProductModal.vue';
+  import { columns, searchFormSchema } from './product.data';
+  import { Product } from '/@/gen/yummy/v1/product';
 
   export default defineComponent({
-    name: 'GoodsManagement',
-    components: { BasicTable, GoodsModal, TableAction, Image, Switch },
+    name: 'ProductManagement',
+    components: { BasicTable, ProductModal, TableAction, Image, Switch },
     setup() {
       const [registerModal, { openModal }] = useModal();
       const [registerTable, { reload }] = useTable({
         title: '产品列表',
-        api: listGoods,
+        api: listProducts,
+        fetchSetting: {
+          listField: 'products',
+        },
         columns,
         formConfig: {
           labelWidth: 120,
@@ -82,8 +83,8 @@
         },
       });
 
-      function toggleSwitch(record: GoodsItem, key: string) {
-        switchGoods(record.goods_id, key);
+      function toggleSwitch(record: Product, key: string) {
+        switchProduct(record.id, key);
       }
 
       function handleCreate() {
