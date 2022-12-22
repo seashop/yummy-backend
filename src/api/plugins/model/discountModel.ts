@@ -1,4 +1,4 @@
-import { GoodsItem } from '../../stores/model/productModel';
+import { ProductItem } from '../../stores/model/productModel';
 import { BasicFetchResult } from '/@/api/model/baseModel';
 
 export interface DiscountItem {
@@ -17,7 +17,7 @@ export interface DiscountItem {
 
 export interface DiscountDetail {
   reduction: DiscountDetail;
-  goods: Array<GoodsItem>;
+  goods: Array<ProductItem>;
 }
 
 export interface selectParams {
@@ -26,4 +26,4 @@ export interface selectParams {
 
 export type DiscountsListResultModel = BasicFetchResult<DiscountItem>;
 
-export type NoGoodsDiscountsListResultModel = BasicFetchResult<GoodsItem>;
+export type NoGoodsDiscountsListResultModel = BasicFetchResult<ProductItem>;

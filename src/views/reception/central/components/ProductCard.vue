@@ -101,7 +101,7 @@
   import { Image } from 'ant-design-vue';
   import { useCentralStore } from '/@/store/modules/central';
   import { ShoppingCartOutlined, LikeOutlined } from '@ant-design/icons-vue';
-  import { GoodsItem } from '/@/api/stores/model/goodsModel';
+  import { Product } from '/@/gen/yummy/v1/product';
   import { defaultImg } from '/@/settings/yummySetting';
   import Tag from './Tag.vue';
   // import BasicButton from '/@/components/Button/src/BasicButton.vue';
@@ -116,7 +116,7 @@
     },
     props: {
       goods: {
-        type: Object as PropType<GoodsItem>,
+        type: Object as PropType<Product>,
         default: () => null,
       },
     },

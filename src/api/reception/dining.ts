@@ -3,7 +3,7 @@ import {
   CalculateType,
   DiningCartItem,
   DiningCartListResultModel,
-  DiningGoodsItem,
+  DiningProductItem,
   listCartsParams,
 } from './model/diningModel';
 import { bindParams } from '../util';
@@ -66,7 +66,7 @@ export const dishUpCart = (id: number) => {
   });
 };
 
-export const appendCart = (id: number, data: Partial<DiningGoodsItem>) => {
+export const appendCart = (id: number, data: Partial<DiningProductItem>) => {
   return defHttp.patch<DiningCartItem>({
     url: bindParams(Api.AppendCart, { id }),
     data,
@@ -79,14 +79,14 @@ export const printCartReceipt = (id: number) => {
   });
 };
 
-export const updateGoods = (id: number, data: Partial<DiningGoodsItem>) => {
-  return defHttp.patch<DiningGoodsItem>({
+export const updateProduct = (id: number, data: Partial<DiningProductItem>) => {
+  return defHttp.patch<DiningProductItem>({
     url: bindParams(Api.UpdateGoods, { id }),
     data,
   });
 };
 
-export const deleteGoods = (id: number) => {
+export const deleteProduct = (id: number) => {
   return defHttp.delete<DiningCartItem>({
     url: bindParams(Api.DeleteGoods, { id }),
   });

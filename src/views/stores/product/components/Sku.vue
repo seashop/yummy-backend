@@ -97,9 +97,9 @@
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
   import { useDrawer } from '/@/components/Drawer';
   import { Icon } from '/@/components/Icon';
-  import { ImageItem } from '/@/api/asset/model/imageModel';
+  import { Image as ImageItem } from '/@/gen/yummy/v1/storage';
   import { listImages } from '/@/api/asset/image';
-  import { GoodsSkuArr, GoodsSkuItem } from '/@/api/stores/model/goodsModel';
+  import { ProductSkuArr, ProductSkuItem } from '/@/api/stores/model/productModel';
 
   interface SpuItem {
     cName: string;
@@ -135,7 +135,7 @@
     },
     props: {
       rdata: {
-        type: Object as PropType<GoodsSkuArr>,
+        type: Object as PropType<ProductSkuArr>,
         defualt: null,
       }, // 修改时的原数据
     },
@@ -150,9 +150,9 @@
         drawer: ref<boolean>(false),
         attrs: ref<Array<SkuAttr>>([]),
         attrsImageId: ref<Array<number>>([]),
-        ovConfig: ref<GoodsSkuArr | undefined>(), // 原修改数据
+        ovConfig: ref<ProductSkuArr | undefined>(), // 原修改数据
         imgList: ref<Array<Object>>([]),
-        tableSku: ref<Array<GoodsSkuItem>>([]),
+        tableSku: ref<Array<ProductSkuItem>>([]),
       });
 
       // Computed
@@ -231,11 +231,11 @@
         if (!tableSpu.value) {
           state.tableSku = [];
         }
-        let spuList: Array<GoodsSkuItem> = [];
+        let spuList: Array<ProductSkuItem> = [];
         const spuItem = tableSpu.value;
         // 联动: rows
         for (let i = 0; i < rows.value; i++) {
-          let skuItem: GoodsSkuItem = {
+          let skuItem: ProductSkuItem = {
             price: getOvValue(i, 'price'),
             stock_num: getOvValue(i, 'stock_num'),
           };
@@ -313,7 +313,7 @@
       }
 
       // 获取修改数据
-      function pickAttrsAndImgsFromOv(res?: GoodsSkuArr) {
+      function pickAttrsAndImgsFromOv(res?: ProductSkuArr) {
         if (res === undefined) {
           return;
         }

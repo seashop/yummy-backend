@@ -10,11 +10,11 @@ export interface DiningCartItem {
   placed: boolean | number;
   served: boolean | number;
   description: string;
-  goods: Array<DiningGoodsItem>;
+  goods: Array<DiningProductItem>;
   created_at: Date;
 }
 
-export interface DiningGoodsItem {
+export interface DiningProductItem {
   id: number;
   dincart_id: number;
   goods_id: number;

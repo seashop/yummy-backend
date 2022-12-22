@@ -8,7 +8,7 @@
           :tableNum="dintbl.title"
           :isPlaced="order_id > 0"
           :canClean="!dintbl.is_cleaned"
-          :canChange="cartGoods.length > 0"
+          :canChange="cartProduct.length > 0"
           @change-diners="changeDiners"
           @change-table="changeTable"
           @clear-table="openClearTableModal"
@@ -17,14 +17,14 @@
       </div>
       <!-- 购物车列表 -->
       <div class="cart_list_box">
-        <template v-if="cartGoods.length && !canShowOrder">
+        <template v-if="cartProduct.length && !canShowOrder">
           <!-- <template v-if="true">  -->
-          <div class="cart_list_item" v-for="item in cartGoods" :key="item.id">
+          <div class="cart_list_item" v-for="item in cartProduct" :key="item.id">
             <div class="godds_img_box">
               <div class="godds_img">
                 <Image
                   :preview="false"
-                  :src="getGoodsImage(item.goods_id)"
+                  :src="getProductImage(item.goods_id)"
                   :fallback="defaultImg"
                 />
               </div>
@@ -43,7 +43,7 @@
             </div>
             <!-- 操作 -->
             <div class="operations" v-if="!order_id">
-              <div class="delete_icon" @click="handleDeleteGoods(item)">
+              <div class="delete_icon" @click="handleDeleteProduct(item)">
                 <img src="/@/assets/icons/Group645.png" alt="" />
               </div>
               <div class="input_number">
@@ -67,7 +67,7 @@
         </template>
       </div>
       <!-- desc -->
-      <div class="desc" v-if="cartGoods && cartGoods.length">
+      <div class="desc" v-if="cartProduct && cartProduct.length">
         <InputTextArea
           style="height: 46px"
           v-model:value="message"
@@ -95,12 +95,12 @@
               />
             </div>
             <div class="order_details_list">
-              <div class="cart_list_item" v-for="item in cartGoods" :key="item.id">
+              <div class="cart_list_item" v-for="item in cartProduct" :key="item.id">
                 <div class="godds_img_box">
                   <div class="godds_img">
                     <Image
                       :preview="false"
-                      :src="getGoodsImage(item.goods_id)"
+                      :src="getProductImage(item.goods_id)"
                       :fallback="defaultImg"
                     />
                   </div>
@@ -119,7 +119,7 @@
                 </div>
                 <!-- 操作 -->
                 <div class="operations">
-                  <!-- <div class="delete_icon" @click="handleDeleteGoods(item)">
+                  <!-- <div class="delete_icon" @click="handleDeleteProduct(item)">
                     <img src="/@/assets/icons/Group645.png" alt="" />
                   </div> -->
                   <div class="delete_icon"></div>
@@ -135,7 +135,7 @@
                 </div>
               </div>
             </div>
-            <div class="order_details_total" v-if="cartGoods.length > 0">
+            <div class="order_details_total" v-if="cartProduct.length > 0">
               <div class="total_details">
                 <span>小 计(subTotal):</span>
                 <span>{{ settleSummary.sub_money }}</span>
@@ -168,7 +168,7 @@
             <span> {{ settleSummary.total_money }} </span>
           </div>
         </div>
-        <!-- //cartGoods.length  -->
+        <!-- //cartProduct.length  -->
         <div
           class="submit_order_btn"
           :class="{ op_disable: order_id > 0 || cart.dish_up }"
@@ -238,7 +238,7 @@
                   <!-- <ListItem> -->
                   <ProductCard
                     :goods="goods"
-                    :checkedGoods="cartGoods.find((item) => item.id == goods.goods_id)"
+                    :checkedProduct="cartProduct.find((item) => item.id == goods.goods_id)"
                     @selected="handleProdcutSelected"
                     @change-product="ChangeQuantity"
                   />
@@ -356,21 +356,21 @@
   } from 'ant-design-vue';
   import { LeftOutlined, DownOutlined } from '@ant-design/icons-vue';
   import { listCategory } from '/@/api/stores/category';
-  import { getGoods, listGoods } from '/@/api/stores/goods';
+  import { getProduct, listProducts } from '/@/api/stores/product';
   import { CategoryItem } from '/@/api/stores/model/categoryModel';
-  import { GoodsItem } from '/@/api/stores/model/goodsModel';
   import { useCentralStore } from '/@/store/modules/central';
   import { useYummyStore } from '/@/store/modules/yummy';
   import { defaultImg } from '/@/settings/yummySetting';
   import { ScrollContainer } from '/@/components/Container';
   import { getBrowser } from '/@/utils/getBrowser';
   import demoImg from '/@/assets/icons/Group 647@2x.png';
+  import { Product } from '/@/gen/yummy/v1/product';
   import {
     listCarts,
     appendCart,
     createCart,
-    deleteGoods,
-    updateGoods,
+    deleteProduct,
+    updateProduct,
     getDiningTable,
     placeDiningTable,
     calculateDiningTable,
@@ -384,7 +384,7 @@
   import {
     CalculateType,
     DiningCartItem,
-    DiningGoodsItem,
+    DiningProductItem,
   } from '/@/api/reception/model/diningModel';
 
   import { DiningTableItem } from '/@/api/plugins/model/diningTableModel';
@@ -451,10 +451,10 @@
         dintbl: {} as DiningTableItem,
         discountRate: 100, // 折扣
         categoryItems: [] as Array<CategoryItem>,
-        goodsItems: [] as Array<GoodsItem>,
+        goodsItems: [] as Array<Product>,
         cart: {} as DiningCartItem,
-        cartGoods: [] as Array<DiningGoodsItem>,
-        goodsStack: [] as Array<GoodsItem>,
+        cartProduct: [] as Array<DiningProductItem>,
+        goodsStack: [] as Array<Product>,
         order_id: 0,
         order: {} as OrderItem,
         diners: 1,
@@ -498,7 +498,7 @@
         console.log('dintbl', state.dintbl);
         state.categoryItems = (await listCategory()).items;
         // console.log('state.categoryItems ', state.categoryItems);
-        state.goodsItems = (await listGoods()).items.filter((item: any) => item.state);
+        state.goodsItems = (await listProducts()).items.filter((item: any) => item.state);
         await getCartList();
       });
 
@@ -533,8 +533,8 @@
           state.order = resp.items[0];
           console.log('state.order', state.order);
           state.order_id = state.order.order_id;
-          state.cartGoods = state.order.ordergoods;
-          console.log('state.cartGoods', state.cartGoods);
+          state.cartProduct = state.order.ordergoods;
+          console.log('state.cartProduct', state.cartProduct);
           state.settleSummary = {
             reduce: state.order.reduction_money,
             vmoney: 0,
@@ -560,21 +560,21 @@
       };
 
       // 获取所有产品信息
-      const getGoodsList = async () => {
-        const res = await listGoods();
+      const getProductList = async () => {
+        const res = await listProducts();
         res.items.forEach((item) => {
           state.goodsStack[item.goods_id] = item;
         });
       };
-      getGoodsList();
+      getProductList();
       // 根据桌台查询订单列表  获取订单
 
-      const getGoodsImage = (goods_id: number) => {
+      const getProductImage = (goods_id: number) => {
         return state.goodsStack[goods_id]?.img?.full_url;
       };
 
       watch(
-        () => state.cartGoods,
+        () => state.cartProduct,
         async (val) => {
           centralStore.changeCartList(val);
           console.log('watch', state.order_id);
@@ -593,18 +593,18 @@
         state.cart = cart;
         state.cartId = state.cart.id;
         state.order_id = state.cart.order_id ?? 0;
-        const result = await listGoods({
+        const result = await listProducts({
           goods_ids: cart.goods.map((item) => item.goods_id),
         });
         result.items.forEach((item) => {
           state.goodsStack[item.goods_id] = item;
         });
-        state.cartGoods = [...cart.goods];
+        state.cartProduct = [...cart.goods];
       }
       // 购物车防抖
       const ChangeQuantity = (id, quantity) => {
         if (quantity <= 0) {
-          handleDeleteGoods({ id });
+          handleDeleteProduct({ id });
           return;
         }
         if (times.value) clearTimeout(times.value);
@@ -613,21 +613,21 @@
         }, 300);
       };
       async function handelChangeQuantity(id, quantity) {
-        const goods = await updateGoods(id, { quantity });
+        const goods = await updateProduct(id, { quantity });
         // console.log('goods', goods);
-        state.cartGoods = state.cartGoods.map((item) => {
+        state.cartProduct = state.cartProduct.map((item) => {
           if (item.id == id) {
             item.quantity = goods.quantity;
             item.served_num = goods.served_num;
           }
           return item;
         });
-        // console.log('state.cartGoods', state.cartGoods);
+        // console.log('state.cartProduct', state.cartProduct);
       }
 
-      async function handleDeleteGoods({ id }) {
-        await deleteGoods(id).then(() => {
-          state.cartGoods = state.cartGoods.filter((item) => item.id != id);
+      async function handleDeleteProduct({ id }) {
+        await deleteProduct(id).then(() => {
+          state.cartProduct = state.cartProduct.filter((item) => item.id != id);
         });
       }
 
@@ -635,7 +635,7 @@
         currentId.value = id;
         // console.log('点击了分类');
         state.goodsItems = (
-          await listGoods({
+          await listProducts({
             category_id: id,
           })
         ).items.filter((item: any) => item.state);
@@ -669,13 +669,13 @@
             return reloadCart(cart);
           })
           .then(async () => {
-            const goods = await getGoods(goods_id);
+            const goods = await getProduct(goods_id);
             state.goodsStack[goods.goods_id] = goods;
           });
       }
 
       const changeTable = () => {
-        console.log('state---item', state.cartGoods);
+        console.log('state---item', state.cartProduct);
       };
 
       const changeDiners = async (diners) => {
@@ -688,14 +688,14 @@
       };
 
       const computedQuantity = () => {
-        return state.cartGoods.reduce((prev, cur) => prev + cur.quantity, 0);
+        return state.cartProduct.reduce((prev, cur) => prev + cur.quantity, 0);
       };
 
       // 下单|餐车上菜 弹窗
       const handleDishUpModal = () => {
         if (state.cart.dish_up) return;
         if (state.order_id > 0) return;
-        if (state.cartGoods && state.cartGoods.length) {
+        if (state.cartProduct && state.cartProduct.length) {
           state.visible = true;
         }
       };
@@ -820,8 +820,8 @@
         getPreset,
         registerPaymentModal,
         goPay,
-        getGoodsList,
-        getGoodsImage,
+        getProductList,
+        getProductImage,
         defaultImg,
         currentId,
         pageWidth,
@@ -830,7 +830,7 @@
         closingVisible,
         handelChangeQuantity,
         ChangeQuantity,
-        handleDeleteGoods,
+        handleDeleteProduct,
         handleCategoryClick,
         handleProdcutSelected,
         managementOrder,

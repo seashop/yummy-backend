@@ -1,10 +1,10 @@
-import { GoodsItem } from '../../stores/model/productModel';
+import { ProductItem } from '../../stores/model/productModel';
 import { OrderUser } from './ordersModel';
 import { BasicFetchResult } from '/@/api/model/baseModel';
 
 export interface EvaluateItem {
   id: number;
-  goods: GoodsItem;
+  goods: ProductItem;
   user: OrderUser;
   content: string;
   reply_content: string;
