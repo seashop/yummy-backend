@@ -53,7 +53,7 @@
         innId: '',
       });
 
-      const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
+      const [registerForm, { resetSchema, setFieldsValue, validate }] = useForm({
         labelWidth: 90,
         baseColProps: { span: 24 },
         schemas: formSchema,
@@ -61,7 +61,7 @@
       });
 
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
-        resetFields();
+        resetSchema(formSchema);
         setModalProps({ confirmLoading: false });
         isUpdate.value = !!data?.isUpdate;
         images.value = (await listImages()).images;

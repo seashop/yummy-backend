@@ -67,11 +67,19 @@ export const searchFormSchema: FormSchema[] = [
     label: '商户',
     required: true,
     component: 'ApiSelect',
-    componentProps: {
-      api: listInns,
-      resultField: 'inns',
-      labelField: 'title',
-      valueField: 'id',
+    componentProps: ({ formModel }) => {
+      console.log(formModel);
+      return {
+        api: listInns,
+        resultField: 'inns',
+        labelField: 'title',
+        valueField: 'id',
+        onOptionsChange: (options) => {
+          if (options.length > 0) {
+            formModel.innId = options[0].value;
+          }
+        },
+      };
     },
     colProps: { span: 8 },
   },
@@ -102,11 +110,20 @@ export const formSchema: FormSchema[] = [
     label: '所属商户',
     required: true,
     component: 'ApiSelect',
-    componentProps: {
-      api: listInns,
-      resultField: 'inns',
-      labelField: 'title',
-      valueField: 'id',
+    componentProps: ({ schema, formModel }) => {
+      console.log(formModel);
+      return {
+        api: listInns,
+        resultField: 'inns',
+        labelField: 'title',
+        valueField: 'id',
+        onOptionsChange: (options) => {
+          if (options.length > 0) {
+            schema.defaultValue = options[0].value;
+            formModel.innId = options[0].value;
+          }
+        },
+      };
     },
   },
   {
@@ -114,8 +131,7 @@ export const formSchema: FormSchema[] = [
     label: '所属分类',
     required: true,
     component: 'ApiSelect',
-    componentProps: ({ formModel }) => {
-      console.log(formModel);
+    componentProps: ({ schema, formModel }) => {
       return {
         api: listCategory,
         params: {
@@ -124,6 +140,12 @@ export const formSchema: FormSchema[] = [
         resultField: 'productCats',
         labelField: 'title',
         valueField: 'id',
+        onOptionsChange: (options) => {
+          if (options.length > 0) {
+            schema.defaultValue = options[0].value;
+            formModel.catId = options[0].value;
+          }
+        },
       };
     },
   },
