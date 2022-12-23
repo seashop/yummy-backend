@@ -21,6 +21,7 @@ const system: AppRouteModule = {
       meta: {
         // affix: true,
         title: t('routes.system.config'),
+        hideMenu: true,
       },
     },
     {

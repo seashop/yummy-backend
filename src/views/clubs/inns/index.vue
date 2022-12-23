@@ -11,6 +11,10 @@
           <TableAction
             :actions="[
               {
+                icon: 'ant-design:setting-twotone',
+                onClick: handleEditConfig.bind(null, record),
+              },
+              {
                 icon: 'clarity:note-edit-line',
                 onClick: handleEdit.bind(null, record),
               },
@@ -40,12 +44,14 @@
   import DetailModal from './DetailModal.vue';
   import { columns, searchFormSchema } from './inn.data';
   import { ListInnsRequest } from '/@/gen/yummy/v1/club_service';
+  import { useGo } from '/@/hooks/web/usePage';
 
   export default defineComponent({
     name: 'InnManagement',
     components: { BasicTable, DetailModal, TableAction },
     setup() {
       const { t } = useI18n();
+      const go = useGo();
 
       const [registerModal, { openModal }] = useModal();
       const [registerTable, { reload, getForm }] = useTable({
@@ -65,7 +71,7 @@
         bordered: true,
         showIndexColumn: false,
         actionColumn: {
-          width: 80,
+          width: 160,
           title: '操作',
           dataIndex: 'action',
           fixed: undefined,
@@ -95,6 +101,10 @@
         });
       }
 
+      function handleEditConfig(record: Recordable) {
+        go(`/clubs/inns/${record.id}/config`);
+      }
+
       function handleDelete(record: Recordable) {
         console.log(record);
       }
@@ -113,6 +123,7 @@
         registerModal,
         handleCreate,
         handleEdit,
+        handleEditConfig,
         handleDelete,
         handleUpdateSuccess,
       };

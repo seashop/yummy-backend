@@ -12,6 +12,7 @@ const plugins: AppRouteModule = {
     orderNo: 50,
     icon: 'ion:grid-outline',
     title: t('routes.plugins.plugins'),
+    hideMenu: true,
   },
   children: [
     {

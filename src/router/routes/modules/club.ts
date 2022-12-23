@@ -9,7 +9,7 @@ const clubs: AppRouteModule = {
   component: LAYOUT,
   redirect: '/clubs/club',
   meta: {
-    orderNo: 40,
+    orderNo: 20,
     icon: 'ion:grid-outline',
     title: t('routes.clubs.clubs'),
   },
@@ -21,6 +21,18 @@ const clubs: AppRouteModule = {
       meta: {
         // affix: true,
         title: t('routes.clubs.inns'),
+      },
+    },
+    {
+      path: 'inns/:id/config',
+      name: 'InnConfig',
+      component: () => import('/@/views/clubs/inns/config.vue'),
+      meta: {
+        currentActiveMenu: '/clubs/inns',
+        title: t('routes.clubs.inns'),
+        hideMenu: true,
+        dynamicLevel: 3,
+        realPath: '/feat/tabs/detail',
       },
     },
   ],

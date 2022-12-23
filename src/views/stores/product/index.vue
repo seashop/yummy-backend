@@ -89,7 +89,10 @@
       });
 
       function toggleSwitch(record: Product, key: string) {
-        switchProduct(record.id, key);
+        if (!record) {
+          return;
+        }
+        switchProduct(record.id as string, key);
       }
 
       function handleCreate() {

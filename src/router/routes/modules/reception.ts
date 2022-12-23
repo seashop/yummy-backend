@@ -12,6 +12,7 @@ const reception: AppRouteModule = {
     orderNo: 20,
     icon: 'ion:grid-outline',
     title: t('routes.reception.reception'),
+    hideMenu: true,
   },
   children: [
     {

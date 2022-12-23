@@ -1,12 +1,15 @@
 import { bindParams } from '../util';
 import { ListInnsRequest, ListInnsResponse } from '/@/gen/merchant/v1/inn_service';
-import { Inn } from '/@/gen/yummy/v1/club';
+import { Inn, InnConfig } from '/@/gen/yummy/v1/club';
+import { ListInnConfigsResponse } from '/@/gen/yummy/v1/club_service';
 import { defHttp } from '/@/utils/http/axios';
 
 export enum Api {
   ListInns = '/inns:list',
   CreateInn = '/inns',
   UpdateInn = '/inns/{id}',
+  ListInnConfigs = '/inns/{innId}/configs:list',
+  BatchUpdateInnConfigs = '/inns/{innId}/configs:batchUpdate',
 }
 
 /**
@@ -28,5 +31,18 @@ export const updateInn = (id: string, data: Inn) => {
   return defHttp.patch({
     url: bindParams(Api.UpdateInn, { id }),
     data: data,
+  });
+};
+
+export const listInnConfigs = (innId: string) => {
+  return defHttp.post<ListInnConfigsResponse>({
+    url: bindParams(Api.ListInnConfigs, { innId }),
+  });
+};
+
+export const batchUpdateInnConfigs = (innId: string, data: InnConfig[]) => {
+  return defHttp.post<ListInnConfigsResponse>({
+    url: bindParams(Api.BatchUpdateInnConfigs, { innId }),
+    data,
   });
 };
