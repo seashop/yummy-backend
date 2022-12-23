@@ -2,7 +2,9 @@
   <div>
     <BasicTable @register="registerTable">
       <template #toolbar>
-        <a-button type="primary" @click="handleCreate"> 新增商品 </a-button>
+        <a-button type="primary" @click="handleCreate">
+          {{ t('routes.stores.createProduct') }}
+        </a-button>
       </template>
       <template #bodyCell="{ column, record }">
         <template v-if="['is_hot', 'is_recommend', 'is_new', 'state'].indexOf(column.key) !== -1">
@@ -53,14 +55,17 @@
   import ProductModal from './ProductModal.vue';
   import { columns, searchFormSchema } from './product.data';
   import { Product } from '/@/gen/yummy/v1/product';
+  import { useI18n } from '/@/hooks/web/useI18n';
 
   export default defineComponent({
     name: 'ProductManagement',
     components: { BasicTable, ProductModal, TableAction, Image, Switch },
     setup() {
+      const { t } = useI18n();
+
       const [registerModal, { openModal }] = useModal();
       const [registerTable, { reload }] = useTable({
-        title: '产品列表',
+        title: t('routes.stores.listProducts'),
         api: listProducts,
         fetchSetting: {
           listField: 'products',
@@ -109,6 +114,7 @@
       }
 
       return {
+        t,
         registerTable,
         registerModal,
         toggleSwitch,

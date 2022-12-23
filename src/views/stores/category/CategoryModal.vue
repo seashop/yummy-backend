@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref, computed, unref, reactive, toRefs } from 'vue';
+  import { defineComponent, ref, computed, reactive, toRefs } from 'vue';
   import { Image } from 'ant-design-vue';
   import { useDrawer } from '/@/components/Drawer';
   import { BasicForm, useForm } from '/@/components/Form/index';
@@ -45,12 +45,11 @@
     setup(_, { emit }) {
       const [registerDrawer, { openDrawer }] = useDrawer();
 
-      const isUpdate = ref(true);
-      const images = ref<ImageItem[]>([]);
-      const rowId = ref('');
-
       const state = reactive({
         innId: '',
+        isUpdate: ref(true),
+        images: ref<ImageItem[]>([]),
+        rowId: ref(''),
       });
 
       const [registerForm, { resetSchema, setFieldsValue, validate }] = useForm({
@@ -63,18 +62,18 @@
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
         resetSchema(formSchema);
         setModalProps({ confirmLoading: false });
-        isUpdate.value = !!data?.isUpdate;
-        images.value = (await listImages()).images;
+        state.isUpdate = !!data?.isUpdate;
+        state.images = (await listImages()).images ?? [];
 
-        if (unref(isUpdate)) {
-          rowId.value = data.record.id;
+        if (state.isUpdate) {
+          state.rowId = data.record.id;
           setFieldsValue({
             ...data.record,
           });
         }
       });
 
-      const getTitle = computed(() => (!unref(isUpdate) ? '新增分类' : '编辑分类'));
+      const getTitle = computed(() => (!state.isUpdate ? '新增分类' : '编辑分类'));
 
       function fieldValueChange(k, v) {
         switch (k) {
@@ -87,8 +86,8 @@
       }
 
       function getImageUrlById(id: String) {
-        for (let index = 0; index < images.value.length; index++) {
-          const image = images.value[index];
+        for (let index = 0; index < state.images.length; index++) {
+          const image = state.images[index];
           if (image.id == id) {
             return imageUrl(image.id);
           }
@@ -97,7 +96,7 @@
       }
 
       async function handlePictureDrawerRealod() {
-        images.value = (await listImages()).images;
+        state.images = (await listImages()).images ?? [];
       }
 
       function handlePictureDrawerSuccess({ ids }) {
@@ -112,8 +111,8 @@
           setModalProps({ confirmLoading: true });
           closeModal();
           emit('success', {
-            isUpdate: unref(isUpdate),
-            values: { ...values, id: unref(isUpdate) ? rowId.value : undefined },
+            isUpdate: state.isUpdate,
+            values: { ...values, id: state.isUpdate ? state.rowId : undefined },
           });
         } catch (e) {
           console.log(e);
@@ -124,7 +123,6 @@
 
       return {
         ...toRefs(state),
-        images,
         registerModal,
         registerForm,
         getTitle,

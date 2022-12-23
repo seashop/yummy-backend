@@ -17,7 +17,7 @@
               },
               {
                 icon: 'clarity:note-edit-line',
-                ifShow: () => false,
+                ifShow: () => true,
                 onClick: handleEdit.bind(null, record),
               },
               {
@@ -53,15 +53,18 @@
   import PasswordModal from './PasswordModal.vue';
   import UserModal from './UserModal.vue';
   import { columns, searchFormSchema } from './user.data';
+  import { ListUsersRequest } from '/@/gen/yummy/v1/user_service';
+  import { UserFilter } from '/@/gen/yummy/v1/user';
 
   export default defineComponent({
     name: 'UserManagement',
     components: { BasicTable, TableAction, Image, PasswordModal, UserModal },
     setup() {
       const [registerModal, { openModal }] = useModal();
-      const [registerTable, { reload }] = useTable({
+      const [registerTable, { getForm, reload }] = useTable({
         title: '管理员列表',
         api: listUsers,
+        handleSearchInfoFn: buildListRequest,
         fetchSetting: {
           listField: 'users',
         },
@@ -82,6 +85,16 @@
           fixed: undefined,
         },
       });
+
+      function buildListRequest(): ListUsersRequest {
+        const params = getForm().getFieldsValue();
+        const filter: UserFilter = {
+          loginName: {
+            contains: params.loginName as string,
+          },
+        };
+        return { filter };
+      }
 
       function handleCreate() {
         openModal(true, {

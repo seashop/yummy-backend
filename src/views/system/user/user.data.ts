@@ -1,5 +1,7 @@
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
+import { User_Role, User_Status } from '/@/gen/yummy/v1/user';
+import { selectEnumProps } from '/@/utils/pb';
 
 export const columns: BasicColumn[] = [
   {
@@ -58,6 +60,25 @@ export const formSchema: FormSchema[] = [
     label: '密码',
     required: true,
     component: 'InputPassword',
+  },
+  {
+    field: 'role',
+    label: '角色',
+    required: true,
+    component: 'Select',
+    componentProps: selectEnumProps(Object.entries(User_Role), function (item, value) {
+      if (value < 1000) {
+        item.disabled = true;
+      }
+      return item;
+    }),
+  },
+  {
+    field: 'status',
+    label: '状态',
+    required: true,
+    component: 'Select',
+    componentProps: selectEnumProps(Object.entries(User_Status)),
   },
   {
     field: 'description',

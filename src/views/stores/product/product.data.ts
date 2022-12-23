@@ -19,8 +19,38 @@ export const columns: BasicColumn[] = [
     width: 200,
   },
   {
+    title: '商户',
+    dataIndex: 'innId',
+    width: 200,
+  },
+  {
+    title: '分类',
+    dataIndex: 'catId',
+    width: 180,
+  },
+  {
+    title: '使用SKU',
+    dataIndex: 'hasSku',
+    width: 180,
+  },
+  {
+    title: '发布时间',
+    dataIndex: 'createdAt',
+    width: 180,
+  },
+  {
     title: '价格',
     dataIndex: 'price',
+    width: 180,
+  },
+  {
+    title: '排序',
+    dataIndex: 'sortId',
+    width: 180,
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
     width: 180,
   },
   // {

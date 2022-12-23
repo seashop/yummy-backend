@@ -5,7 +5,7 @@ import { User } from '/@/gen/yummy/v1/user';
 import { ListUsersRequest, ListUsersResponse } from '/@/gen/yummy/v1/user_service';
 
 export enum Api {
-  ListUsers = '/users',
+  ListUsers = '/users:list',
   CreateUser = '/users',
   UpdateUser = '/users/{id}',
   UpdateUserPassword = '/users/{id}/password',
@@ -17,7 +17,7 @@ export enum Api {
  */
 
 export const listUsers = (params?: ListUsersRequest) => {
-  return defHttp.get<ListUsersResponse>({ url: Api.ListUsers, params });
+  return defHttp.post<ListUsersResponse>({ url: Api.ListUsers, params });
 };
 
 export const createUser = (data: User) => {

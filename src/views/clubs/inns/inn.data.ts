@@ -1,7 +1,7 @@
-import { OptionsItem } from '/#/utils';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
 import { Inn_Runway, Inn_Status } from '/@/gen/yummy/v1/club';
+import { selectEnumProps } from '/@/utils/pb';
 
 export const columns: BasicColumn[] = [
   {
@@ -62,20 +62,7 @@ export const formSchema: FormSchema[] = [
     label: '商户类型',
     required: true,
     component: 'Select',
-    componentProps: ({ formModel, schema }) => {
-      const options: OptionsItem[] = [];
-      Object.entries(Inn_Runway).forEach(([key, value]) => {
-        if (Number.isNaN(Number(value)) || value <= 0) {
-          return;
-        }
-        options.push({ label: key, value: key });
-      });
-      schema.defaultValue = options[0].value;
-      formModel.runway = options[0].value;
-      return {
-        options,
-      };
-    },
+    componentProps: selectEnumProps(Object.entries(Inn_Runway)),
   },
   {
     field: 'phone',
@@ -94,19 +81,6 @@ export const formSchema: FormSchema[] = [
     label: '状态',
     required: true,
     component: 'Select',
-    componentProps: ({ formModel, schema }) => {
-      const options: OptionsItem[] = [];
-      Object.entries(Inn_Status).forEach(([key, value]) => {
-        if (Number.isNaN(Number(value)) || value <= 0) {
-          return;
-        }
-        options.push({ label: key, value: key });
-      });
-      schema.defaultValue = options[0].value;
-      formModel.status = options[0].value;
-      return {
-        options,
-      };
-    },
+    componentProps: selectEnumProps(Object.entries(Inn_Status)),
   },
 ];

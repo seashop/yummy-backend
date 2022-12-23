@@ -14,8 +14,23 @@ export const columns: BasicColumn[] = [
     width: 200,
   },
   {
+    title: '所属商户',
+    dataIndex: 'innId',
+    width: 200,
+  },
+  {
+    title: '排序',
+    dataIndex: 'sortId',
+    width: 180,
+  },
+  {
     title: '图片',
     dataIndex: 'imgId',
+    width: 180,
+  },
+  {
+    title: '更新时间',
+    dataIndex: 'updatedAt',
     width: 180,
   },
 ];
