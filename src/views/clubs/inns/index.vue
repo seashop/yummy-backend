@@ -38,7 +38,7 @@
 <script lang="ts">
   import { defineComponent } from 'vue';
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { listInns, updateInn } from '/@/api/clubs/inns';
+  import { createInn, listInns, updateInn } from '/@/api/clubs/inns';
   import { useModal } from '/@/components/Modal';
   import { useI18n } from '/@/hooks/web/useI18n';
   import DetailModal from './DetailModal.vue';
@@ -109,9 +109,14 @@
         console.log(record);
       }
 
-      async function handleUpdateSuccess({ values }) {
-        const result = await updateInn(values.id, values);
-        console.log(result);
+      async function handleUpdateSuccess({ isUpdate, values }) {
+        if (isUpdate) {
+          const result = await updateInn(values);
+          console.log(result);
+        } else {
+          const result = await createInn(values);
+          console.log(result);
+        }
         reload({
           searchInfo: buildListRequest(),
         });

@@ -27,9 +27,9 @@ export const createInn = (data: Inn) => {
   });
 };
 
-export const updateInn = (id: string, data: Inn) => {
+export const updateInn = (data: Inn) => {
   return defHttp.patch({
-    url: bindParams(Api.UpdateInn, { id }),
+    url: bindParams(Api.UpdateInn, data),
     data: data,
   });
 };

@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { store } from '/@/store';
 import { PresetModel } from '/@/api/common/model/preset';
-import { defaultCommonPreset } from '/@/api/common/preset';
 import { DiningTableItem } from '/@/api/plugins/model/diningTableModel';
 import { listDiningTables } from '/@/api/reception/dining';
 import { createLocalStorage } from '/@/utils/cache';
@@ -58,8 +57,9 @@ export const useYummyStore = defineStore({
 
     async getPresetAction(): Promise<PresetModel | undefined> {
       if (!this.preset) {
-        const preset = await defaultCommonPreset();
-        this.setPreset(preset);
+        // TODO: fetch preset
+        // const preset = await defaultCommonPreset();
+        // this.setPreset(preset);
       }
 
       return this.preset;
