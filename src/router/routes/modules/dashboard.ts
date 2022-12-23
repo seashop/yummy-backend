@@ -7,7 +7,6 @@ const dashboard: AppRouteModule = {
   path: '/dashboard',
   name: 'Dashboard',
   component: LAYOUT,
-  redirect: '/reception/management',
   meta: {
     orderNo: 10,
     icon: 'ion:grid-outline',
