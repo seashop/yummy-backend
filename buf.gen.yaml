@@ -18,6 +18,7 @@ plugins:
     strategy: all
     opt:
       - onlyTypes=true
+      - useOptionals=all
   # - name: grpc-web
   #   opt:
   #     - import_style=typescript

@@ -15,21 +15,12 @@ const customers: AppRouteModule = {
   },
   children: [
     {
-      path: 'inn',
-      name: 'Inn',
-      component: () => import('/@/views/customers/inn/index.vue'),
-      meta: {
-        // affix: true,
-        title: t('routes.customers.inn'),
-      },
-    },
-    {
       path: 'customer',
       name: 'Customer',
       component: () => import('/@/views/customers/customer/index.vue'),
       meta: {
         // affix: true,
-        title: t('routes.customers.customer'),
+        title: t('routes.customers.customers'),
       },
     },
     {

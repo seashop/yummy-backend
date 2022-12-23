@@ -1,4 +1,4 @@
-import { listInns } from '/@/api/customers/inn';
+import { listInns } from '../../../api/clubs/inns';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
 

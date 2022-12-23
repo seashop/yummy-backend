@@ -7,39 +7,22 @@
     width="500px"
     @ok="handleSubmit"
   >
-    <BasicForm @register="registerForm">
-      <template #picDrawer="{ model, field }">
-        <template v-if="model[field] > 0">
-          <Image :src="getImageUrlById(model[field])" :preview="false" />
-          <BasicButton :onClick="() => (model[field] = 0)">删除</BasicButton>
-        </template>
-        <BasicButton v-else :onClick="openDrawer">选择图片</BasicButton>
-      </template>
-    </BasicForm>
+    <BasicForm @register="registerForm" />
   </BasicModal>
-  <PictureDrawer
-    :images="images"
-    @register="registerDrawer"
-    @reload="handlePictureDrawerRealod"
-    @success="handlePictureDrawerSuccess"
-  />
 </template>
 
 <script lang="ts">
   import { defineComponent, ref, unref } from 'vue';
-  import { Image } from 'ant-design-vue';
   import { useDrawer } from '/@/components/Drawer';
   import { BasicForm, useForm } from '/@/components/Form/index';
   import { formSchema } from './inn.data';
   import { BasicModal, useModalInner } from '/@/components/Modal';
-  import PictureDrawer from '/@/components/AssetPicker/PictureDrawer.vue';
-  import BasicButton from '/@/components/Button/src/BasicButton.vue';
   import { listImages } from '/@/api/asset/image';
   import { ImageItem } from '/@/api/asset/model/imageModel';
 
   export default defineComponent({
     name: 'CategoryModal',
-    components: { Image, BasicModal, BasicForm, PictureDrawer, BasicButton },
+    components: { BasicModal, BasicForm },
     emits: ['success', 'register'],
     setup(_, { emit }) {
       const [registerDrawer, { openDrawer }] = useDrawer();
@@ -59,7 +42,6 @@
         resetFields();
         setModalProps({ confirmLoading: false });
         isUpdate.value = !!data?.isUpdate;
-        images.value = (await listImages()).items;
 
         if (unref(isUpdate)) {
           rowId.value = data.record.id;

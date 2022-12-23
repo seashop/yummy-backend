@@ -1,6 +1,11 @@
 <template>
   <div>
     <BasicTable @register="registerTable">
+      <template #toolbar>
+        <a-button type="primary" @click="handleCreate">
+          {{ t('routes.clubs.createInn') }}
+        </a-button>
+      </template>
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'action'">
           <TableAction
@@ -28,22 +33,25 @@
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue';
-
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
-  import { listInns, updateInn } from '/@/api/customers/inn';
+  import { listInns, updateInn } from '/@/api/clubs/inns';
   import { useModal } from '/@/components/Modal';
-
+  import { useI18n } from '/@/hooks/web/useI18n';
   import DetailModal from './DetailModal.vue';
   import { columns, searchFormSchema } from './inn.data';
+  import { ListInnsRequest } from '/@/gen/yummy/v1/club_service';
 
   export default defineComponent({
     name: 'InnManagement',
     components: { BasicTable, DetailModal, TableAction },
     setup() {
+      const { t } = useI18n();
+
       const [registerModal, { openModal }] = useModal();
-      const [registerTable, { reload }] = useTable({
-        title: '用户列表',
+      const [registerTable, { reload, getForm }] = useTable({
+        title: t('routes.clubs.listInns'),
         api: listInns,
+        handleSearchInfoFn: buildListRequest,
         fetchSetting: {
           listField: 'inns',
         },
@@ -64,6 +72,22 @@
         },
       });
 
+      function buildListRequest(): ListInnsRequest {
+        const params = getForm().getFieldsValue();
+        const filter = {
+          title: {
+            contains: params.title as string,
+          },
+        };
+        return { filter };
+      }
+
+      function handleCreate() {
+        openModal(true, {
+          isUpdate: false,
+        });
+      }
+
       function handleEdit(record: Recordable) {
         openModal(true, {
           record,
@@ -78,12 +102,16 @@
       async function handleUpdateSuccess({ values }) {
         const result = await updateInn(values.id, values);
         console.log(result);
-        reload();
+        reload({
+          searchInfo: buildListRequest(),
+        });
       }
 
       return {
+        t,
         registerTable,
         registerModal,
+        handleCreate,
         handleEdit,
         handleDelete,
         handleUpdateSuccess,

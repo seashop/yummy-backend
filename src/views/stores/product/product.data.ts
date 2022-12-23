@@ -1,4 +1,4 @@
-import { listInns } from '/@/api/customers/inn';
+import { listInns } from '../../../api/clubs/inns';
 import { listCategory } from '/@/api/stores/category';
 import { useComponentRegister } from '/@/components/Form';
 import { ComponentType } from '/@/components/Form/src/types';
@@ -110,7 +110,7 @@ export const formSchema: FormSchema[] = [
     label: '所属商户',
     required: true,
     component: 'ApiSelect',
-    componentProps: ({ schema, formModel }) => {
+    componentProps: ({ formModel, schema }) => {
       console.log(formModel);
       return {
         api: listInns,
@@ -131,7 +131,7 @@ export const formSchema: FormSchema[] = [
     label: '所属分类',
     required: true,
     component: 'ApiSelect',
-    componentProps: ({ schema, formModel }) => {
+    componentProps: ({ formModel, schema }) => {
       return {
         api: listCategory,
         params: {
