@@ -1,29 +1,24 @@
 import { defHttp } from '/@/utils/http/axios';
-import {
-  OrderItem,
-  OrderListResultModel,
-  OrderPriceType,
-  PayOrderType,
-  selectParams,
-} from './model/ordersModel';
+import { OrderItem, OrderListResultModel, OrderPriceType, PayOrderType } from './model/ordersModel';
 import { bindParams } from '../util';
+import { ListOrdersRequest, ListOrdersResponse } from '/@/gen/yummy/v1/order_service';
 
 enum Api {
-  ListOrders = '/order/admin',
-  EditOrderPay = '/order/admin/{id}/pay',
-  EditOrderCourier = '/order/admin/{id}/courier',
-  EditOrderReceive = '/order/admin/{id}/receive',
-  DeleteOrder = '/order/admin/{id}/destroy',
-  UpdateOrderPrice = '/order/admin/{id}/price',
-  PrintOrderReceipt = '/order/admin/{id}/print/receipt',
+  ListOrders = '/orders:list',
+  EditOrderPay = '/orders/{id}/pay',
+  EditOrderCourier = '/orders/{id}/courier',
+  EditOrderReceive = '/orders/{id}/receive',
+  DeleteOrder = '/orders/{id}',
+  UpdateOrderPrice = '/orders/{id}/price',
+  PrintOrderReceipt = '/orders/{id}/print/receipt',
 }
 
 /**
  * @description: order management
  */
 
-export const listOrders = (params?: selectParams) => {
-  return defHttp.get<OrderListResultModel>({ url: Api.ListOrders, params });
+export const listOrders = (data?: ListOrdersRequest) => {
+  return defHttp.post<ListOrdersResponse>({ url: Api.ListOrders, data });
 };
 
 export const editOrderPay = (id: number, data: Partial<PayOrderType>) => {

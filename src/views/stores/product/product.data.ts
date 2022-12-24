@@ -141,7 +141,6 @@ export const formSchema: FormSchema[] = [
     required: true,
     component: 'ApiSelect',
     componentProps: ({ formModel, schema }) => {
-      console.log(formModel);
       return {
         api: listInns,
         resultField: 'inns',
@@ -162,6 +161,9 @@ export const formSchema: FormSchema[] = [
     required: true,
     component: 'ApiSelect',
     componentProps: ({ formModel, schema }) => {
+      if (!formModel.innId) {
+        return {};
+      }
       return {
         api: listCategory,
         params: {

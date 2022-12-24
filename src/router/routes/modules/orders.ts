@@ -23,22 +23,22 @@ const orders: AppRouteModule = {
         title: t('routes.orders.order'),
       },
     },
-    {
-      path: 'evaluate',
-      name: 'Evaluate',
-      component: () => import('/@/views/orders/evaluate/index.vue'),
-      meta: {
-        title: t('routes.orders.evaluate'),
-      },
-    },
-    {
-      path: 'refund',
-      name: 'Refund',
-      component: () => import('/@/views/orders/refund/index.vue'),
-      meta: {
-        title: t('routes.orders.refund'),
-      },
-    },
+    // {
+    //   path: 'evaluate',
+    //   name: 'Evaluate',
+    //   component: () => import('/@/views/orders/evaluate/index.vue'),
+    //   meta: {
+    //     title: t('routes.orders.evaluate'),
+    //   },
+    // },
+    // {
+    //   path: 'refund',
+    //   name: 'Refund',
+    //   component: () => import('/@/views/orders/refund/index.vue'),
+    //   meta: {
+    //     title: t('routes.orders.refund'),
+    //   },
+    // },
   ],
 };
 

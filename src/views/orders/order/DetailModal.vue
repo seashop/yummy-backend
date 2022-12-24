@@ -9,16 +9,15 @@
   >
     <BasicForm @register="registerForm">
       <template #picDrawer="{ model, field }">
-        <template v-if="model[field]?.length > 0">
+        <template v-if="model[field] > 0">
           <Image :src="getImageUrlById(model[field])" :preview="false" />
           <BasicButton :onClick="() => (model[field] = 0)">删除</BasicButton>
         </template>
-        <BasicButton v-else :onClick="openPictureDrawer()">选择图片</BasicButton>
+        <BasicButton v-else :onClick="openDrawer">选择图片</BasicButton>
       </template>
     </BasicForm>
   </BasicModal>
   <PictureDrawer
-    :innId="innId"
     :images="images"
     @register="registerDrawer"
     @reload="handlePictureDrawerRealod"
@@ -27,11 +26,11 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref, computed, reactive, toRefs } from 'vue';
+  import { defineComponent, ref, unref } from 'vue';
   import { Image } from 'ant-design-vue';
   import { useDrawer } from '/@/components/Drawer';
   import { BasicForm, useForm } from '/@/components/Form/index';
-  import { formSchema } from './category.data';
+  import { formSchema } from './order.data';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import PictureDrawer from '/@/components/AssetPicker/PictureDrawer.vue';
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
@@ -39,24 +38,17 @@
   import { Image as ImageItem } from '/@/gen/yummy/v1/storage';
 
   export default defineComponent({
-    name: 'CategoryModal',
+    name: 'OrderModal',
     components: { Image, BasicModal, BasicForm, PictureDrawer, BasicButton },
     emits: ['success', 'register'],
     setup(_, { emit }) {
-      const state = reactive({
-        innId: '',
-        isUpdate: ref(true),
-        images: ref<ImageItem[]>([]),
-        rowId: ref(''),
-      });
-
       const [registerDrawer, { openDrawer }] = useDrawer();
-      function openPictureDrawer() {
-        state.innId = getFieldsValue()['innId'];
-        return openDrawer;
-      }
 
-      const [registerForm, { resetSchema, getFieldsValue, setFieldsValue, validate }] = useForm({
+      const isUpdate = ref(true);
+      const images = ref<ImageItem[]>([]);
+      const rowId = ref('');
+
+      const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
         labelWidth: 90,
         baseColProps: { span: 24 },
         schemas: formSchema,
@@ -64,24 +56,24 @@
       });
 
       const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
-        resetSchema(formSchema);
+        resetFields();
         setModalProps({ confirmLoading: false });
-        state.isUpdate = !!data?.isUpdate;
-        state.images = (await listImages()).images ?? [];
+        isUpdate.value = !!data?.isUpdate;
+        images.value = (await listImages()).images ?? [];
 
-        if (state.isUpdate) {
-          state.rowId = data.record.id;
+        if (unref(isUpdate)) {
+          rowId.value = data.record.id;
           setFieldsValue({
             ...data.record,
           });
         }
       });
 
-      const getTitle = computed(() => (!state.isUpdate ? '新增分类' : '编辑分类'));
+      const getTitle = '详情';
 
-      function getImageUrlById(id: String) {
-        for (let index = 0; index < state.images.length; index++) {
-          const image = state.images[index];
+      function getImageUrlById(id: string) {
+        for (let index = 0; index < images.value.length; index++) {
+          const image = images.value[index];
           if (image.id == id) {
             return imageUrl(image.id);
           }
@@ -90,12 +82,12 @@
       }
 
       async function handlePictureDrawerRealod() {
-        state.images = (await listImages()).images ?? [];
+        images.value = (await listImages()).images ?? [];
       }
 
       function handlePictureDrawerSuccess({ ids }) {
         setFieldsValue({
-          imgId: ids?.length > 0 ? ids[0] : null,
+          img_id: ids?.length > 0 ? ids[0] : null,
         });
       }
 
@@ -103,26 +95,26 @@
         try {
           const values = await validate();
           setModalProps({ confirmLoading: true });
+          // TODO custom api
+          console.log(values);
           closeModal();
           emit('success', {
-            isUpdate: state.isUpdate,
-            values: { ...values, id: state.isUpdate ? state.rowId : undefined },
+            isUpdate: unref(isUpdate),
+            values: { ...values, id: unref(isUpdate) ? rowId.value : undefined },
           });
-        } catch (e) {
-          console.log(e);
         } finally {
           setModalProps({ confirmLoading: false });
         }
       }
 
       return {
-        ...toRefs(state),
+        images,
         registerModal,
         registerForm,
         getTitle,
         handleSubmit,
         registerDrawer,
-        openPictureDrawer,
+        openDrawer,
         getImageUrlById,
         handlePictureDrawerRealod,
         handlePictureDrawerSuccess,

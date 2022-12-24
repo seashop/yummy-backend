@@ -19,7 +19,9 @@
           />
           <BasicButton :onClick="() => (model[field] = 0)">删除</BasicButton>
         </template>
-        <BasicButton v-else :onClick="() => openDrawer(true, { field })"> 选择图片 </BasicButton>
+        <BasicButton v-else :onClick="() => openPictureDrawer()(true, { field })">
+          选择图片
+        </BasicButton>
       </template>
       <template #sku="{}">
         <FormItemRest>
@@ -68,9 +70,6 @@
     },
     emits: ['success', 'register', 'back'],
     setup(_, { emit }) {
-      const { createMessage } = useMessage();
-      const [registerDrawer, { openDrawer }] = useDrawer();
-
       const state = reactive({
         innId: '',
         sub: 0,
@@ -81,7 +80,14 @@
         rowId: '' as string,
       });
 
-      const [registerForm, { resetSchema, setFieldsValue, validate }] = useForm({
+      const { createMessage } = useMessage();
+      const [registerDrawer, { openDrawer }] = useDrawer();
+      function openPictureDrawer() {
+        state.innId = getFieldsValue()['innId'];
+        return openDrawer;
+      }
+
+      const [registerForm, { resetSchema, getFieldsValue, setFieldsValue, validate }] = useForm({
         labelWidth: 90,
         baseColProps: { span: 24 },
         schemas: formSchema,
@@ -98,7 +104,7 @@
 
         if (unref(state.isUpdate)) {
           const record = await getProduct(data.record.innId, data.record.id);
-          state.rowId = record.id;
+          state.rowId = record.id as string;
 
           if (record?.skuAttrIds.length > 0) {
             setFieldsValue({
@@ -148,7 +154,7 @@
       }
 
       async function handlePictureDrawerRealod() {
-        state.images = (await listImages()).images;
+        state.images = (await listImages()).images ?? [];
       }
       handlePictureDrawerRealod();
 
@@ -229,7 +235,7 @@
         handleSkuResult,
         handleSubmit,
         registerDrawer,
-        openDrawer,
+        openPictureDrawer,
         getImageUrlById,
         handlePictureDrawerRealod,
         handlePictureDrawerSuccess,

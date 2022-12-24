@@ -34,8 +34,8 @@
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import PictureDrawer from '/@/components/AssetPicker/PictureDrawer.vue';
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
-  import { listImages } from '/@/api/asset/image';
-  import { ImageItem } from '/@/api/asset/model/imageModel';
+  import { imageUrl, listImages } from '/@/api/asset/image';
+  import { Image as ImageItem } from '/@/gen/yummy/v1/storage';
 
   export default defineComponent({
     name: 'CategoryModal',
@@ -59,7 +59,7 @@
         resetFields();
         setModalProps({ confirmLoading: false });
         isUpdate.value = !!data?.isUpdate;
-        images.value = (await listImages()).items;
+        images.value = (await listImages()).images ?? [];
 
         if (unref(isUpdate)) {
           rowId.value = data.record.id;
@@ -71,19 +71,18 @@
 
       const getTitle = '详情';
 
-      function getImageUrlById(id: Number) {
+      function getImageUrlById(id: string) {
         for (let index = 0; index < images.value.length; index++) {
           const image = images.value[index];
           if (image.id == id) {
-            console.log(image.full_url);
-            return image.full_url;
+            return imageUrl(image.id);
           }
         }
         return '';
       }
 
       async function handlePictureDrawerRealod() {
-        images.value = (await listImages()).items;
+        images.value = (await listImages()).images ?? [];
       }
 
       function handlePictureDrawerSuccess({ ids }) {
