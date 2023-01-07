@@ -1,4 +1,5 @@
 import { BasicFetchResult } from '/@/api/model/baseModel';
+import { InnConfig_Cat } from '/@/gen/yummy/v1/club';
 
 export interface ConfigItem {
   id: number;
@@ -15,7 +16,7 @@ export interface ConfigItem {
 
 export interface ConfigGroupItem {
   id: number;
-  scope: string;
+  scope: InnConfig_Cat;
   title: string;
   // created_at: Date;
   // updated_at: Date;

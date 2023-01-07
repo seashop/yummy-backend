@@ -1,7 +1,7 @@
 import { bindParams } from '../util';
 import { ListInnsRequest, ListInnsResponse } from '/@/gen/merchant/v1/inn_service';
-import { Inn, InnConfig } from '/@/gen/yummy/v1/club';
-import { ListInnConfigsResponse } from '/@/gen/yummy/v1/club_service';
+import { Inn, InnConfig, InnConfig_Cat } from '/@/gen/yummy/v1/club';
+import { ListInnConfigsRequest, ListInnConfigsResponse } from '/@/gen/yummy/v1/club_service';
 import { defHttp } from '/@/utils/http/axios';
 
 export enum Api {
@@ -34,9 +34,13 @@ export const updateInn = (data: Inn) => {
   });
 };
 
-export const listInnConfigs = (innId: string) => {
+export const listInnConfigs = (innId: string, cat: InnConfig_Cat) => {
+  const data: ListInnConfigsRequest = {
+    filter: { cat },
+  };
   return defHttp.post<ListInnConfigsResponse>({
     url: bindParams(Api.ListInnConfigs, { innId }),
+    data,
   });
 };
 
