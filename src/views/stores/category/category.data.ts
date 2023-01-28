@@ -1,6 +1,7 @@
 import { listInns } from '../../../api/clubs/inns';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
+import { dateUtil, formatToDateTime } from '/@/utils/dateUtil';
 
 export const columns: BasicColumn[] = [
   {
@@ -32,6 +33,9 @@ export const columns: BasicColumn[] = [
     title: '更新时间',
     dataIndex: 'updatedAt',
     width: 180,
+    format: (_, record) => {
+      return record?.updatedAt ? formatToDateTime(dateUtil(record?.updatedAt)) : '-';
+    },
   },
 ];
 

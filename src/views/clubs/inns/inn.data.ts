@@ -1,6 +1,7 @@
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
 import { Inn_Runway, Inn_Status } from '/@/gen/yummy/v1/club';
+import { dateUtil, formatToDateTime } from '/@/utils/dateUtil';
 import { selectEnumProps } from '/@/utils/pb';
 
 export const columns: BasicColumn[] = [
@@ -38,6 +39,9 @@ export const columns: BasicColumn[] = [
     title: '创建时间',
     dataIndex: 'createdAt',
     width: 180,
+    format: (_, record) => {
+      return record?.createdAt ? formatToDateTime(dateUtil(record?.createdAt)) : '-';
+    },
   },
 ];
 

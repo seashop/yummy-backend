@@ -1,6 +1,7 @@
 import { listLevels } from '/@/api/customers/level';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
+import { dateUtil, formatToDateTime } from '/@/utils/dateUtil';
 
 export const columns: BasicColumn[] = [
   {
@@ -20,8 +21,11 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '创建时间',
-    dataIndex: 'created_at',
+    dataIndex: 'createdAt',
     width: 180,
+    format: (_, record) => {
+      return record?.createdAt ? formatToDateTime(dateUtil(record?.createdAt)) : '-';
+    },
   },
   {
     title: '顾客',

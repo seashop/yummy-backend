@@ -4,6 +4,7 @@ import { useComponentRegister } from '/@/components/Form';
 import { ComponentType } from '/@/components/Form/src/types';
 import { BasicColumn, FormSchema } from '/@/components/Table';
 import { Tinymce } from '/@/components/Tinymce/index';
+import { dateUtil, formatToDateTime } from '/@/utils/dateUtil';
 
 useComponentRegister('Tinymce' as ComponentType, Tinymce);
 
@@ -32,11 +33,17 @@ export const columns: BasicColumn[] = [
     title: '使用SKU',
     dataIndex: 'hasSku',
     width: 180,
+    format: (_, record) => {
+      return record?.hasSku ? '是' : '否';
+    },
   },
   {
     title: '发布时间',
     dataIndex: 'createdAt',
     width: 180,
+    format: (_, record) => {
+      return record?.createdAt ? formatToDateTime(dateUtil(record?.createdAt)) : '-';
+    },
   },
   {
     title: '价格',
@@ -98,7 +105,6 @@ export const searchFormSchema: FormSchema[] = [
     required: true,
     component: 'ApiSelect',
     componentProps: ({ formModel }) => {
-      console.log(formModel);
       return {
         api: listInns,
         resultField: 'inns',
