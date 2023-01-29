@@ -62,6 +62,13 @@ export const formSchema: FormSchema[] = [
     component: 'Input',
   },
   {
+    field: 'logoId',
+    label: '商户Logo',
+    required: true,
+    slot: 'picDrawer',
+    component: 'Input',
+  },
+  {
     field: 'runway',
     label: '商户类型',
     required: true,
