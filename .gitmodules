@@ -1,0 +1,4 @@
+[submodule "deps/yummy-go"]
+	path = deps/yummy-go
+	url = https://github.com/seashop/yummy-go.git
+	branch = main
