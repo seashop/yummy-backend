@@ -1,1 +1,0 @@
-import{d$ as n,e0 as r}from"./index.332f1f61.js";const e=t=>n.get({url:r("/inns/{innId}/productCats",t),params:t}),o=t=>n.post({url:r("/inns/{innId}/productCats",t),data:t}),u=t=>n.patch({url:r("/inns/{innId}/productCats/{id}",t),data:t});export{o as c,e as l,u};

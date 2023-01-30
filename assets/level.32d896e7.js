@@ -1,0 +1,1 @@
+import{d$ as l}from"./index.6d9bb3fb.js";const r=e=>l.get({url:"/level/admin/get_all_level",params:e}),a=e=>l.post({url:"/level/admin/add_level",data:e}),s=e=>l.post({url:"/level/admin/edit_level",data:e});export{a as c,r as l,s as u};
