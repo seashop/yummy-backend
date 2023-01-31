@@ -1,0 +1,1 @@
+import{d$ as e,e0 as s}from"./index.05f21f62.js";const p=r=>e.post({url:"/orders:list",data:r}),i=(r,t)=>e.patch({url:s("/orders/{id}/pay",{id:r}),data:t}),a=(r,t)=>e.patch({url:s("/orders/{id}/price",{id:r}),data:t}),o=r=>e.post({url:s("/orders/{id}/print/receipt",{id:r})});export{i as e,p as l,o as p,a as u};
