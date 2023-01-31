@@ -27,6 +27,9 @@ export const createImage = (data: Partial<Image>) => {
 
 export const CreateImageUrl = globSetting.apiUrl + globSetting.urlPrefix + Api.Upload;
 
-export const imageUrl = (id: string) => {
+export const imageUrl = (id: string | undefined) => {
+  if (!id) {
+    console.log('empty image id');
+  }
   return bindParams(globSetting.apiUrl + globSetting.urlPrefix + Api.ImageUrl, { id });
 };

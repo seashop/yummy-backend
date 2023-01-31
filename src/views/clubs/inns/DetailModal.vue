@@ -20,7 +20,6 @@
     </BasicForm>
   </BasicModal>
   <PictureDrawer
-    innId="00000000000000000000000000"
     :images="state.images"
     :limit="1"
     @register="registerDrawer"
