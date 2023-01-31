@@ -12,27 +12,27 @@ export const columns: BasicColumn[] = [
   {
     title: '序号',
     dataIndex: 'id',
-    width: 200,
+    width: 280,
   },
   {
     title: '名称',
     dataIndex: 'title',
-    width: 200,
+    width: 160,
   },
   {
     title: '商户',
-    dataIndex: 'innId',
-    width: 200,
+    dataIndex: 'innTitle',
+    width: 160,
   },
   {
     title: '分类',
-    dataIndex: 'catId',
-    width: 180,
+    dataIndex: 'catTitle',
+    width: 80,
   },
   {
     title: '使用SKU',
     dataIndex: 'hasSku',
-    width: 180,
+    width: 80,
     format: (_, record) => {
       return record?.hasSku ? '是' : '否';
     },
@@ -48,17 +48,17 @@ export const columns: BasicColumn[] = [
   {
     title: '价格',
     dataIndex: 'price',
-    width: 180,
+    width: 60,
   },
   {
     title: '排序',
     dataIndex: 'sortId',
-    width: 180,
+    width: 60,
   },
   {
     title: '状态',
     dataIndex: 'status',
-    width: 180,
+    width: 60,
   },
   // {
   //   title: '总库存',

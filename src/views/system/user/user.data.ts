@@ -7,7 +7,7 @@ export const columns: BasicColumn[] = [
   {
     title: '序号',
     dataIndex: 'id',
-    width: 240,
+    width: 260,
   },
   {
     title: '用户名',
@@ -29,14 +29,14 @@ export const columns: BasicColumn[] = [
     dataIndex: 'description',
     width: 200,
   },
-  {
-    title: '分组',
-    dataIndex: 'group_id',
-    format: (_, record) => {
-      return record?.group?.name;
-    },
-    width: 80,
-  },
+  // {
+  //   title: '分组',
+  //   dataIndex: 'group_id',
+  //   format: (_, record) => {
+  //     return record?.group?.name;
+  //   },
+  //   width: 80,
+  // },
 ];
 
 export const searchFormSchema: FormSchema[] = [

@@ -12,22 +12,22 @@ export const columns: BasicColumn[] = [
   {
     title: '名称',
     dataIndex: 'title',
-    width: 200,
+    width: 80,
   },
   {
     title: '所属商户',
-    dataIndex: 'innId',
-    width: 200,
+    dataIndex: 'innTitle',
+    width: 160,
   },
   {
     title: '排序',
     dataIndex: 'sortId',
-    width: 180,
+    width: 60,
   },
   {
     title: '图片',
     dataIndex: 'imgId',
-    width: 180,
+    width: 80,
   },
   {
     title: '更新时间',

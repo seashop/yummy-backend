@@ -1,4 +1,3 @@
-import { listLevels } from '/@/api/customers/level';
 import { BasicColumn } from '/@/components/Table';
 import { FormSchema } from '/@/components/Table';
 import { dateUtil, formatToDateTime } from '/@/utils/dateUtil';
@@ -7,16 +6,19 @@ export const columns: BasicColumn[] = [
   {
     title: '序号',
     dataIndex: 'id',
-    width: 200,
+    width: 270,
   },
   {
     title: '订单类型',
-    dataIndex: 'nickname',
-    width: 200,
+    dataIndex: 'needPack',
+    width: 80,
+    format: (_, record) => {
+      return record?.needPack ? '打包' : '堂食';
+    },
   },
   {
     title: '商户',
-    dataIndex: 'innId',
+    dataIndex: 'innTitle',
     width: 180,
   },
   {
@@ -29,12 +31,17 @@ export const columns: BasicColumn[] = [
   },
   {
     title: '顾客',
-    dataIndex: 'accountId',
+    dataIndex: 'accountTitle',
     width: 180,
   },
   {
     title: '订单金额',
     dataIndex: 'total',
+    width: 80,
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
     width: 180,
   },
 ];
@@ -50,28 +57,9 @@ export const searchFormSchema: FormSchema[] = [
 
 export const formSchema: FormSchema[] = [
   {
-    field: 'level_id',
-    label: '等级',
+    field: 'total',
+    label: '订单金额',
     required: true,
-    component: 'ApiSelect',
-    componentProps: {
-      api: listLevels,
-      resultField: 'items',
-      labelField: 'title',
-      valueField: 'id',
-    },
-    defaultValue: 0,
-  },
-  {
-    field: 'points',
-    label: '积分',
-    required: true,
-    component: 'Input',
-  },
-  {
-    field: 'money',
-    label: '金额',
-    required: true,
-    component: 'Input',
+    component: 'InputNumber',
   },
 ];
