@@ -10,123 +10,103 @@
     <BasicForm @register="registerForm">
       <template #picDrawer="{ model, field }">
         <template v-if="model[field]?.length > 0">
-          <Image :src="getImageUrlById(model[field])" :preview="false" />
+          <Image :src="imageUrl(model[field])" :preview="false" />
           <BasicButton :onClick="() => (model[field] = 0)">删除</BasicButton>
         </template>
-        <BasicButton v-else :onClick="openPictureDrawer()">选择图片</BasicButton>
+        <BasicButton v-else :onClick="openDrawer">选择图片</BasicButton>
       </template>
     </BasicForm>
   </BasicModal>
   <PictureDrawer
-    :innId="innId"
-    :images="images"
+    v-model:value="imgId"
+    :images="state.images"
     @register="registerDrawer"
     @reload="handlePictureDrawerRealod"
     @success="handlePictureDrawerSuccess"
   />
 </template>
 
-<script lang="ts">
-  import { defineComponent, ref, computed, reactive, toRefs } from 'vue';
+<script lang="ts" setup>
+  import { ref, computed, reactive } from 'vue';
   import { Image } from 'ant-design-vue';
+  import { imageUrl, listImages } from '/@/api/asset/image';
   import { useDrawer } from '/@/components/Drawer';
   import { BasicForm, useForm } from '/@/components/Form/index';
-  import { formSchema } from './category.data';
   import { BasicModal, useModalInner } from '/@/components/Modal';
   import PictureDrawer from '/@/components/AssetPicker/PictureDrawer.vue';
   import BasicButton from '/@/components/Button/src/BasicButton.vue';
-  import { imageUrl, listImages } from '/@/api/asset/image';
   import { Image as ImageItem } from '/@/gen/yummy/v1/storage';
+  import { formSchema } from './category.data';
+  import { get } from 'lodash-es';
 
-  export default defineComponent({
-    name: 'CategoryModal',
-    components: { Image, BasicModal, BasicForm, PictureDrawer, BasicButton },
-    emits: ['success', 'register'],
-    setup(_, { emit }) {
-      const state = reactive({
-        innId: '',
-        isUpdate: ref(true),
-        images: ref<ImageItem[]>([]),
-        rowId: ref(''),
+  const emit = defineEmits(['success', 'register']);
+  const state = reactive({
+    isUpdate: ref(true),
+    images: ref<ImageItem[]>([]),
+    rowId: ref(''),
+  });
+
+  const [registerDrawer, { openDrawer }] = useDrawer();
+
+  const [registerForm, { resetSchema, getFieldsValue, setFieldsValue, validate }] = useForm({
+    labelWidth: 90,
+    baseColProps: { span: 24 },
+    schemas: formSchema,
+    showActionButtonGroup: false,
+  });
+
+  const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+    resetSchema(formSchema);
+    setModalProps({ confirmLoading: false });
+    state.isUpdate = !!data?.isUpdate;
+    state.images = (await listImages()).images ?? [];
+
+    if (state.isUpdate) {
+      state.rowId = data.record.id;
+      setFieldsValue({
+        ...data.record,
       });
+    }
+  });
 
-      const [registerDrawer, { openDrawer }] = useDrawer();
-      function openPictureDrawer() {
-        state.innId = getFieldsValue()['innId'];
-        return openDrawer;
-      }
+  const getTitle = computed(() => (!state.isUpdate ? '新增分类' : '编辑分类'));
 
-      const [registerForm, { resetSchema, getFieldsValue, setFieldsValue, validate }] = useForm({
-        labelWidth: 90,
-        baseColProps: { span: 24 },
-        schemas: formSchema,
-        showActionButtonGroup: false,
+  const imgId = computed({
+    get: () => {
+      console.log(getFieldsValue());
+      return get(getFieldsValue(), 'imgId');
+    },
+    set: (val) => {
+      setFieldsValue({
+        imgId: val,
       });
-
-      const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
-        resetSchema(formSchema);
-        setModalProps({ confirmLoading: false });
-        state.isUpdate = !!data?.isUpdate;
-        state.images = (await listImages()).images ?? [];
-
-        if (state.isUpdate) {
-          state.rowId = data.record.id;
-          setFieldsValue({
-            ...data.record,
-          });
-        }
-      });
-
-      const getTitle = computed(() => (!state.isUpdate ? '新增分类' : '编辑分类'));
-
-      function getImageUrlById(id: String) {
-        for (let index = 0; index < state.images.length; index++) {
-          const image = state.images[index];
-          if (image.id == id) {
-            return imageUrl(image.id);
-          }
-        }
-        return '';
-      }
-
-      async function handlePictureDrawerRealod() {
-        state.images = (await listImages()).images ?? [];
-      }
-
-      function handlePictureDrawerSuccess({ ids }) {
-        setFieldsValue({
-          imgId: ids?.length > 0 ? ids[0] : null,
-        });
-      }
-
-      async function handleSubmit() {
-        try {
-          const values = await validate();
-          setModalProps({ confirmLoading: true });
-          closeModal();
-          emit('success', {
-            isUpdate: state.isUpdate,
-            values: { ...values, id: state.isUpdate ? state.rowId : undefined },
-          });
-        } catch (e) {
-          console.log(e);
-        } finally {
-          setModalProps({ confirmLoading: false });
-        }
-      }
-
-      return {
-        ...toRefs(state),
-        registerModal,
-        registerForm,
-        getTitle,
-        handleSubmit,
-        registerDrawer,
-        openPictureDrawer,
-        getImageUrlById,
-        handlePictureDrawerRealod,
-        handlePictureDrawerSuccess,
-      };
     },
   });
+
+  async function handlePictureDrawerRealod() {
+    state.images = (await listImages()).images ?? [];
+  }
+
+  function handlePictureDrawerSuccess({ ids }) {
+    console.log(ids);
+    // setFieldsValue({
+    //   imgId: ids?.length > 0 ? ids[0] : null,
+    // });
+  }
+
+  async function handleSubmit() {
+    try {
+      const values = await validate();
+      setModalProps({ confirmLoading: true });
+      closeModal();
+      emit('success', {
+        isUpdate: state.isUpdate,
+        values: { ...values, id: state.isUpdate ? state.rowId : undefined },
+      });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setModalProps({ confirmLoading: false });
+    }
+  }
 </script>

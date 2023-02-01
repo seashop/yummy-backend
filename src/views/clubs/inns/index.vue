@@ -35,8 +35,7 @@
     <DetailModal @register="registerModal" @success="handleUpdateSuccess" />
   </div>
 </template>
-<script lang="ts">
-  import { defineComponent } from 'vue';
+<script lang="ts" setup>
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { createInn, listInns, updateInn } from '/@/api/clubs/inns';
   import { useModal } from '/@/components/Modal';
@@ -46,92 +45,75 @@
   import { ListInnsRequest } from '/@/gen/yummy/v1/club_service';
   import { useGo } from '/@/hooks/web/usePage';
 
-  export default defineComponent({
-    name: 'InnManagement',
-    components: { BasicTable, DetailModal, TableAction },
-    setup() {
-      const { t } = useI18n();
-      const go = useGo();
+  const { t } = useI18n();
+  const go = useGo();
 
-      const [registerModal, { openModal }] = useModal();
-      const [registerTable, { reload, getForm }] = useTable({
-        title: t('routes.clubs.listInns'),
-        api: listInns,
-        handleSearchInfoFn: buildListRequest,
-        fetchSetting: {
-          listField: 'inns',
-        },
-        columns,
-        formConfig: {
-          labelWidth: 120,
-          schemas: searchFormSchema,
-        },
-        useSearchForm: true,
-        showTableSetting: true,
-        bordered: true,
-        showIndexColumn: false,
-        actionColumn: {
-          width: 160,
-          title: '操作',
-          dataIndex: 'action',
-          fixed: undefined,
-        },
-      });
-
-      function buildListRequest(): ListInnsRequest {
-        const params = getForm().getFieldsValue();
-        const filter = {
-          title: {
-            contains: params.title as string,
-          },
-        };
-        return { filter };
-      }
-
-      function handleCreate() {
-        openModal(true, {
-          isUpdate: false,
-        });
-      }
-
-      function handleEdit(record: Recordable) {
-        openModal(true, {
-          record,
-          isUpdate: true,
-        });
-      }
-
-      function handleEditConfig(record: Recordable) {
-        go(`/clubs/inns/${record.id}/config`);
-      }
-
-      function handleDelete(record: Recordable) {
-        console.log(record);
-      }
-
-      async function handleUpdateSuccess({ isUpdate, values }) {
-        if (isUpdate) {
-          const result = await updateInn(values);
-          console.log(result);
-        } else {
-          const result = await createInn(values);
-          console.log(result);
-        }
-        reload({
-          searchInfo: buildListRequest(),
-        });
-      }
-
-      return {
-        t,
-        registerTable,
-        registerModal,
-        handleCreate,
-        handleEdit,
-        handleEditConfig,
-        handleDelete,
-        handleUpdateSuccess,
-      };
+  const [registerModal, { openModal }] = useModal();
+  const [registerTable, { reload, getForm }] = useTable({
+    title: t('routes.clubs.listInns'),
+    api: listInns,
+    handleSearchInfoFn: buildListRequest,
+    fetchSetting: {
+      listField: 'inns',
+    },
+    columns,
+    formConfig: {
+      labelWidth: 120,
+      schemas: searchFormSchema,
+    },
+    useSearchForm: true,
+    showTableSetting: true,
+    bordered: true,
+    showIndexColumn: false,
+    actionColumn: {
+      width: 160,
+      title: '操作',
+      dataIndex: 'action',
+      fixed: undefined,
     },
   });
+
+  function buildListRequest(): ListInnsRequest {
+    const params = getForm().getFieldsValue();
+    const filter = {
+      title: {
+        contains: params.title as string,
+      },
+    };
+    return { filter };
+  }
+
+  function handleCreate() {
+    openModal(true, {
+      isUpdate: false,
+    });
+  }
+
+  function handleEdit(record: Recordable) {
+    openModal(true, {
+      record,
+      isUpdate: true,
+    });
+  }
+
+  function handleEditConfig(record: Recordable) {
+    go(`/clubs/inns/${record.id}/config`);
+  }
+
+  function handleDelete(record: Recordable) {
+    console.log(record);
+  }
+
+  async function handleUpdateSuccess({ isUpdate, values }) {
+    if (isUpdate) {
+      const result = await updateInn(values);
+      console.log(result);
+    } else {
+      const result = await createInn(values);
+      console.log(result);
+    }
+    reload({
+      searchInfo: buildListRequest(),
+    });
+  }
 </script>

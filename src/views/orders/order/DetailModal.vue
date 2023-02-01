@@ -10,7 +10,7 @@
     <BasicForm @register="registerForm">
       <template #picDrawer="{ model, field }">
         <template v-if="model[field] > 0">
-          <Image :src="getImageUrlById(model[field])" :preview="false" />
+          <Image :src="imageUrl(model[field])" :preview="false" />
           <BasicButton :onClick="() => (model[field] = 0)">删除</BasicButton>
         </template>
         <BasicButton v-else :onClick="openDrawer">选择图片</BasicButton>
@@ -66,16 +66,6 @@
   });
 
   const getTitle = '详情';
-
-  function getImageUrlById(id: string) {
-    for (let index = 0; index < images.value.length; index++) {
-      const image = images.value[index];
-      if (image.id == id) {
-        return imageUrl(image.id);
-      }
-    }
-    return '';
-  }
 
   async function handlePictureDrawerRealod() {
     images.value = (await listImages()).images ?? [];
