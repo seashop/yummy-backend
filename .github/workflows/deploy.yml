@@ -56,7 +56,7 @@ jobs:
   #         ARGS: --delete --verbose --parallel=80
 
   push-to-gh-pages:
-    if: "contains(github.event.head_commit.message, '[stage]')"
+    if: "contains(github.event.head_commit.message, '[stage]') || github.event_name == 'workflow_dispatch'"
     runs-on: ubuntu-latest
     environment: github-pages
     steps:
