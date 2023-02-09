@@ -14,14 +14,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive, ref, watch } from 'vue';
   import { Button, Card, Tabs } from 'ant-design-vue';
   import { set, sortBy } from 'lodash-es';
+  import { computed, onMounted, reactive, ref, watch } from 'vue';
+  import { useRoute } from 'vue-router';
   import { ConfigGroupItem } from '/@/api/system/model/configModel';
-  import { BasicForm, useForm } from '/@/components/Form';
+  import { BasicForm, FormSchema, useForm } from '/@/components/Form';
   import { ComponentType } from '/@/components/Form/src/types';
   import { useMessage } from '/@/hooks/web/useMessage';
-  import { useRoute } from 'vue-router';
   import { listInnConfigs, batchUpdateInnConfigs } from '/@/api/clubs/inns';
   import { InnConfig, InnConfig_Cat } from '/@/gen/yummy/v1/club';
   import { isBoolean, isNumber } from '/@/utils/is';
@@ -91,9 +91,13 @@
             component: item.component as ComponentType,
             label: item.title as string,
             required: true,
-          };
-          if (item.props instanceof Object) {
-            set(formSchema, 'componentProps', { ...item.props });
+          } as FormSchema;
+          if (item.props && item.props.length > 0) {
+            set(formSchema, 'componentProps', JSON.parse(item.props));
+            // formSchema.componentProps = {
+            //   valueFormat: 'HH:mm:ss',
+            //   format: 'HH:mm',
+            // };
           }
           switch (item.component) {
             case 'Switch':
@@ -107,7 +111,7 @@
               set(values, item.key as string, item.value);
               break;
           }
-          console.log('----', item, formSchema);
+          console.log('----', { item, formSchema });
           appendSchemaByField(formSchema, '');
         });
         setFieldsValue(values);
